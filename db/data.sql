@@ -5,7 +5,7 @@ use MoneyDodo;
 drop table user;
 # 用户
 create table if not exists user (
-	id varchar(20) primary key COMMENT '学号',
+	id varchar(20) not null primary key COMMENT '学号',
     name varchar(20) not null COMMENT '姓名',
     password varchar(20) not null COMMENT '密码',
     introduction text COMMENT '个人简介',

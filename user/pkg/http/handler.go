@@ -50,15 +50,20 @@ func encodeGetSpecResponse(ctx context.Context, w http1.ResponseWriter, response
 
 // makeGetAllHandler creates the handler logic
 func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/get-all").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetAllEndpoint, decodeGetAllRequest, encodeGetAllResponse, options...)))
+	m.Methods("GET").Path("/api/users").Handler(
+		handlers.CORS(
+			handlers.AllowedMethods([]string{"GET"}),
+			handlers.AllowedOrigins([]string{"*"}),
+		)(http.NewServer(endpoints.GetAllEndpoint, decodeGetAllRequest, encodeGetAllResponse, options...)),
+	)
 }
 
 // decodeGetAllRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeGetAllRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.GetAllRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	// err := json.NewDecoder(r.Body).Decode(&req)
+	return req, nil
 }
 
 // encodeGetAllResponse is a transport/http.EncodeResponseFunc that encodes
@@ -75,15 +80,26 @@ func encodeGetAllResponse(ctx context.Context, w http1.ResponseWriter, response 
 
 // makeGetUDFHandler creates the handler logic
 func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/get-udf").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetUDFEndpoint, decodeGetUDFRequest, encodeGetUDFResponse, options...)))
+	m.Methods("GET").Path("/api/users/{username}").Handler(
+		handlers.CORS(
+			handlers.AllowedMethods([]string{"GET"}),
+			handlers.AllowedOrigins([]string{"*"}),
+		)(http.NewServer(endpoints.GetUDFEndpoint, decodeGetUDFRequest, encodeGetUDFResponse, options...)),
+	)
 }
 
 // decodeGetUDFRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeGetUDFRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.GetUDFRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	name, ok := vars["username"]
+	if !ok {
+		return nil, errors.New("not a valid username")
+	}
+	req := endpoint.GetUDFRequest{
+		Name: name,
+	}
+	return req, nil
 }
 
 // encodeGetUDFResponse is a transport/http.EncodeResponseFunc that encodes
@@ -100,7 +116,12 @@ func encodeGetUDFResponse(ctx context.Context, w http1.ResponseWriter, response 
 
 // makePostHandler creates the handler logic
 func makePostHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/post").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PostEndpoint, decodePostRequest, encodePostResponse, options...)))
+	m.Methods("POST").Path("/api/users").Handler(
+		handlers.CORS(
+			handlers.AllowedMethods([]string{"POST"}),
+			handlers.AllowedOrigins([]string{"*"}),
+		)(http.NewServer(endpoints.PostEndpoint, decodePostRequest, encodePostResponse, options...)),
+	)
 }
 
 // decodePostRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -150,7 +171,12 @@ func encodePatchResponse(ctx context.Context, w http1.ResponseWriter, response i
 
 // makePutHandler creates the handler logic
 func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/put").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PutEndpoint, decodePutRequest, encodePutResponse, options...)))
+	m.Methods("PUT").Path("/api/users/{userid:[0-9]+}").Handler(
+		handlers.CORS(
+			handlers.AllowedMethods([]string{"PUT"}),
+			handlers.AllowedOrigins([]string{"*"}),
+		)(http.NewServer(endpoints.PutEndpoint, decodePutRequest, encodePutResponse, options...)),
+	)
 }
 
 // decodePutRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -158,6 +184,12 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 func decodePutRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.PutRequest{}
 	err := json.NewDecoder(r.Body).Decode(&req)
+	vars := mux.Vars(r)
+	id, ok := vars["userid"]
+	if !ok {
+		return nil, errors.New("not a valid ID")
+	}
+	req.Id = id
 	return req, err
 }
 
@@ -175,15 +207,26 @@ func encodePutResponse(ctx context.Context, w http1.ResponseWriter, response int
 
 // makeDeleteHandler creates the handler logic
 func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/delete").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.DeleteEndpoint, decodeDeleteRequest, encodeDeleteResponse, options...)))
+	m.Methods("DELETE").Path("/api/users/{userid:[0-9]+}").Handler(
+		handlers.CORS(
+			handlers.AllowedMethods([]string{"DELETE"}),
+			handlers.AllowedOrigins([]string{"*"}),
+		)(http.NewServer(endpoints.DeleteEndpoint, decodeDeleteRequest, encodeDeleteResponse, options...)),
+	)
 }
 
 // decodeDeleteRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeDeleteRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.DeleteRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["userid"]
+	if !ok {
+		return nil, errors.New("not a valid ID")
+	}
+	req := endpoint.DeleteRequest{
+		Id: id,
+	}
+	return req, nil
 }
 
 // encodeDeleteResponse is a transport/http.EncodeResponseFunc that encodes

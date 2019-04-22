@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/money-hub/MoneyDodo.service/db"
@@ -12,51 +13,75 @@ import (
 type UserService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
-	GetSpec(ctx context.Context, id string) (bool, error, interface{})
-	GetAll(ctx context.Context) (bool, error, interface{})
-	GetUDF(ctx context.Context, name string) (bool, error, interface{})
-	Post(ctx context.Context, user model.User) (bool, error, interface{})
-	Patch(ctx context.Context, user model.User) (bool, error, interface{})
-	Put(ctx context.Context, user model.User) (bool, error, interface{})
-	Delete(ctx context.Context, id string) (bool, error, interface{})
+	GetSpec(ctx context.Context, id string) (bool, error, *model.User)
+	GetAll(ctx context.Context) (bool, error, []model.User)
+	GetUDF(ctx context.Context, name string) (bool, error, []model.User)
+	Post(ctx context.Context, user model.User) (bool, error, *model.User)
+	Patch(ctx context.Context, id string, user model.User) (bool, error, *model.User)
+	Put(ctx context.Context, id string, user model.User) (bool, error, *model.User)
+	Delete(ctx context.Context, id string) (bool, error, *model.User)
 }
 
 type basicUserService struct {
 	*db.DBService
 }
 
-func (b *basicUserService) GetSpec(ctx context.Context, id string) (bool, error, interface{}) {
+func (b *basicUserService) GetSpec(ctx context.Context, id string) (bool, error, *model.User) {
 	// TODO implement the business logic of GetSpec
 	user := &model.User{
 		Id: id,
 	}
 	ok, err := b.Engine().Get(user)
-	log.Println(ok, err)
+	if ok == false {
+		user = nil
+	}
 	return ok, err, user
 }
-func (b *basicUserService) GetAll(ctx context.Context) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) GetAll(ctx context.Context) (bool, error, []model.User) {
 	// TODO implement the business logic of GetAll
-	return b0, e1, i2
+	users := make([]model.User, 0)
+	err := b.Engine().Find(&users)
+	ok := true
+	if err != nil {
+		ok = false
+	}
+	return ok, err, users
 }
-func (b *basicUserService) GetUDF(ctx context.Context, name string) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) GetUDF(ctx context.Context, name string) (bool, error, []model.User) {
 	// TODO implement the business logic of GetUDF
-	return b0, e1, i2
+	_, err, users := b.GetAll(ctx)
+	udfUsers := make([]model.User, 0)
+	for _, user := range users {
+		if user.Name == name {
+			udfUsers = append(udfUsers, user)
+		}
+	}
+	return len(udfUsers) > 0, err, udfUsers
 }
-func (b *basicUserService) Post(ctx context.Context, user model.User) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) Post(ctx context.Context, user model.User) (bool, error, *model.User) {
 	// TODO implement the business logic of Post
-	return b0, e1, i2
+	if user.Id == "" {
+		return false, errors.New("not a valid userid"), nil
+	}
+	row, err := b.Engine().Insert(user)
+	return row > 0, err, nil
 }
-func (b *basicUserService) Patch(ctx context.Context, user model.User) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) Patch(ctx context.Context, id string, user model.User) (b0 bool, e1 error, i2 *model.User) {
 	// TODO implement the business logic of Patch
 	return b0, e1, i2
 }
-func (b *basicUserService) Put(ctx context.Context, user model.User) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) Put(ctx context.Context, id string, user model.User) (bool, error, *model.User) {
 	// TODO implement the business logic of Put
-	return b0, e1, i2
+	row, err := b.Engine().Where("id = ?", id).AllCols().Update(user)
+	return row > 0, err, nil
 }
-func (b *basicUserService) Delete(ctx context.Context, id string) (b0 bool, e1 error, i2 interface{}) {
+func (b *basicUserService) Delete(ctx context.Context, id string) (bool, error, *model.User) {
 	// TODO implement the business logic of Delete
-	return b0, e1, i2
+	user := model.User{
+		Id: id,
+	}
+	row, err := b.Engine().Delete(user)
+	return row > 0, err, nil
 }
 
 // NewBasicUserService returns a naive, stateless implementation of UserService.
