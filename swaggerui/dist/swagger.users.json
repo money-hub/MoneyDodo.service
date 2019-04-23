@@ -1,0 +1,290 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/api/users": {
+      "get": {
+        "description": "Get all users' profiles",
+        "tags": [
+          "users"
+        ],
+        "summary": "Get all users' profiles",
+        "operationId": "UserList",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggUsersResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      },
+      "post": {
+        "description": "If the user's id is \"exists\", error will be returned.",
+        "tags": [
+          "users"
+        ],
+        "summary": "Create a new user with the profile.",
+        "operationId": "swaggCreateUserReq",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggNoReturnValue"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    },
+    "/api/users/{userid}": {
+      "get": {
+        "description": "You need to specify the userid to get the detail profile about the user.",
+        "tags": [
+          "users"
+        ],
+        "summary": "Get the user's profile with userid.",
+        "operationId": "User",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id of user",
+            "name": "userid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggUserResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      },
+      "put": {
+        "description": "Update the user profile with the profile. Also, you need to specify the user ID.",
+        "tags": [
+          "users"
+        ],
+        "summary": "Update the user profile",
+        "operationId": "swaggUpdateUserReq",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id of user",
+            "name": "userid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggNoReturnValue"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      },
+      "delete": {
+        "description": "You need to specify the user ID to delete the user .",
+        "tags": [
+          "users"
+        ],
+        "summary": "Delete the user",
+        "operationId": "User",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id of user",
+            "name": "userid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggNoReturnValue"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    },
+    "/api/users/{username}": {
+      "get": {
+        "description": "Get all users' profiles",
+        "tags": [
+          "users"
+        ],
+        "summary": "Get all users' profiles",
+        "operationId": "UserList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "name of user",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggUsersResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Balance"
+        },
+        "creditScore": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CreditScore"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "icon": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int8"
+          },
+          "x-go-name": "Icon"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "introduction": {
+          "type": "string",
+          "x-go-name": "Introduction"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    }
+  },
+  "responses": {
+    "swaggBadReq": {
+      "description": "Error Fail",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "HTTP Status Code 200",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggNoReturnValue": {
+      "description": "Error Fail",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "HTTP Status Code 200",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggUserResp": {
+      "description": "HTTP status code 200 and user model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/User"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggUsersResp": {
+      "description": "HTTP status code 200 and an array of user models in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "User model",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/User"
+            },
+            "x-go-name": "Data"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    }
+  }
+}

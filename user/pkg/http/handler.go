@@ -14,6 +14,21 @@ import (
 
 // makeGetSpecHandler creates the handler logic
 func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation GET /api/users/{userid} users User
+	// ---
+	// summary: Get the user's profile with userid.
+	// description: You need to specify the userid to get the detail profile about the user.
+	// parameters:
+	// - name: userid
+	//   in: path
+	//   description: id of user
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggUserResp"
+	//   "400":
+	//     "$ref": "#/responses/swaggBadReq"
 	m.Methods("GET").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
@@ -39,10 +54,6 @@ func decodeGetSpecRequest(_ context.Context, r *http1.Request) (interface{}, err
 // encodeGetSpecResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodeGetSpecResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -50,6 +61,15 @@ func encodeGetSpecResponse(ctx context.Context, w http1.ResponseWriter, response
 
 // makeGetAllHandler creates the handler logic
 func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation GET /api/users users UserList
+	// ---
+	// summary: Get all users' profiles
+	// description: Get all users' profiles
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggUsersResp"
+	//   "400":
+	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("GET").Path("/api/users").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
@@ -69,10 +89,6 @@ func decodeGetAllRequest(_ context.Context, r *http1.Request) (interface{}, erro
 // encodeGetAllResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodeGetAllResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -80,6 +96,21 @@ func encodeGetAllResponse(ctx context.Context, w http1.ResponseWriter, response 
 
 // makeGetUDFHandler creates the handler logic
 func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation GET /api/users/{username} users UserList
+	// ---
+	// summary: Get all users' profiles
+	// description: Get all users' profiles
+	// parameters:
+	// - name: username
+	//   in: path
+	//   description: name of user
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggUsersResp"
+	//   "400":
+	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("GET").Path("/api/users/{username}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
@@ -105,10 +136,6 @@ func decodeGetUDFRequest(_ context.Context, r *http1.Request) (interface{}, erro
 // encodeGetUDFResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodeGetUDFResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -116,6 +143,12 @@ func encodeGetUDFResponse(ctx context.Context, w http1.ResponseWriter, response 
 
 // makePostHandler creates the handler logic
 func makePostHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:route POST /api/users users swaggCreateUserReq
+	// Create a new user with the profile.
+	// If the user's id is "exists", error will be returned.
+	// responses:
+	//   200: swaggNoReturnValue
+	//   400: swaggBadReq
 	m.Methods("POST").Path("/api/users").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"POST"}),
@@ -135,10 +168,6 @@ func decodePostRequest(_ context.Context, r *http1.Request) (interface{}, error)
 // encodePostResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodePostResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -160,10 +189,6 @@ func decodePatchRequest(_ context.Context, r *http1.Request) (interface{}, error
 // encodePatchResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodePatchResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -171,6 +196,21 @@ func encodePatchResponse(ctx context.Context, w http1.ResponseWriter, response i
 
 // makePutHandler creates the handler logic
 func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation PUT /api/users/{userid} users swaggUpdateUserReq
+	// ---
+	// summary: Update the user profile
+	// description: Update the user profile with the profile. Also, you need to specify the user ID.
+	// parameters:
+	// - name: userid
+	//   in: path
+	//   description: id of user
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggNoReturnValue"
+	//   "400":
+	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("PUT").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"PUT"}),
@@ -196,10 +236,6 @@ func decodePutRequest(_ context.Context, r *http1.Request) (interface{}, error) 
 // encodePutResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodePutResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -207,6 +243,21 @@ func encodePutResponse(ctx context.Context, w http1.ResponseWriter, response int
 
 // makeDeleteHandler creates the handler logic
 func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation DELETE /api/users/{userid} users User
+	// ---
+	// summary: Delete the user
+	// description: You need to specify the user ID to delete the user .
+	// parameters:
+	// - name: userid
+	//   in: path
+	//   description: id of user
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggNoReturnValue"
+	//   "400":
+	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("DELETE").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"DELETE"}),
@@ -232,32 +283,7 @@ func decodeDeleteRequest(_ context.Context, r *http1.Request) (interface{}, erro
 // encodeDeleteResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
 func encodeDeleteResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
-	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
-		ErrorEncoder(ctx, f.Failed(), w)
-		return nil
-	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
-}
-func ErrorEncoder(_ context.Context, err error, w http1.ResponseWriter) {
-	w.WriteHeader(err2code(err))
-	json.NewEncoder(w).Encode(errorWrapper{Error: err.Error()})
-}
-func ErrorDecoder(r *http1.Response) error {
-	var w errorWrapper
-	if err := json.NewDecoder(r.Body).Decode(&w); err != nil {
-		return err
-	}
-	return errors.New(w.Error)
-}
-
-// This is used to set the http status, see an example here :
-// https://github.com/go-kit/kit/blob/master/examples/addsvc/pkg/addtransport/http.go#L133
-func err2code(err error) int {
-	return http1.StatusInternalServerError
-}
-
-type errorWrapper struct {
-	Error string `json:"error"`
 }

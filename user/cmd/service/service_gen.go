@@ -8,7 +8,6 @@ import (
 	opentracing "github.com/go-kit/kit/tracing/opentracing"
 	http "github.com/go-kit/kit/transport/http"
 	endpoint "github.com/money-hub/MoneyDodo.service/user/pkg/endpoint"
-	http1 "github.com/money-hub/MoneyDodo.service/user/pkg/http"
 	service "github.com/money-hub/MoneyDodo.service/user/pkg/service"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
@@ -21,13 +20,13 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
 	options := map[string][]http.ServerOption{
-		"Delete":  {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Delete", logger))},
-		"GetAll":  {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAll", logger))},
-		"GetSpec": {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetSpec", logger))},
-		"GetUDF":  {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetUDF", logger))},
-		"Patch":   {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Patch", logger))},
-		"Post":    {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Post", logger))},
-		"Put":     {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Put", logger))},
+		"Delete":  {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Delete", logger))},
+		"GetAll":  {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAll", logger))},
+		"GetSpec": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetSpec", logger))},
+		"GetUDF":  {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetUDF", logger))},
+		"Patch":   {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Patch", logger))},
+		"Post":    {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Post", logger))},
+		"Put":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Put", logger))},
 	}
 	return options
 }
