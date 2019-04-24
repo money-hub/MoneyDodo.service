@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	service "github.com/money-hub/MoneyDodo.service/authentication/pkg/service"
 )
@@ -32,7 +33,10 @@ func MakeGetOpenidEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 }
 
 // AdminLoginRequest collects the request parameters for the AdminLogin method.
-type AdminLoginRequest struct{}
+type AdminLoginRequest struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
 
 // AdminLoginResponse collects the response parameters for the AdminLogin method.
 type AdminLoginResponse struct {
@@ -44,7 +48,8 @@ type AdminLoginResponse struct {
 // MakeAdminLoginEndpoint returns an endpoint that invokes AdminLogin on the service.
 func MakeAdminLoginEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		status, errinfo, data := s.AdminLogin(ctx)
+		req := request.(AdminLoginRequest)
+		status, errinfo, data := s.AdminLogin(ctx, req.Name, req.Password)
 		return AdminLoginResponse{
 			Data:    data,
 			Errinfo: errinfo,
@@ -64,8 +69,11 @@ func (e Endpoints) GetOpenid(ctx context.Context, code string) (status bool, err
 }
 
 // AdminLogin implements Service. Primarily useful in a client.
-func (e Endpoints) AdminLogin(ctx context.Context) (status bool, errinfo string, data string) {
-	request := AdminLoginRequest{}
+func (e Endpoints) AdminLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
+	request := AdminLoginRequest{
+		Name:     name,
+		Password: password,
+	}
 	response, err := e.AdminLoginEndpoint(ctx, request)
 	if err != nil {
 		return

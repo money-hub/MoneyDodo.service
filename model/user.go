@@ -2,7 +2,7 @@ package model
 
 type User struct {
 	Id           string  `json:"id"`
-	SId           string  `json:"sId"`
+	SId          string  `json:"sId"`
 	Name         string  `json:"name"`
 	Password     string  `json:"password" xorm:"->"`
 	Introduction string  `json:"introduction"`
@@ -11,4 +11,5 @@ type User struct {
 	Phone        string  `json:"phone"`
 	CreditScore  int     `json:"creditScore" xorm:"creditScore"`
 	Email        string  `json:"email"`
+	IsAuth       bool    `json:"isAuth"`
 }

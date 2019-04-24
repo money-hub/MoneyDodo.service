@@ -28,9 +28,9 @@ func (l loggingMiddleware) GetOpenid(ctx context.Context, code string) (status b
 	}()
 	return l.next.GetOpenid(ctx, code)
 }
-func (l loggingMiddleware) AdminLogin(ctx context.Context) (status bool, errinfo string, data string) {
+func (l loggingMiddleware) AdminLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
 	defer func() {
-		l.logger.Log("method", "AdminLogin", "status", status, "errinfo", errinfo, "data", data)
+		l.logger.Log("method", "AdminLogin", "name", name, "password", password, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.AdminLogin(ctx)
+	return l.next.AdminLogin(ctx, name, password)
 }

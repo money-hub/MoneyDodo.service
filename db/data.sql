@@ -2,7 +2,7 @@
 create database if not exists MoneyDodo;
 
 use MoneyDodo;
-drop table user;
+
 # 用户
 create table if not exists user (
 	id varchar(20) not null primary key COMMENT 'OpenId',
@@ -13,7 +13,8 @@ create table if not exists user (
     icon MEDIUMBLOB COMMENT '头像',
     phone varchar(11) COMMENT '电话号码',
     creditScore int COMMENT '信用分数',
-    email varchar(20) COMMENT '邮箱'
+    email varchar(20) COMMENT '邮箱',
+    isAuth boolean default false COMMENT '是否认证'
 );
 
 # 管理员
