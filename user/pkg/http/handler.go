@@ -161,7 +161,7 @@ func makePostHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http
 // JSON-encoded request from the HTTP request body.
 func decodePostRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.PostRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req.User)
 	return req, err
 }
 
@@ -206,6 +206,10 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 	//   description: id of user
 	//   type: string
 	//   required: true
+	// - name: Body
+	//   in: body
+	//   schema:
+	//     "$ref": "#/definitions/User"
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggNoReturnValue"
@@ -223,7 +227,7 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 // JSON-encoded request from the HTTP request body.
 func decodePutRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.PutRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req.User)
 	vars := mux.Vars(r)
 	id, ok := vars["userid"]
 	if !ok {

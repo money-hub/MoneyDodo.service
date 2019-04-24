@@ -87,6 +87,13 @@
             "schema": {
               "$ref": "#/definitions/User"
             }
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           }
         ],
         "responses": {
