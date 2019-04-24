@@ -2,6 +2,7 @@ package model
 
 type User struct {
 	Id           string  `json:"id"`
+	SId           string  `json:"sId"`
 	Name         string  `json:"name"`
 	Password     string  `json:"password" xorm:"->"`
 	Introduction string  `json:"introduction"`
