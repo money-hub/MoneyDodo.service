@@ -22,15 +22,15 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) GetOpenId(ctx context.Context, code string) (e0 error, s1 string, s2 string) {
+func (l loggingMiddleware) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
 	defer func() {
-		l.logger.Log("method", "GetOpenId", "code", code, "e0", e0, "s1", s1, "s2", s2)
+		l.logger.Log("method", "GetOpenid", "code", code, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.GetOpenId(ctx, code)
+	return l.next.GetOpenid(ctx, code)
 }
-func (l loggingMiddleware) AdminLogin(ctx context.Context, username string, password string) (e0 error, b1 bool, s2 string) {
+func (l loggingMiddleware) AdminLogin(ctx context.Context) (status bool, errinfo string, data string) {
 	defer func() {
-		l.logger.Log("method", "AdminLogin", "username", username, "password", password, "e0", e0, "b1", b1, "s2", s2)
+		l.logger.Log("method", "AdminLogin", "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.AdminLogin(ctx, username, password)
+	return l.next.AdminLogin(ctx)
 }

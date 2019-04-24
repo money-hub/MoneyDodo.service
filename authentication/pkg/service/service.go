@@ -1,25 +1,74 @@
 package service
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
+type WeChatRes struct {
+	Openid      string `json:"openid"`
+	Session_key string `json:"session_key"`
+	Errcode     int    `json:"errcode"`
+	Errmsg      string `json:"errmsg"`
+}
 
 // AuthenticationService describes the service.
 type AuthenticationService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
-	GetOpenId(ctx context.Context, code string) (error, string, string)
 
-	AdminLogin(ctx context.Context, username string, password string) (error, bool, string)
+	// data - token
+
+	// 微信小程序
+	GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string)
+
+	// 管理员Web
+	AdminLogin(ctx context.Context) (status bool, errinfo string, data string)
 }
 
 type basicAuthenticationService struct{}
 
-func (b *basicAuthenticationService) GetOpenId(ctx context.Context, code string) (e0 error, s1 string, s2 string) {
-	// TODO implement the business logic of GetOpenId
-	return e0, s1, s2
+func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
+	// TODO implement the business logic of GetOpenid
+
+	// https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
+
+	var AppId = "wx6f4b63c2710e1bae"
+	var AppSecret = "2f11628e5f62c350247e8deb24a9814b"
+
+	//构造url
+	url := "https://api.weixin.qq.com/sns/jscode2session?appid=" + AppId +
+		"&secret=" + AppSecret +
+		"&js_code=" + code +
+		"&grant_type=authorization_code"
+
+	res, err := http.Get(url)
+
+	if err != nil {
+		return false, err.Error(), ""
+	}
+
+	defer res.Body.Close() //关闭链接
+
+	body, _ := ioutil.ReadAll(res.Body)
+	var info WeChatRes
+	if err := json.Unmarshal(body, &info); err == nil {
+		if info.Errcode == 0 {
+			return true, "", info.Openid
+		} else {
+			return false, info.Errmsg, ""
+		}
+	} else {
+		return false, err.Error(), ""
+	}
 }
-func (b *basicAuthenticationService) AdminLogin(ctx context.Context, username string, password string) (e0 error, b1 bool, s2 string) {
+
+func (b *basicAuthenticationService) AdminLogin(ctx context.Context) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of AdminLogin
-	return e0, b1, s2
+
+	return status, errinfo, data
 }
 
 // NewBasicAuthenticationService returns a naive, stateless implementation of AuthenticationService.

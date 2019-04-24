@@ -6,93 +6,69 @@ import (
 	service "github.com/money-hub/MoneyDodo.service/authentication/pkg/service"
 )
 
-// GetOpenIdRequest collects the request parameters for the GetOpenId method.
-type GetOpenIdRequest struct {
+// GetOpenidRequest collects the request parameters for the GetOpenid method.
+type GetOpenidRequest struct {
 	Code string `json:"code"`
 }
 
-// GetOpenIdResponse collects the response parameters for the GetOpenId method.
-type GetOpenIdResponse struct {
-	E0 error  `json:"e0"`
-	S1 string `json:"s1"`
-	S2 string `json:"s2"`
+// GetOpenidResponse collects the response parameters for the GetOpenid method.
+type GetOpenidResponse struct {
+	Status  bool   `json:"status"`
+	Errinfo string `json:"errinfo"`
+	Data    string `json:"data"`
 }
 
-// MakeGetOpenIdEndpoint returns an endpoint that invokes GetOpenId on the service.
-func MakeGetOpenIdEndpoint(s service.AuthenticationService) endpoint.Endpoint {
+// MakeGetOpenidEndpoint returns an endpoint that invokes GetOpenid on the service.
+func MakeGetOpenidEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetOpenIdRequest)
-		e0, s1, s2 := s.GetOpenId(ctx, req.Code)
-		return GetOpenIdResponse{
-			E0: e0,
-			S1: s1,
-			S2: s2,
+		req := request.(GetOpenidRequest)
+		status, errinfo, data := s.GetOpenid(ctx, req.Code)
+		return GetOpenidResponse{
+			Data:    data,
+			Errinfo: errinfo,
+			Status:  status,
 		}, nil
 	}
 }
 
-// Failed implements Failer.
-func (r GetOpenIdResponse) Failed() error {
-	return r.E0
-}
-
 // AdminLoginRequest collects the request parameters for the AdminLogin method.
-type AdminLoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
+type AdminLoginRequest struct{}
 
 // AdminLoginResponse collects the response parameters for the AdminLogin method.
 type AdminLoginResponse struct {
-	E0 error  `json:"e0"`
-	B1 bool   `json:"b1"`
-	S2 string `json:"s2"`
+	Status  bool   `json:"status"`
+	Errinfo string `json:"errinfo"`
+	Data    string `json:"data"`
 }
 
 // MakeAdminLoginEndpoint returns an endpoint that invokes AdminLogin on the service.
 func MakeAdminLoginEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(AdminLoginRequest)
-		e0, b1, s2 := s.AdminLogin(ctx, req.Username, req.Password)
+		status, errinfo, data := s.AdminLogin(ctx)
 		return AdminLoginResponse{
-			B1: b1,
-			E0: e0,
-			S2: s2,
+			Data:    data,
+			Errinfo: errinfo,
+			Status:  status,
 		}, nil
 	}
 }
 
-// Failed implements Failer.
-func (r AdminLoginResponse) Failed() error {
-	return r.E0
-}
-
-// Failure is an interface that should be implemented by response types.
-// Response encoders can check if responses are Failer, and if so they've
-// failed, and if so encode them using a separate write path based on the error.
-type Failure interface {
-	Failed() error
-}
-
-// GetOpenId implements Service. Primarily useful in a client.
-func (e Endpoints) GetOpenId(ctx context.Context, code string) (e0 error, s1 string, s2 string) {
-	request := GetOpenIdRequest{Code: code}
-	response, err := e.GetOpenIdEndpoint(ctx, request)
+// GetOpenid implements Service. Primarily useful in a client.
+func (e Endpoints) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
+	request := GetOpenidRequest{Code: code}
+	response, err := e.GetOpenidEndpoint(ctx, request)
 	if err != nil {
 		return
 	}
-	return response.(GetOpenIdResponse).E0, response.(GetOpenIdResponse).S1, response.(GetOpenIdResponse).S2
+	return response.(GetOpenidResponse).Status, response.(GetOpenidResponse).Errinfo, response.(GetOpenidResponse).Data
 }
 
 // AdminLogin implements Service. Primarily useful in a client.
-func (e Endpoints) AdminLogin(ctx context.Context, username string, password string) (e0 error, b1 bool, s2 string) {
-	request := AdminLoginRequest{
-		Password: password,
-		Username: username,
-	}
+func (e Endpoints) AdminLogin(ctx context.Context) (status bool, errinfo string, data string) {
+	request := AdminLoginRequest{}
 	response, err := e.AdminLoginEndpoint(ctx, request)
 	if err != nil {
 		return
 	}
-	return response.(AdminLoginResponse).E0, response.(AdminLoginResponse).B1, response.(AdminLoginResponse).S2
+	return response.(AdminLoginResponse).Status, response.(AdminLoginResponse).Errinfo, response.(AdminLoginResponse).Data
 }
