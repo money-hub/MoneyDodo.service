@@ -9,6 +9,49 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type decodeFunc func(ctx context.Context, r *http.Request) (interface{}, error)
+type encodeFunc func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+
+type Decodes struct {
+	GetSpecDecode   func(ctx context.Context, r *http.Request) (interface{}, error)
+	GetAllDecode    func(ctx context.Context, r *http.Request) (interface{}, error)
+	PostClaimDecode func(ctx context.Context, r *http.Request) (interface{}, error)
+	PostDecode      func(ctx context.Context, r *http.Request) (interface{}, error)
+	PutDecode       func(ctx context.Context, r *http.Request) (interface{}, error)
+	DeleteDecode    func(ctx context.Context, r *http.Request) (interface{}, error)
+}
+
+type Encodes struct {
+	GetSpecEncode   func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+	GetAllEncode    func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+	PostClaimEncode func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+	PostEncode      func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+	PutEncode       func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+	DeleteEncode    func(ctx context.Context, w http.ResponseWriter, response interface{}) (err error)
+}
+
+func MakeServerDecodes() Decodes {
+	return Decodes{
+		GetSpecDecode:   decodeGetSpecRequest,
+		GetAllDecode:    decodeGetAllRequest,
+		PostClaimDecode: decodePostClaimRequest,
+		PostDecode:      decodePostRequest,
+		PutDecode:       decodePutRequest,
+		DeleteDecode:    decodeDeleteRequest,
+	}
+}
+
+func MakeServerEncodes() Encodes {
+	return Encodes{
+		GetSpecEncode:   encodeGetSpecResponse,
+		GetAllEncode:    encodeGetAllResponse,
+		PostClaimEncode: encodePostClaimResponse,
+		PostEncode:      encodePostResponse,
+		PutEncode:       encodePutResponse,
+		DeleteEncode:    encodeDeleteResponse,
+	}
+}
+
 // decodeGetSpecRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded requestfrom the HTTP request body.
 func decodeGetSpecRequest(ctx context.Context, r *http.Request) (interface{}, error) {

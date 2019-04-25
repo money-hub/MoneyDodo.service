@@ -7,6 +7,27 @@ import (
 	"github.com/money-hub/MoneyDodo.service/model"
 )
 
+type Endpoints struct {
+	GetSpecEndpoint   endpoint.Endpoint
+	GetAllEndpoint    endpoint.Endpoint
+	PostClaimEndpoint endpoint.Endpoint
+	PostEndpoint      endpoint.Endpoint
+	PutEndpoint       endpoint.Endpoint
+	DeleteEndpoint    endpoint.Endpoint
+}
+
+func MakeServerEndpoints(s PTaskService) Endpoints {
+	eps := Endpoints{
+		GetSpecEndpoint:   MakeGetSpecEndpoint(s),
+		GetAllEndpoint:    MakeGetAllEndpoint(s),
+		PostClaimEndpoint: MakePostClaimEndpoint(s),
+		PostEndpoint:      MakePostEndpoint(s),
+		PutEndpoint:       MakePutEndpoint(s),
+		DeleteEndpoint:    MakeDeleteEndpoint(s),
+	}
+	return eps
+}
+
 // GetSpecRequest collects the request parameters for the GetSpec method.
 type GetSpecRequest struct {
 	UserId string `json:"userId"`

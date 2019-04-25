@@ -13,7 +13,7 @@ create table if not exists user (
     icon MEDIUMBLOB COMMENT '头像',
     phone varchar(11) COMMENT '电话号码',
     creditScore int COMMENT '信用分数',
-    email varchar(20) COMMENT '邮箱'
+    email varchar(50) COMMENT '邮箱'
 );
 
 # 管理员
@@ -39,4 +39,11 @@ create table if not exists task (
     cutoffTime text COMMENT '截至时间',
     rewardAmount double COMMENT '赏金金额',
     taskStatus varchar(20) COMMENT '任务状态'
+);
+
+# 用户-任务
+create table if not exists admin (
+    userId varchar(20) not null COMMENT '用户Id',
+    taskId varchar(20) not null COMMENT '任务Id',
+    detail varchar(20) not null COMMENT '发布或者接受'
 );

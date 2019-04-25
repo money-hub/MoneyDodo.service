@@ -3,7 +3,7 @@ package model
 type Relation struct {
 	UserId string `json:"userId" xorm:"userId"`
 	TaskId string `json:"taskId" xorm:"taskId"`
-	Detail string `json:"info" xorm:"Info"` // release or claim
+	Detail string `json:"detail" xorm:"detail"` // release or claim
 }
 
 func NewEmptyRelation() Relation {
