@@ -135,7 +135,7 @@ func MakePostClaimEndpoint(s PTaskService) endpoint.Endpoint {
 type DeleteRequest struct {
 	UserId string `json:"userId"`
 	TaskId string `json:"taskId"`
-	Detail string `json:"detail"`
+	Status string `json:"status"`
 }
 
 // DeleteResponse collects the response parameters for the Delete method.
@@ -149,7 +149,7 @@ type DeleteResponse struct {
 func MakeDeleteEndpoint(s PTaskService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteRequest)
-		status, errinfo, data := s.Delete(ctx, req.UserId, req.TaskId, req.Detail)
+		status, errinfo, data := s.Delete(ctx, req.UserId, req.TaskId, req.Status)
 		return DeleteResponse{
 			Status:  status,
 			Errinfo: errinfo,

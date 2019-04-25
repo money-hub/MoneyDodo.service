@@ -79,15 +79,15 @@ func (l *LoggingMiddleware) Put(ctx context.Context, userId string, taskId strin
 	return
 }
 
-func (l *LoggingMiddleware) Delete(ctx context.Context, userId string, taskId string, detail string) (status bool, errinfo string, data *model.Task) {
+func (l *LoggingMiddleware) Delete(ctx context.Context, userId string, taskId string, status string) (status1 bool, errinfo string, data *model.Task) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Delete",
-			"input", DeleteRequest{userId, taskId, detail},
-			"output", DeleteResponse{status, errinfo, data},
+			"input", DeleteRequest{userId, taskId, status},
+			"output", DeleteResponse{status1, errinfo, data},
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status, errinfo, data = l.Next.Delete(ctx, userId, taskId, detail)
+	status1, errinfo, data = l.Next.Delete(ctx, userId, taskId, status)
 	return
 }

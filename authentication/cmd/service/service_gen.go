@@ -8,7 +8,6 @@ import (
 	opentracing "github.com/go-kit/kit/tracing/opentracing"
 	http "github.com/go-kit/kit/transport/http"
 	endpoint "github.com/money-hub/MoneyDodo.service/authentication/pkg/endpoint"
-	http1 "github.com/money-hub/MoneyDodo.service/authentication/pkg/http"
 	service "github.com/money-hub/MoneyDodo.service/authentication/pkg/service"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
@@ -21,20 +20,20 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
 	options := map[string][]http.ServerOption{
-		"AdminLogin": {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminLogin", logger))},
-		"GetOpenId":  {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetOpenId", logger))},
+		"AdminLogin": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminLogin", logger))},
+		"GetOpenid":  {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetOpenid", logger))},
 	}
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
-	mw["GetOpenId"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetOpenId")), endpoint.InstrumentingMiddleware(duration.With("method", "GetOpenId"))}
+	mw["GetOpenid"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetOpenid")), endpoint.InstrumentingMiddleware(duration.With("method", "GetOpenid"))}
 	mw["AdminLogin"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AdminLogin")), endpoint.InstrumentingMiddleware(duration.With("method", "AdminLogin"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"GetOpenId", "AdminLogin"}
+	methods := []string{"GetOpenid", "AdminLogin"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}

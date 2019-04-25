@@ -65,7 +65,7 @@ func main() {
 	sub.Methods("POST").Path("/{userId:[0-9]+}/tasks/{taskId:[0-9]+}").Handler(postClaimHandler)
 	sub.Methods("POST").Path("/{userId:[0-9]+}/tasks").Handler(postHandler)
 	sub.Methods("PUT").Path("/{userId:[0-9]+}/tasks/{taskId:[0-9]+}").Handler(putHandler)
-	sub.Methods("DELETE").Path("/{userId:[0-9]+}/tasks/{taskId:[0-9]+}").Handler(deleteHandler)
+	sub.Methods("DELETE").Path("/{userId:[0-9]+}/tasks/{taskId:[0-9]+}").Handler(deleteHandler).Queries("status", "{status}")
 
 	n.UseHandler(router)
 	port := os.Getenv("PORT")

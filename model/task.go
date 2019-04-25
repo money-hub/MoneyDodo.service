@@ -2,13 +2,20 @@ package model
 
 import "time"
 
+const (
+	TaskStatusNone     = "non-released"
+	TaskStatusReleased = "released"
+	TaskStatusClaimed  = "claimed"
+	TaskStatusFinished = "finished"
+)
+
 type Task struct {
 	Id        string     `json:"id" xorm:"<-"`
 	Type      string     `json:"type"`
-	From      string     `json:"from"`
+	Publisher string     `json:"publisher"`
 	Recipient string     `json:"recipient"`
-	Limit     string     `json:"limit"`
-	Release   *time.Time `json:"release"`
+	Restrain  string     `json:"restrain"`
+	Pubdate   *time.Time `json:"pubdate"`
 	Cutoff    *time.Time `json:"cutoff"`
 	Reward    float64    `json:"reward"`
 	Status    string     `json:"status"`

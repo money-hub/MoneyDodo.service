@@ -10,7 +10,7 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	GetOpenIdEndpoint  endpoint.Endpoint
+	GetOpenidEndpoint  endpoint.Endpoint
 	AdminLoginEndpoint endpoint.Endpoint
 }
 
@@ -19,10 +19,10 @@ type Endpoints struct {
 func New(s service.AuthenticationService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
 		AdminLoginEndpoint: MakeAdminLoginEndpoint(s),
-		GetOpenIdEndpoint:  MakeGetOpenIdEndpoint(s),
+		GetOpenidEndpoint:  MakeGetOpenidEndpoint(s),
 	}
-	for _, m := range mdw["GetOpenId"] {
-		eps.GetOpenIdEndpoint = m(eps.GetOpenIdEndpoint)
+	for _, m := range mdw["GetOpenid"] {
+		eps.GetOpenidEndpoint = m(eps.GetOpenidEndpoint)
 	}
 	for _, m := range mdw["AdminLogin"] {
 		eps.AdminLoginEndpoint = m(eps.AdminLoginEndpoint)

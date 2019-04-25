@@ -156,11 +156,16 @@ func encodePostClaimResponse(ctx context.Context, w http.ResponseWriter, respons
 func decodePutRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	userId, ok := vars["userId"]
+	taskId, ok2 := vars["taskId"]
 	if !ok {
 		return nil, errors.New("not a valid userId")
 	}
+	if !ok2 {
+		return nil, errors.New("not a valid taskId")
+	}
 	req := PutRequest{
 		UserId: userId,
+		TaskId: taskId,
 	}
 	err := json.NewDecoder(r.Body).Decode(&req.Task)
 	return req, err
@@ -180,7 +185,7 @@ func decodeDeleteRequest(ctx context.Context, r *http.Request) (interface{}, err
 	vars := mux.Vars(r)
 	userId, ok1 := vars["userId"]
 	taskId, ok2 := vars["taskId"]
-	detail, ok3 := vars["detail"]
+	status, ok3 := vars["status"]
 	if !ok1 {
 		return nil, errors.New("not a valid userId")
 	}
@@ -188,12 +193,12 @@ func decodeDeleteRequest(ctx context.Context, r *http.Request) (interface{}, err
 		return nil, errors.New("not a valid taskId")
 	}
 	if !ok3 {
-		return nil, errors.New("not a valid detail")
+		return nil, errors.New("not a valid status")
 	}
 	req := DeleteRequest{
 		UserId: userId,
 		TaskId: taskId,
-		Detail: detail,
+		Status: status,
 	}
 	return req, nil
 }

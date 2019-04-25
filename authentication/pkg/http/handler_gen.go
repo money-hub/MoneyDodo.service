@@ -12,7 +12,7 @@ import (
 // predefined paths.
 func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.ServerOption) http1.Handler {
 	m := mux.NewRouter()
-	makeGetOpenIdHandler(m, endpoints, options["GetOpenId"])
+	makeGetOpenidHandler(m, endpoints, options["GetOpenid"])
 	makeAdminLoginHandler(m, endpoints, options["AdminLogin"])
 	return m
 }
