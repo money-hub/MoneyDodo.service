@@ -217,7 +217,7 @@ func (b *basicPTaskService) Put(ctx context.Context, userId string, taskId strin
 	}
 	// 发布者
 	if task1.Publisher == userId {
-		if task1.Status == model.TaskStatusReleased && task.Status == model.TaskStatusReleased {
+		if (task1.Status == model.TaskStatusNone && task.Status == model.TaskStatusNone) || task1.Status == model.TaskStatusNone && task.Status == model.TaskStatusReleased {
 			_, err := sess.Where("id = ? and publisher = ?", taskId, userId).AllCols().Update(task)
 			if err != nil {
 				sess.Rollback()
@@ -361,7 +361,7 @@ func NewBasicPTaskService() PTaskService {
 	basicPTaskSvc := &basicPTaskService{
 		&db.DBService{},
 	}
-	err := basicPTaskSvc.Bind("conf/conf.users.yml")
+	err := basicPTaskSvc.Bind("conf/conf.lyh.yml")
 	if err != nil {
 		log.Printf("The PTaskService failed to bind with mysql")
 	}
