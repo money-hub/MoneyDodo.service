@@ -110,7 +110,7 @@ func NewBasicUserService() UserService {
 	basicUserSvc := &basicUserService{
 		&db.DBService{},
 	}
-	err := basicUserSvc.Bind("conf/conf.users.yml")
+	err := basicUserSvc.Bind("conf/conf.lyh.yml")
 	if err != nil {
 		log.Printf("The UserService failed to bind with mysql")
 	}

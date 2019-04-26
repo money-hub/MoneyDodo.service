@@ -14,12 +14,12 @@ import (
 
 // makeGetSpecHandler creates the handler logic
 func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation GET /api/users/{userId} users User
+	// swagger:operation GET /api/users/{userid} users swaggGetSpecReq
 	// ---
-	// summary: Get the user's profile with userId.
-	// description: You need to specify the userId to get the detail profile about the user.
+	// summary: Get the user's profile with userid.
+	// description: You need to specify the userid to get the detail profile about the user.
 	// parameters:
-	// - name: userId
+	// - name: userid
 	//   in: path
 	//   description: id of user
 	//   type: string
@@ -29,7 +29,7 @@ func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []h
 	//	   "$ref": "#/responses/swaggUserResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("GET").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -41,9 +41,9 @@ func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []h
 // JSON-encoded request from the HTTP request body.
 func decodeGetSpecRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["userId"]
+	id, ok := vars["userid"]
 	if !ok {
-		return nil, errors.New("not a valid userId")
+		return nil, errors.New("not a valid ID")
 	}
 	req := endpoint.GetSpecRequest{
 		Id: id,
@@ -61,7 +61,7 @@ func encodeGetSpecResponse(ctx context.Context, w http1.ResponseWriter, response
 
 // makeGetAllHandler creates the handler logic
 func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation GET /api/users users UserList
+	// swagger:operation GET /api/users users swaggGetAllReq
 	// ---
 	// summary: Get all users' profiles
 	// description: Get all users' profiles
@@ -96,10 +96,10 @@ func encodeGetAllResponse(ctx context.Context, w http1.ResponseWriter, response 
 
 // makeGetUDFHandler creates the handler logic
 func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation GET /api/users/{username} users UserList
+	// swagger:operation GET /api/users/{username} users swaggGetUDFReq
 	// ---
-	// summary: Get all users' profiles
-	// description: Get all users' profiles
+	// summary: Get all users' profiles with the request username
+	// description: Get all users' profiles with the request username
 	// parameters:
 	// - name: username
 	//   in: path
@@ -196,12 +196,12 @@ func encodePatchResponse(ctx context.Context, w http1.ResponseWriter, response i
 
 // makePutHandler creates the handler logic
 func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation PUT /api/users/{userId} users swaggUpdateUserReq
+	// swagger:operation PUT /api/users/{userid} users swaggPutReq
 	// ---
 	// summary: Update the user profile
 	// description: Update the user profile with the profile. Also, you need to specify the user ID.
 	// parameters:
-	// - name: userId
+	// - name: userid
 	//   in: path
 	//   description: id of user
 	//   type: string
@@ -215,7 +215,7 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	m.Methods("PUT").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("PUT").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"PUT"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -229,9 +229,9 @@ func decodePutRequest(_ context.Context, r *http1.Request) (interface{}, error) 
 	req := endpoint.PutRequest{}
 	err := json.NewDecoder(r.Body).Decode(&req.User)
 	vars := mux.Vars(r)
-	id, ok := vars["userId"]
+	id, ok := vars["userid"]
 	if !ok {
-		return nil, errors.New("not a valid userId")
+		return nil, errors.New("not a valid ID")
 	}
 	req.Id = id
 	return req, err
@@ -247,12 +247,12 @@ func encodePutResponse(ctx context.Context, w http1.ResponseWriter, response int
 
 // makeDeleteHandler creates the handler logic
 func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation DELETE /api/users/{userId} users User
+	// swagger:operation DELETE /api/users/{userid} users swaggDeleteReq
 	// ---
 	// summary: Delete the user
 	// description: You need to specify the user ID to delete the user .
 	// parameters:
-	// - name: userId
+	// - name: userid
 	//   in: path
 	//   description: id of user
 	//   type: string
@@ -262,7 +262,7 @@ func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	m.Methods("DELETE").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("DELETE").Path("/api/users/{userid:[0-9]+}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"DELETE"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -274,9 +274,9 @@ func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 // JSON-encoded request from the HTTP request body.
 func decodeDeleteRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["userId"]
+	id, ok := vars["userid"]
 	if !ok {
-		return nil, errors.New("not a valid userId")
+		return nil, errors.New("not a valid ID")
 	}
 	req := endpoint.DeleteRequest{
 		Id: id,
