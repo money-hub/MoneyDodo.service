@@ -1,6 +1,6 @@
 # 服务器地址，mysql端口，用户名，密码，以及数据库名称
 host: 127.0.0.1
 port: 3306
-username:
-password:
+username: root
+password: liuxiao123
 schema: MoneyDodo
