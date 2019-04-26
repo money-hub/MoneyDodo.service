@@ -1,0 +1,28 @@
+language: go
+sudo : false
+
+notifications: 
+  email:
+    - 903235327@qq.com
+    - 673133182@qq.com
+    - 1039868176@qq.com
+  on_success: change
+  on_failure: always
+
+go:
+  -1.11
+
+install:
+  - go get github.com/go-playground/overalls  #overalls能够支持到各级子目录
+  - go get github.com/mattn/goveralls         #goveralls是coveralls对golang的测试覆盖率支持命令
+  - go get github.com/smartystreets/goconvey  #很好用的测试工具
+  - go get github.com/money-hub/MoneyDodo.service
+
+script:
+  - cd $GOPATH/src/github.com/money-hub/MoneyDodo.service
+  - go build
+  - go test -v ./... -covermode=count -coverprofile=coverage.out -coverpkg="github.com/money-hub/MoneyDodo.service/..."
+  - $GOPATH/bin/goveralls -v -coverprofile=coverage.out -service=travis-ci
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

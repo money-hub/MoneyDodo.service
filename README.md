@@ -1,5 +1,7 @@
 # MoneyDodo.service
 
+[![Analytics](https://github.com/money-hub/MoneyDodo.service/UA-139167220-1/welcome-page)](https://github.com/money-hub/MoneyDodo.service)
+
 此项目为MoneyDodo.web和MoneyDodo.wechat的后台服务实现，采用微服务，使用go-kit框架，代码主体利用[GoKit CLI](<https://github.com/kujtimiihoxha/kit>)开源工具快速生成，便于将开发重心放到业务逻辑上。
 
 ## 代码结构介绍
