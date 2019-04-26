@@ -12,4 +12,5 @@ type User struct {
 	CreditScore  int     `json:"creditScore" xorm:"creditScore"`
 	Email        string  `json:"email"`
 	IsAuth       bool    `json:"isAuth" xorm:"isAuth"`
+	CertifiedPic []int8  `json:"certifiedPic" xorm:"certifiedPic"`
 }

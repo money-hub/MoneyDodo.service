@@ -14,7 +14,8 @@ create table if not exists user (
     phone varchar(11) COMMENT '电话号码',
     creditScore int COMMENT '信用分数',
     email varchar(20) COMMENT '邮箱',
-    isAuth boolean default false COMMENT '是否认证'
+    isAuth boolean default false COMMENT '是否认证',
+    certifiedPic MEDIUMBLOB COMMENT '认证图片'
 );
 
 # 管理员
