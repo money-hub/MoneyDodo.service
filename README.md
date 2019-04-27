@@ -6,31 +6,31 @@
 
 此项目为MoneyDodo.web和MoneyDodo.wechat的后台服务实现，采用微服务，使用go-kit框架，代码主体利用[GoKit CLI](<https://github.com/kujtimiihoxha/kit>)开源工具快速生成，便于将开发重心放到业务逻辑上。
 
-## 代码结构介绍
+## 一、代码结构介绍
 
-**conf:** 存放数据库配置文件，具体配置方法参考`conf.example.yml`
+**1. conf:** 存放数据库配置文件，具体配置方法参考`conf.example.yml`
 
-**db:** 存放数据库相关内容，初始化xorm、MySQL引擎
+**2. db:** 存放数据库相关内容，初始化xorm、MySQL引擎
 
-**model:** 存放数据结构，包括user、task等
+**3. model:** 存放数据结构，包括user、task等
 
-**middleware:** 中间件，目前包括jwt认证中间件。
+**4. middleware:** 中间件，目前包括jwt认证中间件。
 
-**swagger:** swaggerui，API的可视化界面，便于前后端进行交互
+**5. swagger:** swaggerui，API的可视化界面，便于前后端进行交互
 
-**authentication:** 用户登录认证相关服务，主要处理用户登陆的认证，token获取，退出等请求
+**6. authentication:** 用户登录认证相关服务，主要处理用户登陆的认证，token获取，退出等请求
 
-**user:** 用户系统微服务，主要处理用户信息的Get、Post、Put、Patch、Delete等请求
+**7. user:** 用户系统微服务，主要处理用户信息的Get、Post、Put、Patch、Delete等请求
 
-**personalTasks:** 用户task相关微服务，主要处理用户发布任务，删除任务，领取任务，查询任务等请求
+**8. personalTasks:** 用户task相关微服务，主要处理用户发布任务，删除任务，领取任务，查询任务等请求
 
-**certify:** 用户实名认知相关服务，主要处理用户上传实名认证信息，查询信息等请求。
+**9. certify:** 用户实名认知相关服务，主要处理用户上传实名认证信息，查询信息等请求。
 
 **...其他微服务，待完成**
 
 之后，代码结构可以再次调整，将共用代码进行提取，减少代码冗余。
 
-## GoKit CLI使用方法
+## 二、GoKit CLI使用方法
 
 **GoKit CLI**使用方法可以参考<https://medium.com/@kujtimii.h/creating-a-todo-app-using-gokit-cli-20f066a58e1>
 
@@ -48,13 +48,15 @@ $ go run user/cmd/main.go
 #端口为8081
 ```
 
-## swaggerui使用方法
+## 三、swaggerui使用方法
 
 参考链接：
 https://swagger.io/docs/specification/paths-and-operations/
 https://studygolang.com/articles/12354?fr=sidebar
 
-**以user服务中PUT请求为例：**
+### 以user服务中PUT请求为例：
+
+#### A.注释规范
 
 ```bash
 // swagger:operation PUT /api/users/{userid} users swaggPutReq
@@ -134,3 +136,29 @@ type swaggNoReturnValue struct {
 **18. "400"** - **400**表示状态码，我用`400`来表示失败的请求。返回格式说明与上述过程一致。
 
 更加详细的说明参看[官方文档](https://swagger.io/docs/specification/paths-and-operations/)。
+
+#### B. 生成swagger.user.json
+
+- 注意在`user/cmd/main.go`文件中`import _ "github.com/money-hub/MoneyDodo.service/swagger"`，只有这样，上述注释中的`#/responses/`才会被识别。
+
+- 安装**go-swagger**:
+
+  ```bash
+  go get github.com\go-swagger\go-swagger\cmd\swagger
+  ```
+
+- 生成spec
+
+  ```bash
+  # 当前路径：根目录
+  $ cd user/cmd
+  # 此命令会从当前文件及下的main函数入口递归搜索所有文件的swagger注释，最终生成指定的`swagger.users.json`
+  $ swagger generate spec -o ../../swagger/swaggerui/dist/swagger.user.json
+  $ cd ../..
+  # 开启的默认端口为8000，注意不要占用此端口
+  $ go run swagger/swaggerui/main.go
+  ```
+
+#### C. 说明
+
+每个服务各自生成相应的文档，命名格式为`swagger.XXX.json`。`XXX`为服务名称，方便查询。
