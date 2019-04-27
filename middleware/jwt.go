@@ -22,9 +22,9 @@ type jwtCustomClaims struct {
 	jwt.StandardClaims
 
 	// 追加自己需要的信息
-	Id   string `json:"id"`
-	Role int    `json:"role"`
-	Auth bool   `json:"auth"`
+	Id                  string `json:"id"`
+	Role                int    `json:"role"`
+	CertificationStatus int    `json:"certificationStatus"`
 }
 
 func checkErr(err error) {
@@ -37,7 +37,7 @@ func checkErr(err error) {
  * 生成 token
  * SecretKey 是一个 const 常量
  */
-func CreateToken(SecretKey []byte, issuer string, id string, role int, auth bool) (tokenString string, err error) {
+func CreateToken(SecretKey []byte, issuer string, id string, role int, certificationStatus int) (tokenString string, err error) {
 	claims := &jwtCustomClaims{
 		jwt.StandardClaims{
 			ExpiresAt: int64(time.Now().Add(time.Hour * 72).Unix()),
@@ -45,7 +45,7 @@ func CreateToken(SecretKey []byte, issuer string, id string, role int, auth bool
 		},
 		id,
 		role,
-		auth,
+		certificationStatus,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err = token.SignedString(SecretKey)
