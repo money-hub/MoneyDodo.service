@@ -13,6 +13,21 @@ import (
 
 // makeGetOpenidHandler creates the handler logic
 func makeGetOpenidHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation POST /api/auth/user authentication swaggGetOpenidReq
+	// ---
+	// summary: Get the user's openid with user's code.
+	// description: You need to specify the userid to get the detail profile about the user.
+	// parameters:
+	// - name: code
+	//   in: path
+	//   description: code of user
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggUserResp"
+	//   "400":
+	//     "$ref": "#/responses/swaggBadReq"
 	m.Methods("POST").Path("/api/auth/user").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetOpenidEndpoint, decodeGetOpenidRequest, encodeGetOpenidResponse, options...)))
 }
 
@@ -34,6 +49,15 @@ func encodeGetOpenidResponse(ctx context.Context, w http1.ResponseWriter, respon
 
 // makeAdminLoginHandler creates the handler logic
 func makeAdminLoginHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation GET /api/users users swaggGetAllReq
+	// ---
+	// summary: Get all users' profiles
+	// description: Get all users' profiles
+	// responses:
+	//   "200":
+	//	   "$ref": "#/responses/swaggUsersResp"
+	//   "400":
+	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("POST").Path("/api/auth/admin").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminLoginEndpoint, decodeAdminLoginRequest, encodeAdminLoginResponse, options...)))
 }
 
