@@ -93,7 +93,7 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	}
 	has, _ := b.Engine().Get(admin)
 	if has == true && admin.Password == password {
-		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, "")
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, 0)
 		return true, "", token
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
