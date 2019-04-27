@@ -1,5 +1,23 @@
 {
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
   "swagger": "2.0",
+  "info": {
+    "description": "This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example",
+    "title": "money-hub MoneyDodo/user",
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
   "paths": {
     "/api/users": {
       "get": {
@@ -210,11 +228,16 @@
           "format": "double",
           "x-go-name": "Balance"
         },
+        "certificationStatus": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CertificationStatus"
+        },
         "certifiedPic": {
           "type": "array",
           "items": {
             "type": "integer",
-            "format": "int8"
+            "format": "uint8"
           },
           "x-go-name": "CertifiedPic"
         },
@@ -242,10 +265,6 @@
         "introduction": {
           "type": "string",
           "x-go-name": "Introduction"
-        },
-        "isAuth": {
-          "type": "boolean",
-          "x-go-name": "IsAuth"
         },
         "name": {
           "type": "string",
@@ -397,6 +416,13 @@
           }
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   }
 }
