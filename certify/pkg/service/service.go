@@ -13,17 +13,51 @@ import (
 type CertifyService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
-	GetAllUnAuth(ctx context.Context) (status bool, errinfo string, data []model.User)
-	PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User)
-	PostCertifyInfo(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User)
+	GetAuthInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User)
+	PostAuthInfo(ctx context.Context, id string, certifiedPic []byte) (status bool, errinfo string, data model.User)
+	GetAllUnCertify(ctx context.Context) (status bool, errinfo string, data []model.User)
+	GetUnCertifyInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User)
+	PostCertifyState(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User)
 }
 
 type basicCertifyService struct {
 	*db.DBService
 }
 
-func (b *basicCertifyService) GetAllUnAuth(ctx context.Context) (status bool, errinfo string, data []model.User) {
-	// TODO implement the business logic of GetAllUnAuth
+func (b *basicCertifyService) GetAuthInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User) {
+	// TODO implement the business logic of GetAuthInfo
+	user := model.User{}
+	_, err := b.Engine().Where("id = ? and certificationStatus != 0", id).Get(&user)
+	if err == nil {
+		return true, "", user
+	}
+	return false, err.Error(), data
+}
+
+func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User) {
+	// TODO implement the business logic of PostAuthInfo
+	user := model.User{
+		Id: id,
+	}
+	status, err := b.Engine().Get(&user)
+	if status == false || err != nil {
+		return false, err.Error(), data
+	}
+	user.CertifiedPic = img
+	user.CertificationStatus = 1
+	_, err = b.Engine().Id(id).Update(&user)
+	if err != nil {
+		return false, err.Error(), data
+	}
+	_, err = b.Engine().Id(id).Get(&data)
+	if err != nil {
+		return false, err.Error(), data
+	}
+	return true, "", data
+}
+
+func (b *basicCertifyService) GetAllUnCertify(ctx context.Context) (status bool, errinfo string, data []model.User) {
+	// TODO implement the business logic of GetAllUnCertify
 	user := model.User{}
 	rows, err := b.Engine().Where("certificationStatus = ?", 1).Rows(user)
 	if err == nil {
@@ -36,37 +70,26 @@ func (b *basicCertifyService) GetAllUnAuth(ctx context.Context) (status bool, er
 			data = append(data, user)
 		}
 		return true, "", data
-	} else {
-		return false, err.Error(), data
 	}
+	return false, err.Error(), data
 }
-func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User) {
-	// TODO implement the business logic of PostAuthInfo
+
+func (b *basicCertifyService) GetUnCertifyInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User) {
+	// TODO implement the business logic of GetUnCertifyInfo
+	user := model.User{}
+	_, err := b.Engine().Where("id = ? and certificationStatus = ? ", id, 1).Get(&user)
+	if err == nil {
+		return true, "", user
+	}
+	return false, err.Error(), data
+}
+
+func (b *basicCertifyService) PostCertifyState(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User) {
+	// TODO implement the business logic of PostCertifyState
 	user := model.User{
 		Id: id,
 	}
-	status, err := b.Engine().Get(user)
-	if status == false || err != nil {
-		return false, err.Error(), data
-	}
-	user.CertifiedPic = img
-	user.CertificationStatus = 1
-	_, err = b.Engine().Id(id).Update(user)
-	if err != nil {
-		return false, err.Error(), data
-	}
-	_, err = b.Engine().Id(id).Get(data)
-	if err != nil {
-		return false, err.Error(), data
-	}
-	return true, "", data
-}
-func (b *basicCertifyService) PostCertifyInfo(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User) {
-	// TODO implement the business logic of PostCertifyInfo
-	user := model.User{
-		Id: id,
-	}
-	status, err := b.Engine().Get(user)
+	status, err := b.Engine().Get(&user)
 	if status == false || err != nil {
 		return false, err.Error(), data
 	}
@@ -75,11 +98,11 @@ func (b *basicCertifyService) PostCertifyInfo(ctx context.Context, id string, pa
 	} else {
 		user.CertificationStatus = 3
 	}
-	_, err = b.Engine().Id(id).Update(user)
+	_, err = b.Engine().Id(id).Update(&user)
 	if err != nil {
 		return false, err.Error(), data
 	}
-	_, err = b.Engine().Id(id).Get(data)
+	_, err = b.Engine().Id(id).Get(&data)
 	if err != nil {
 		return false, err.Error(), data
 	}

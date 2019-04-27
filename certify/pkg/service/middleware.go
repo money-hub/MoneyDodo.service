@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	log "github.com/go-kit/kit/log"
 	model "github.com/money-hub/MoneyDodo.service/model"
 )
@@ -23,11 +24,11 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) GetAllUnAuth(ctx context.Context) (status bool, errinfo string, data []model.User) {
+func (l loggingMiddleware) GetAuthInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User) {
 	defer func() {
-		l.logger.Log("method", "GetAllUnAuth", "status", status, "errinfo", errinfo, "data", data)
+		l.logger.Log("method", "GetAuthInfo", "id", id, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.GetAllUnAuth(ctx)
+	return l.next.GetAuthInfo(ctx, id)
 }
 func (l loggingMiddleware) PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User) {
 	defer func() {
@@ -35,9 +36,21 @@ func (l loggingMiddleware) PostAuthInfo(ctx context.Context, id string, img []by
 	}()
 	return l.next.PostAuthInfo(ctx, id, img)
 }
-func (l loggingMiddleware) PostCertifyInfo(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User) {
+func (l loggingMiddleware) GetAllUnCertify(ctx context.Context) (status bool, errinfo string, data []model.User) {
 	defer func() {
-		l.logger.Log("method", "PostCertifyInfo", "id", id, "pass", pass, "status", status, "errinfo", errinfo, "data", data)
+		l.logger.Log("method", "GetAllUnCertify", "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.PostCertifyInfo(ctx, id, pass)
+	return l.next.GetAllUnCertify(ctx)
+}
+func (l loggingMiddleware) GetUnCertifyInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User) {
+	defer func() {
+		l.logger.Log("method", "GetUnCertifyInfo", "id", id, "status", status, "errinfo", errinfo, "data", data)
+	}()
+	return l.next.GetUnCertifyInfo(ctx, id)
+}
+func (l loggingMiddleware) PostCertifyState(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User) {
+	defer func() {
+		l.logger.Log("method", "PostCertifyState", "id", id, "pass", pass, "status", status, "errinfo", errinfo, "data", data)
+	}()
+	return l.next.PostCertifyState(ctx, id, pass)
 }

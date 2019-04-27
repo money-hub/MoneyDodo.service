@@ -20,22 +20,26 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
 	options := map[string][]http.ServerOption{
-		"GetAllUnAuth":    {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAllUnAuth", logger))},
-		"PostAuthInfo":    {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PostAuthInfo", logger))},
-		"PostCertifyInfo": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PostCertifyInfo", logger))},
+		"GetAllUnCertify":  {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAllUnCertify", logger))},
+		"GetAuthInfo":      {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAuthInfo", logger))},
+		"GetUnCertifyInfo": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetUnCertifyInfo", logger))},
+		"PostAuthInfo":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PostAuthInfo", logger))},
+		"PostCertifyState": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PostCertifyState", logger))},
 	}
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
-	mw["GetAllUnAuth"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetAllUnAuth")), endpoint.InstrumentingMiddleware(duration.With("method", "GetAllUnAuth"))}
+	mw["GetAuthInfo"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetAuthInfo")), endpoint.InstrumentingMiddleware(duration.With("method", "GetAuthInfo"))}
 	mw["PostAuthInfo"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "PostAuthInfo")), endpoint.InstrumentingMiddleware(duration.With("method", "PostAuthInfo"))}
-	mw["PostCertifyInfo"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "PostCertifyInfo")), endpoint.InstrumentingMiddleware(duration.With("method", "PostCertifyInfo"))}
+	mw["GetAllUnCertify"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetAllUnCertify")), endpoint.InstrumentingMiddleware(duration.With("method", "GetAllUnCertify"))}
+	mw["GetUnCertifyInfo"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetUnCertifyInfo")), endpoint.InstrumentingMiddleware(duration.With("method", "GetUnCertifyInfo"))}
+	mw["PostCertifyState"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "PostCertifyState")), endpoint.InstrumentingMiddleware(duration.With("method", "PostCertifyState"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"GetAllUnAuth", "PostAuthInfo", "PostCertifyInfo"}
+	methods := []string{"GetAuthInfo", "PostAuthInfo", "GetAllUnCertify", "GetUnCertifyInfo", "PostCertifyState"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}

@@ -10,27 +10,37 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	GetAllUnAuthEndpoint    endpoint.Endpoint
-	PostAuthInfoEndpoint    endpoint.Endpoint
-	PostCertifyInfoEndpoint endpoint.Endpoint
+	GetAuthInfoEndpoint      endpoint.Endpoint
+	PostAuthInfoEndpoint     endpoint.Endpoint
+	GetAllUnCertifyEndpoint  endpoint.Endpoint
+	GetUnCertifyInfoEndpoint endpoint.Endpoint
+	PostCertifyStateEndpoint endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func New(s service.CertifyService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
-		GetAllUnAuthEndpoint:    MakeGetAllUnAuthEndpoint(s),
-		PostAuthInfoEndpoint:    MakePostAuthInfoEndpoint(s),
-		PostCertifyInfoEndpoint: MakePostCertifyInfoEndpoint(s),
+		GetAllUnCertifyEndpoint:  MakeGetAllUnCertifyEndpoint(s),
+		GetAuthInfoEndpoint:      MakeGetAuthInfoEndpoint(s),
+		GetUnCertifyInfoEndpoint: MakeGetUnCertifyInfoEndpoint(s),
+		PostAuthInfoEndpoint:     MakePostAuthInfoEndpoint(s),
+		PostCertifyStateEndpoint: MakePostCertifyStateEndpoint(s),
 	}
-	for _, m := range mdw["GetAllUnAuth"] {
-		eps.GetAllUnAuthEndpoint = m(eps.GetAllUnAuthEndpoint)
+	for _, m := range mdw["GetAuthInfo"] {
+		eps.GetAuthInfoEndpoint = m(eps.GetAuthInfoEndpoint)
 	}
 	for _, m := range mdw["PostAuthInfo"] {
 		eps.PostAuthInfoEndpoint = m(eps.PostAuthInfoEndpoint)
 	}
-	for _, m := range mdw["PostCertifyInfo"] {
-		eps.PostCertifyInfoEndpoint = m(eps.PostCertifyInfoEndpoint)
+	for _, m := range mdw["GetAllUnCertify"] {
+		eps.GetAllUnCertifyEndpoint = m(eps.GetAllUnCertifyEndpoint)
+	}
+	for _, m := range mdw["GetUnCertifyInfo"] {
+		eps.GetUnCertifyInfoEndpoint = m(eps.GetUnCertifyInfoEndpoint)
+	}
+	for _, m := range mdw["PostCertifyState"] {
+		eps.PostCertifyStateEndpoint = m(eps.PostCertifyStateEndpoint)
 	}
 	return eps
 }
