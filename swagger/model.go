@@ -90,3 +90,50 @@ type swaggNoReturnValue struct {
 		Errinfo string `json:"errinfo"`
 	}
 }
+
+// Get User's openid request
+// swagger:parameters swaggGetOpenidReq
+type swaggAuthOfUserReq struct {
+	// in:body
+	body struct {
+		code string
+	}
+}
+
+// HTTP status code 200 and token in data
+// swagger:response swaggAuthOfUserResp
+type swaggAuthOfUserResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Token
+		Token string `json:"data"`
+	}
+}
+
+// Admin login request
+// swagger:parameters swaggAdminLoginReq
+type swaggAuthOfAdminReq struct {
+	// in:body
+	Body struct {
+		name     string
+		password string
+	}
+}
+
+// HTTP status code 200 and token in data
+// swagger:response swaggAuthOfAdminResp
+type swaggAuthOfAdminResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Token
+		Token string `json:"data"`
+	}
+}

@@ -17,6 +17,7 @@ type handle struct {
 type Service struct {
 	auth *handle
 	user *handle
+	task *handle
 }
 
 func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +31,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var remote *url.URL
 	if strings.Contains(r.RequestURI, "api/auth") {
 		remote, _ = url.Parse("http://" + this.auth.host + ":" + this.auth.port)
-	} else if strings.Contains(r.RequestURI, "api/auth") {
+	} else if strings.Contains(r.RequestURI, "api/user") {
 		remote, _ = url.Parse("http://" + this.user.host + ":" + this.user.port)
 	} else {
 		fmt.Fprintf(w, "404 Not Found")

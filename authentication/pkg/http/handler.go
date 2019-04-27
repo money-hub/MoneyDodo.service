@@ -13,10 +13,10 @@ import (
 
 // makeGetOpenidHandler creates the handler logic
 func makeGetOpenidHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation POST /api/auth/user authentication swaggGetOpenidReq
+	// swagger:operation POST /api/auth/user authentication swaggAuthOfUserReq
 	// ---
-	// summary: Get the user's openid with user's code.
-	// description: You need to specify the userid to get the detail profile about the user.
+	// summary: Get the user's token with user's code.
+	// description: You need to specify the code of the WeChat applet to log in to get the corresponding token.
 	// parameters:
 	// - name: code
 	//   in: path
@@ -25,7 +25,7 @@ func makeGetOpenidHandler(m *mux.Router, endpoints endpoint.Endpoints, options [
 	//   required: true
 	// responses:
 	//   "200":
-	//	   "$ref": "#/responses/swaggUserResp"
+	//	   "$ref": "#/responses/swaggAuthOfUserResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
 	m.Methods("POST").Path("/api/auth/user").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetOpenidEndpoint, decodeGetOpenidRequest, encodeGetOpenidResponse, options...)))
@@ -49,15 +49,26 @@ func encodeGetOpenidResponse(ctx context.Context, w http1.ResponseWriter, respon
 
 // makeAdminLoginHandler creates the handler logic
 func makeAdminLoginHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	// swagger:operation GET /api/users users swaggGetAllReq
+	// swagger:operation POST /api/auth/admin authentication swaggAuthOfAdminReq
 	// ---
-	// summary: Get all users' profiles
-	// description: Get all users' profiles
+	// summary: Administrator login verification
+	// description: Administrator login verification
+	// parameters:
+	// - name: name
+	//   in: path
+	//   description: admin name
+	//   type: string
+	//   required: true
+	// - name: password
+	//   in: path
+	//   description: admin password
+	//   type: string
+	//   required: true
 	// responses:
 	//   "200":
-	//	   "$ref": "#/responses/swaggUsersResp"
+	//     "$ref": "#/responses/swaggAuthOfAdminResp"
 	//   "400":
-	//	   "$ref": "#/responses/swaggBadReq"
+	//     "$ref": "#/responses/swaggBadReq"
 	m.Methods("POST").Path("/api/auth/admin").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminLoginEndpoint, decodeAdminLoginRequest, encodeAdminLoginResponse, options...)))
 }
 
