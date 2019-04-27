@@ -1,42 +1,33 @@
 {
   "swagger": "2.0",
   "paths": {
-    "/api/users": {
-      "get": {
-        "description": "Get all users' profiles",
-        "tags": [
-          "users"
-        ],
-        "summary": "Get all users' profiles",
-        "operationId": "swaggGetAllReq",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggUsersResp"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      },
+    "/api/auth/admin": {
       "post": {
-        "description": "If the user's id is \"exists\", error will be returned.",
+        "description": "Administrator login verification",
         "tags": [
-          "users"
+          "authentication"
         ],
-        "summary": "Create a new user with the profile.",
-        "operationId": "swaggCreateUserReq",
+        "summary": "Administrator login verification",
+        "operationId": "swaggAuthOfAdminReq",
         "parameters": [
           {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
+            "type": "string",
+            "description": "admin name",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "admin password",
+            "name": "password",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggAuthOfAdminResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -44,110 +35,26 @@
         }
       }
     },
-    "/api/users/{userid}": {
-      "get": {
-        "description": "You need to specify the userid to get the detail profile about the user.",
+    "/api/auth/user": {
+      "post": {
+        "description": "You need to specify the code of the WeChat applet to log in to get the corresponding token.",
         "tags": [
-          "users"
+          "authentication"
         ],
-        "summary": "Get the user's profile with userid.",
-        "operationId": "swaggGetSpecReq",
+        "summary": "Get the user's token with user's code.",
+        "operationId": "swaggAuthOfUserReq",
         "parameters": [
           {
             "type": "string",
-            "description": "id of user",
-            "name": "userid",
+            "description": "code of user",
+            "name": "code",
             "in": "path",
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggUserResp"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      },
-      "put": {
-        "description": "Update the user profile with the profile. Also, you need to specify the user ID.",
-        "tags": [
-          "users"
-        ],
-        "summary": "Update the user profile",
-        "operationId": "swaggPutReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userid",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      },
-      "delete": {
-        "description": "You need to specify the user ID to delete the user .",
-        "tags": [
-          "users"
-        ],
-        "summary": "Delete the user",
-        "operationId": "swaggDeleteReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userid",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      }
-    },
-    "/api/users/{username}": {
-      "get": {
-        "description": "Get all users' profiles with the request username",
-        "tags": [
-          "users"
-        ],
-        "summary": "Get all users' profiles with the request username",
-        "operationId": "swaggGetUDFReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "name of user",
-            "name": "username",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggUsersResp"
+            "$ref": "#/responses/swaggAuthOfUserResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -210,11 +117,16 @@
           "format": "double",
           "x-go-name": "Balance"
         },
+        "certificationStatus": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CertificationStatus"
+        },
         "certifiedPic": {
           "type": "array",
           "items": {
             "type": "integer",
-            "format": "int8"
+            "format": "uint8"
           },
           "x-go-name": "CertifiedPic"
         },
@@ -243,10 +155,6 @@
           "type": "string",
           "x-go-name": "Introduction"
         },
-        "isAuth": {
-          "type": "boolean",
-          "x-go-name": "IsAuth"
-        },
         "name": {
           "type": "string",
           "x-go-name": "Name"
@@ -268,6 +176,52 @@
     }
   },
   "responses": {
+    "swaggAuthOfAdminResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggAuthOfUserResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
     "swaggBadReq": {
       "description": "Error Fail",
       "schema": {

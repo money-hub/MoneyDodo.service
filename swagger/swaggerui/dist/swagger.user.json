@@ -11,7 +11,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example",
-    "title": "money-hub MoneyDodo/personalTasks",
+    "title": "money-hub MoneyDodo/user",
     "license": {
       "name": "MIT",
       "url": "http://opensource.org/licenses/MIT"
@@ -19,26 +19,17 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/users/{userId}/tasks": {
+    "/api/users": {
       "get": {
-        "description": "Get all task of the user. You need to specify the userId and taskId.",
+        "description": "Get all users' profiles",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Get all tasks of the user (with id=userId).",
+        "summary": "Get all users' profiles",
         "operationId": "swaggGetAllReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggTasksResp"
+            "$ref": "#/responses/swaggUsersResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -46,31 +37,24 @@
         }
       },
       "post": {
-        "description": "Create a task. Also, you need to specify the userId and taskId.",
+        "description": "If the user's id is \"exists\", error will be returned.",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Create a task.",
-        "operationId": "swaggPostReq",
+        "summary": "Create a new user with the profile.",
+        "operationId": "swaggCreateUserReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/User"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggTaskResp"
+            "$ref": "#/responses/swaggNoReturnValue"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -78,33 +62,26 @@
         }
       }
     },
-    "/api/users/{userId}/tasks/{taskId}": {
+    "/api/users/{userid}": {
       "get": {
-        "description": "Get the specical task. You need to specify the userId and taskId.",
+        "description": "You need to specify the userid to get the detail profile about the user.",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Get the specical task of the user (with id=userId).",
+        "summary": "Get the user's profile with userid.",
         "operationId": "swaggGetSpecReq",
         "parameters": [
           {
             "type": "string",
             "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of task",
-            "name": "taskId",
+            "name": "userid",
             "in": "path",
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggTaskResp"
+            "$ref": "#/responses/swaggUserResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -112,24 +89,17 @@
         }
       },
       "put": {
-        "description": "Update the task information. Also, you need to specify the user ID and task ID.",
+        "description": "Update the user profile with the profile. Also, you need to specify the user ID.",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Update the task information",
+        "summary": "Update the user profile",
         "operationId": "swaggPutReq",
         "parameters": [
           {
             "type": "string",
             "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of task",
-            "name": "taskId",
+            "name": "userid",
             "in": "path",
             "required": true
           },
@@ -137,7 +107,7 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/User"
             }
           }
         ],
@@ -150,25 +120,18 @@
           }
         }
       },
-      "post": {
-        "description": "The user (with id=userId) claims the task (with id=taskId). You need to specify the userId and taskId.",
+      "delete": {
+        "description": "You need to specify the user ID to delete the user .",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Claim the task (with id=taskId).",
-        "operationId": "swaggPostClaimReq",
+        "summary": "Delete the user",
+        "operationId": "swaggDeleteReq",
         "parameters": [
           {
             "type": "string",
             "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of task",
-            "name": "taskId",
+            "name": "userid",
             "in": "path",
             "required": true
           }
@@ -183,39 +146,26 @@
         }
       }
     },
-    "/api/users/{userId}/tasks/{taskId}?status={status}": {
-      "delete": {
-        "description": "When status is equal to \"non-released\" or \"finished\", it means the creator want to delete it. When status is equal to \"released\", it means the creator want to cancel to release it. When status is equal to \"claimed\", it means the recipient want to cancel to claim it. Also, you need to specify the user ID and task ID.",
+    "/api/users/{username}": {
+      "get": {
+        "description": "Get all users' profiles with the request username",
         "tags": [
-          "personalTasks"
+          "users"
         ],
-        "summary": "Delete\\Cancel to Release\\Cancel to Claim a task.",
-        "operationId": "swaggDeleteReq",
+        "summary": "Get all users' profiles with the request username",
+        "operationId": "swaggGetUDFReq",
         "parameters": [
           {
             "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "description": "id of task",
-            "name": "taskId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "status of task",
-            "name": "status",
+            "description": "name of user",
+            "name": "username",
             "in": "path",
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggUsersResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"

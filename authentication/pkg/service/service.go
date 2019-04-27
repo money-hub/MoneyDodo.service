@@ -44,7 +44,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 	// https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
 	// var AppID = "wx6f4b63c2710e1bae"
 	// var AppSecret = "2f11628e5f62c350247e8deb24a9814b"
-	var AppID = "wx25915d3c4f6a78f3";
+	var AppID = "wx25915d3c4f6a78f3"
 	var AppSecret = "133e74afeca06c60a597cf3b694a6c87"
 
 	//构造url
@@ -76,7 +76,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 					fmt.Println("[Authentication log] Insert user failed")
 				}
 			}
-			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.IsAuth)
+			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
 			return true, "", token
 		}
 		return false, info.Errmsg, ""
@@ -93,7 +93,7 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	}
 	has, _ := b.Engine().Get(admin)
 	if has == true && admin.Password == password {
-		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, true)
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, 0)
 		return true, "", token
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
