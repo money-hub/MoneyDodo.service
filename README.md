@@ -1,6 +1,8 @@
 # MoneyDodo.service
 
-[![Analytics](https://github.com/money-hub/MoneyDodo.service/UA-139167220-1/welcome-page)](https://github.com/money-hub/MoneyDodo.service)
+[![Build Status](https://travis-ci.org/money-hub/MoneyDodo.service.svg?branch=master)](https://travis-ci.org/money-hub/MoneyDodo.service.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/money-hub/MoneyDodo.service/badge.svg?branch=master)](https://coveralls.io/github/money-hub/MoneyDodo.service?branch=master)
+[![Analytics](https://ga-beacon.appspot.com/UA-139167220-1/welcome-page)](https://github.com/money-hub/MoneyDodo.service)
 
 此项目为MoneyDodo.web和MoneyDodo.wechat的后台服务实现，采用微服务，使用go-kit框架，代码主体利用[GoKit CLI](<https://github.com/kujtimiihoxha/kit>)开源工具快速生成，便于将开发重心放到业务逻辑上。
 
@@ -18,11 +20,31 @@
 
 存放数据结构，包括user、task等
 
+**middleware**
+
+中间件，目前包括jwt认证中间件。
+
+**swagger**
+
+swaggerui，API的可视化界面，便于前后端进行交互
+
+**authentication**
+
+用户登录认证相关服务，主要处理用户登陆的认证，token获取，退出等请求
+
 **user**
 
-用户系统微服务，主要处理用户的Get、Post、Put、Patch、Delete等请求
+用户系统微服务，主要处理用户信息的Get、Post、Put、Patch、Delete等请求
 
-**……（其他微服务）**
+**personalTasks**
+
+用户task相关微服务，主要处理用户发布任务，删除任务，领取任务，查询任务等请求
+
+**certify**
+
+用户实名认知相关服务，主要处理用户上传实名认证信息，查询信息等请求。
+
+**...其他微服务，待完成**
 
 之后，代码结构可以再次调整，将共用代码进行提取，减少代码冗余。
 

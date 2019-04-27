@@ -10,7 +10,7 @@ notifications:
   on_failure: always
 
 go:
-  -1.11
+  - "1.11"
 
 install:
   - go get github.com/go-playground/overalls  #overalls能够支持到各级子目录
