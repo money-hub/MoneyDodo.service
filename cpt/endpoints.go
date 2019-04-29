@@ -16,7 +16,7 @@ type Endpoints struct {
 	DeleteEndpoint    endpoint.Endpoint
 }
 
-func MakeServerEndpoints(s PTaskService) Endpoints {
+func MakeServerEndpoints(s CptService) Endpoints {
 	eps := Endpoints{
 		GetSpecEndpoint:   MakeGetSpecEndpoint(s),
 		GetAllEndpoint:    MakeGetAllEndpoint(s),
@@ -42,7 +42,7 @@ type GetSpecResponse struct {
 }
 
 // MakeGetSpecEndpoint returns an endpoint that invokes GetSpec on the service.
-func MakeGetSpecEndpoint(s PTaskService) endpoint.Endpoint {
+func MakeGetSpecEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetSpecRequest)
 		status, errinfo, data := s.GetSpec(ctx, req.UserId, req.TaskId)
@@ -67,7 +67,7 @@ type GetAllResponse struct {
 }
 
 // MakeGetAllEndpoint returns an endpoint that invokes GetAll on the service.
-func MakeGetAllEndpoint(s PTaskService) endpoint.Endpoint {
+func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetAllRequest)
 		status, errinfo, data := s.GetAll(ctx, req.UserId)
@@ -93,7 +93,7 @@ type PostResponse struct {
 }
 
 // MakePostEndpoint returns an endpoint that invokes Post on the service.
-func MakePostEndpoint(s PTaskService) endpoint.Endpoint {
+func MakePostEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(PostRequest)
 		status, errinfo, data := s.Post(ctx, req.UserId, req.Task)
@@ -119,7 +119,7 @@ type PostClaimResponse struct {
 }
 
 // MakePostClaimEndpoint returns an endpoint that invokes PostClaim on the service.
-func MakePostClaimEndpoint(s PTaskService) endpoint.Endpoint {
+func MakePostClaimEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(PostClaimRequest)
 		status, errinfo, data := s.PostClaim(ctx, req.UserId, req.TaskId)
@@ -146,7 +146,7 @@ type DeleteResponse struct {
 }
 
 // MakeDeleteEndpoint returns an endpoint that invokes Delete on the service.
-func MakeDeleteEndpoint(s PTaskService) endpoint.Endpoint {
+func MakeDeleteEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteRequest)
 		status, errinfo, data := s.Delete(ctx, req.UserId, req.TaskId, req.Status)
@@ -173,7 +173,7 @@ type PutResponse struct {
 }
 
 // MakePutEndpoint returns an endpoint that invokes Put on the service.
-func MakePutEndpoint(s PTaskService) endpoint.Endpoint {
+func MakePutEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(PutRequest)
 		status, errinfo, data := s.Put(ctx, req.UserId, req.TaskId, req.Task)

@@ -3,10 +3,13 @@ package model
 import "time"
 
 const (
-	TaskStatusNone     = "non-released"
-	TaskStatusReleased = "released"
-	TaskStatusClaimed  = "claimed"
-	TaskStatusFinished = "finished"
+	TaskActionRelease    = "release"
+	TaskActionClaim      = "claim"
+	TaskActionFinish     = "finish"
+	TaskStateNonReleased = "non-released"
+	TaskStateReleased    = "released"
+	TaskStateClaimed     = "claimed"
+	TaskStateFinished    = "finished"
 )
 
 type Task struct {
@@ -18,7 +21,7 @@ type Task struct {
 	Pubdate   *time.Time `json:"pubdate"`
 	Cutoff    *time.Time `json:"cutoff"`
 	Reward    float64    `json:"reward"`
-	Status    string     `json:"status"`
+	State     string     `json:"state"`
 }
 
 type query struct {

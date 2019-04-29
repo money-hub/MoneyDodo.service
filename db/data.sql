@@ -35,20 +35,23 @@ create table if not exists task (
 	id int AUTO_INCREMENT primary key COMMENT '任务id',
     type varchar(20) not null COMMENT '任务类型',
     publisher varchar(20) not null COMMENT '发布者',
-    recipient text COMMENT '接收者',
+    recipient varchar(20) COMMENT '接收者',
     restrain text COMMENT '任务限制',
     pubdate text COMMENT '发布时间',
     cutoff text COMMENT '截至时间',
     reward double COMMENT '赏金金额',
-    status varchar(20) COMMENT '任务状态'
+    state varchar(20) COMMENT '任务状态'
 );
 
-# 用户-任务
-create table if not exists relation (
-    userId varchar(20) not null COMMENT '用户Id',
+# 交易
+create table if not exists deal (
     taskId int not null COMMENT '任务Id',
-    detail varchar(20) not null COMMENT '发布或者接受',
-    primary key(userId, taskId, detail),
-    foreign key(userId) references user(id),
+    publisher varchar(20) COMMENT '发布者',
+    recipient varchar(20) COMMENT '接受者',
+    since text COMMENT '交易开始时间',
+    until text COMMETN '交易结束时间',
+    reward double COMMENT '交易额',
+    state varchar(20) COMMENT '交易状态',
+    primary key(taskId),
     foreign Key(taskId) references task(id)
 );

@@ -11,7 +11,7 @@ import (
 // log middleware
 type LoggingMiddleware struct {
 	Logger log.Logger
-	Next   PTaskService
+	Next   CptService
 }
 
 func (l *LoggingMiddleware) GetSpec(ctx context.Context, userId string, taskId string) (status bool, errinfo string, data *model.Task) {
