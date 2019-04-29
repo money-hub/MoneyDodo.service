@@ -13,15 +13,18 @@ const (
 )
 
 type Task struct {
-	Id        string     `json:"id" xorm:"<-"`
-	Type      string     `json:"type"`
-	Publisher string     `json:"publisher"`
-	Recipient string     `json:"recipient"`
-	Restrain  string     `json:"restrain"`
-	Pubdate   *time.Time `json:"pubdate"`
-	Cutoff    *time.Time `json:"cutoff"`
-	Reward    float64    `json:"reward"`
-	State     string     `json:"state"`
+	Id              string    `json:"id" xorm:"<-"`
+	Type            string    `json:"type"`
+	Publisher       string    `json:"publisher"`
+	Recipient       string    `json:"recipient"`
+	Restrain        string    `json:"restrain"`
+	Pubdate         time.Time `json:"pubdate"`
+	Cutoff          time.Time `json:"cutoff"`
+	Enddate         time.Time `json:"enddate"`
+	Reward          float64   `json:"reward"`
+	RecipientFinish bool      `json:"recipientFinish" xorm:"recipientFinish"`
+	ConfirmFinish   bool      `json:"confirmFinish" xorm:"confirmFinish"`
+	State           string    `json:"state"`
 }
 
 type query struct {

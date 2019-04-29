@@ -10,7 +10,7 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example",
+    "description": "This documentation describes example APIs found under https://github.com/money-hub/MoneyDodo.service",
     "title": "money-hub MoneyDodo/user",
     "license": {
       "name": "MIT",
@@ -178,10 +178,19 @@
     "Task": {
       "type": "object",
       "properties": {
+        "confirmFinish": {
+          "type": "boolean",
+          "x-go-name": "ConfirmFinish"
+        },
         "cutoff": {
           "type": "string",
           "format": "date-time",
           "x-go-name": "Cutoff"
+        },
+        "enddate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Enddate"
         },
         "id": {
           "type": "string",
@@ -200,6 +209,10 @@
           "type": "string",
           "x-go-name": "Recipient"
         },
+        "recipientFinish": {
+          "type": "boolean",
+          "x-go-name": "RecipientFinish"
+        },
         "restrain": {
           "type": "string",
           "x-go-name": "Restrain"
@@ -209,9 +222,9 @@
           "format": "double",
           "x-go-name": "Reward"
         },
-        "status": {
+        "state": {
           "type": "string",
-          "x-go-name": "Status"
+          "x-go-name": "State"
         },
         "type": {
           "type": "string",
@@ -251,11 +264,7 @@
           "x-go-name": "Email"
         },
         "icon": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int8"
-          },
+          "type": "string",
           "x-go-name": "Icon"
         },
         "id": {
@@ -270,10 +279,6 @@
           "type": "string",
           "x-go-name": "Name"
         },
-        "password": {
-          "type": "string",
-          "x-go-name": "Password"
-        },
         "phone": {
           "type": "string",
           "x-go-name": "Phone"
@@ -287,6 +292,52 @@
     }
   },
   "responses": {
+    "swaggAuthOfAdminResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggAuthOfUserResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
     "swaggBadReq": {
       "description": "Error Fail",
       "schema": {

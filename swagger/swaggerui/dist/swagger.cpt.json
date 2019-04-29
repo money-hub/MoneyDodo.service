@@ -10,8 +10,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example",
-    "title": "money-hub MoneyDodo/personalTasks",
+    "description": "This documentation describes example APIs found under https://github.com/money-hub/MoneyDodo.service",
+    "title": "money-hub MoneyDodo/cpt",
     "license": {
       "name": "MIT",
       "url": "http://opensource.org/licenses/MIT"
@@ -19,23 +19,14 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/users/{userId}/tasks": {
+    "/api/tasks": {
       "get": {
         "description": "Get all task of the user. You need to specify the userId and taskId.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Get all tasks of the user (with id=userId).",
         "operationId": "swaggGetAllReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/responses/swaggTasksResp"
@@ -48,18 +39,11 @@
       "post": {
         "description": "Create a task. Also, you need to specify the userId and taskId.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Create a task.",
         "operationId": "swaggPostReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "name": "Body",
             "in": "body",
@@ -78,22 +62,15 @@
         }
       }
     },
-    "/api/users/{userId}/tasks/{taskId}": {
+    "/api/tasks/{taskId}": {
       "get": {
         "description": "Get the specical task. You need to specify the userId and taskId.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Get the specical task of the user (with id=userId).",
         "operationId": "swaggGetSpecReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "type": "string",
             "description": "id of task",
@@ -110,26 +87,28 @@
             "$ref": "#/responses/swaggBadReq"
           }
         }
-      },
+      }
+    },
+    "/api/tasks/{taskId}?action={action}": {
       "put": {
         "description": "Update the task information. Also, you need to specify the user ID and task ID.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Update the task information",
         "operationId": "swaggPutReq",
         "parameters": [
           {
             "type": "string",
-            "description": "id of user",
-            "name": "userId",
+            "description": "id of task",
+            "name": "taskId",
             "in": "path",
             "required": true
           },
           {
             "type": "string",
-            "description": "id of task",
-            "name": "taskId",
+            "description": "action can be one of \"release\", \"claim\" and \"finish\"",
+            "name": "action",
             "in": "path",
             "required": true
           },
@@ -139,38 +118,6 @@
             "schema": {
               "$ref": "#/definitions/Task"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      },
-      "post": {
-        "description": "The user (with id=userId) claims the task (with id=taskId). You need to specify the userId and taskId.",
-        "tags": [
-          "personalTasks"
-        ],
-        "summary": "Claim the task (with id=taskId).",
-        "operationId": "swaggPostClaimReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of task",
-            "name": "taskId",
-            "in": "path",
-            "required": true
           }
         ],
         "responses": {
@@ -187,18 +134,11 @@
       "delete": {
         "description": "When status is equal to \"non-released\" or \"finished\", it means the creator want to delete it. When status is equal to \"released\", it means the creator want to cancel to release it. When status is equal to \"claimed\", it means the recipient want to cancel to claim it. Also, you need to specify the user ID and task ID.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Delete\\Cancel to Release\\Cancel to Claim a task.",
         "operationId": "swaggDeleteReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "description": "id of task",
             "name": "taskId",
@@ -207,8 +147,8 @@
           },
           {
             "type": "string",
-            "description": "status of task",
-            "name": "status",
+            "description": "state can be one of \"non-released\", \"released\", \"claimed\" and \"finished\"",
+            "name": "state",
             "in": "path",
             "required": true
           }
@@ -228,10 +168,19 @@
     "Task": {
       "type": "object",
       "properties": {
+        "confirmFinish": {
+          "type": "boolean",
+          "x-go-name": "ConfirmFinish"
+        },
         "cutoff": {
           "type": "string",
           "format": "date-time",
           "x-go-name": "Cutoff"
+        },
+        "enddate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Enddate"
         },
         "id": {
           "type": "string",
@@ -250,6 +199,10 @@
           "type": "string",
           "x-go-name": "Recipient"
         },
+        "recipientFinish": {
+          "type": "boolean",
+          "x-go-name": "RecipientFinish"
+        },
         "restrain": {
           "type": "string",
           "x-go-name": "Restrain"
@@ -259,9 +212,9 @@
           "format": "double",
           "x-go-name": "Reward"
         },
-        "status": {
+        "state": {
           "type": "string",
-          "x-go-name": "Status"
+          "x-go-name": "State"
         },
         "type": {
           "type": "string",
@@ -301,11 +254,7 @@
           "x-go-name": "Email"
         },
         "icon": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int8"
-          },
+          "type": "string",
           "x-go-name": "Icon"
         },
         "id": {
@@ -320,10 +269,6 @@
           "type": "string",
           "x-go-name": "Name"
         },
-        "password": {
-          "type": "string",
-          "x-go-name": "Password"
-        },
         "phone": {
           "type": "string",
           "x-go-name": "Phone"
@@ -337,6 +282,52 @@
     }
   },
   "responses": {
+    "swaggAuthOfAdminResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggAuthOfUserResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
     "swaggBadReq": {
       "description": "Error Fail",
       "schema": {

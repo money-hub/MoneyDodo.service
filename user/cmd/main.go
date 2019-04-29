@@ -4,7 +4,7 @@
 
 // money-hub MoneyDodo/user
 //
-// This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example
+// This documentation describes example APIs found under https://github.com/money-hub/MoneyDodo.service
 //
 //     Schemes: http
 //     Version: 1.0.0

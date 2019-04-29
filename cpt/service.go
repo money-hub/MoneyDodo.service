@@ -1,8 +1,9 @@
-package personalTasks
+package cpt
 
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/money-hub/MoneyDodo.service/db"
 	"github.com/money-hub/MoneyDodo.service/model"
@@ -110,7 +111,13 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, action string,
 	if task1.Publisher == id {
 		// 1. 如果当前操作为release，则需要满足之前task的state为non-released
 		// 2. 如果当前操作为finish，则需要满足之前task的state为claimed
-		if (action == model.TaskActionRelease && task1.State == model.TaskStateNonReleased) || (action == model.TaskActionFinish && task1.State == model.TaskActionClaim) {
+		if (action == model.TaskActionRelease && task1.State == model.TaskStateNonReleased) || (action == model.TaskActionFinish && task1.State == model.TaskStateClaimed) {
+			if action == model.TaskActionRelease {
+				task.Pubdate = time.Now()
+			} else if action == model.TaskActionFinish {
+				task.Enddate = time.Now()
+				task.ConfirmFinish = true
+			}
 			_, err := sess.Where("id = ?", taskId).Update(task)
 			if err != nil {
 				sess.Rollback()
@@ -122,24 +129,35 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, action string,
 	} else if task1.Recipient == id {
 		// 任务接受者
 		// 1. 如果当前操作为claim，则需要满足之前task的state为released
-		if action == model.TaskActionClaim && task1.State == model.TaskStateReleased {
+		// 2. 如果当前操作为finish，则需要满足之前task的state为claimed
+		if (action == model.TaskActionClaim && task1.State == model.TaskStateReleased) || (action == model.TaskActionFinish && task1.State == model.TaskStateClaimed) {
+			if action == model.TaskActionFinish {
+				task.RecipientFinish = true
+			}
 			_, err := sess.Where("id = ?", taskId).Update(task)
 			if err != nil {
 				sess.Rollback()
 				return false, err.Error(), nil
 			}
-			deal := model.Deal{
-				TaskId: taskId,
-			}
-			if _, err = sess.Where("userId = ? and taskId = ?", userId, taskId).AllCols().Update(r); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
+			if action == model.TaskActionClaim {
+				deal := model.Deal{
+					TaskId:    taskId,
+					Publisher: task.Publisher,
+					Recipient: task.Recipient,
+					Since:     time.Now(),
+					Reward:    task.Reward,
+					State:     model.DealStateUnderway,
+				}
+				if _, err = sess.Insert(deal); err != nil {
+					sess.Rollback()
+					return false, err.Error(), nil
+				}
 			}
 		} else {
 			return false, "The url parameter action is not matching to task.State.", nil
 		}
 	} else {
-		return false, "You are not involved in this task.", nil
+		return false, "The user is not involved in this task.", nil
 	}
 	err = sess.Commit()
 	if err != nil {
@@ -148,30 +166,18 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, action string,
 	return true, "", nil
 }
 
-func (b *basicCptService) Delete(ctx context.Context, userId string, taskId string, status string) (status1 bool, errinfo string, data *model.Task) {
-	// 用户未注册
-	user := &model.User{
-		Id: userId,
-	}
-	ok, err := b.Engine().Get(user)
-	if err != nil {
-		return false, err.Error(), nil
-	}
-	if !ok {
-		return false, "The user may not be registered.", nil
-	}
-	if status != model.TaskStatusNone && status != model.TaskStatusReleased && status != model.TaskStatusClaimed && status != model.TaskStatusFinished {
+func (b *basicCptService) Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task) {
+	if state != model.TaskStateNonReleased && state != model.TaskStateReleased && state != model.TaskStateClaimed && state != model.TaskStateFinished {
 		return false, "The query parameter status is not correct!", nil
 	}
+	var err error
 	sess := b.Engine().NewSession()
 	defer sess.Close()
 	if err = sess.Begin(); err != nil {
 		return false, err.Error(), nil
 	}
-	r := model.Relation{
-		UserId: userId,
+	deal := model.Deal{
 		TaskId: taskId,
-		Status: status,
 	}
 
 	task := &model.Task{
@@ -181,68 +187,95 @@ func (b *basicCptService) Delete(ctx context.Context, userId string, taskId stri
 		return false, err.Error(), nil
 	}
 
-	task1 := *task
-	task1.Recipient = ""
-	task1.Status = model.TaskStatusNone
-
+	// 获取进行此操作的用户ID
+	id := ctx.Value("Id").(string)
 	// 发布者
-	if task.Publisher == userId {
-		log.Println(1)
-		if status == model.TaskStatusClaimed {
-			return false, "The query parameter status is not correct!", nil
+	if task.Publisher == id {
+		if state == model.TaskStateClaimed {
+			return false, "The query parameter state is not correct!", nil
 		}
-		if status == model.TaskStatusReleased {
-			if task.Status == model.TaskStatusNone {
+		if state == model.TaskStateReleased {
+			if task.State == model.TaskStateNonReleased {
 				return true, "The task doesn't released, you don't need to cancel it.", nil
 			}
 			// 发布者不能取消一个被接受的任务
-			if task.Status == model.TaskStatusClaimed {
+			if task.State == model.TaskStateClaimed {
 				return false, "The task has been claimed, you can't cancel it.", nil
 			}
 
-			if task.Status == model.TaskStatusFinished {
+			if task.State == model.TaskStateFinished {
 				return false, "The task has been finished, you can't cancel it", nil
 			}
 
-			// 发布者取消发布，或者删除已完成的任务
-			if _, err = sess.Delete(r); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
-			// 更新任务状态为未发布
-			if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task1); err != nil {
+			// 发布者取消发布，更新任务状态为未发布
+			task.State = model.TaskStateNonReleased
+			if _, err = sess.Where("Id = ?", taskId).Update(task); err != nil {
 				sess.Rollback()
 				return false, err.Error(), nil
 			}
 		}
 
-		if status == model.TaskStatusNone || status == model.TaskStatusFinished {
+		// 发布者删除未发布的任务
+		if state == model.TaskStateNonReleased {
 			if _, err = sess.Delete(task); err != nil {
 				sess.Rollback()
 				return false, err.Error(), nil
 			}
 		}
-	} else if task.Recipient == userId {
-		// 领取者
-		log.Println(2)
-		if status != model.TaskStatusClaimed {
+		// 发布者删除已完成的任务
+		if state == model.TaskStateFinished {
+			// 如果接收者已经删除了此任务，则将任务从数据库中删除
+			if task.Recipient != "" {
+				if _, err = sess.Delete(task); err != nil {
+					sess.Rollback()
+					return false, err.Error(), nil
+				}
+			} else {
+				// 否则，只需要将task.Publisher置为空即可
+				task.Publisher = ""
+				if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
+					sess.Rollback()
+					return false, err.Error(), nil
+				}
+			}
+		}
+	} else if task.Recipient == id {
+		// 接收者
+		// 取消接受任务，删除deal交易信息，更新任务状态为为发布状态
+		if state == model.TaskStateClaimed {
+			if _, err = sess.Delete(deal); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+			task.State = model.TaskStateReleased
+			if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+		} else if state == model.TaskStateFinished {
+			// 如果发布者已经删除了此任务，则将任务从数据库中删除
+			if task.Publisher != "" {
+				if _, err = sess.Delete(task); err != nil {
+					sess.Rollback()
+					return false, err.Error(), nil
+				}
+			} else {
+				// 否则，只需要将task.Recipient置为空即可
+				task.Recipient = ""
+				if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
+					sess.Rollback()
+					return false, err.Error(), nil
+				}
+			}
+		} else {
 			return false, "The query parameter status is not correct!", nil
-		}
-		if _, err = sess.Delete(r); err != nil {
-			sess.Rollback()
-			return false, err.Error(), nil
-		}
-		// 更新任务状态为未发布
-		if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task1); err != nil {
-			sess.Rollback()
-			return false, err.Error(), nil
 		}
 	}
 	err = sess.Commit()
 	if err != nil {
 		return false, err.Error(), nil
 	}
-	return false, "The url userId is not equal to the task.Publisher or task.Recipient.", nil
+	return true, "", nil
 }
 
 // NewBasicCptService returns a naive, stateless implementation of CptService.

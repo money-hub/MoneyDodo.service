@@ -1,4 +1,4 @@
-package personalTasks
+package cpt
 
 import (
 	"context"
@@ -8,45 +8,45 @@ import (
 )
 
 type Endpoints struct {
-	GetSpecEndpoint   endpoint.Endpoint
-	GetAllEndpoint    endpoint.Endpoint
-	PostClaimEndpoint endpoint.Endpoint
-	PostEndpoint      endpoint.Endpoint
-	PutEndpoint       endpoint.Endpoint
-	DeleteEndpoint    endpoint.Endpoint
+	GetSpecEndpoint endpoint.Endpoint
+	GetAllEndpoint  endpoint.Endpoint
+	PostEndpoint    endpoint.Endpoint
+	PutEndpoint     endpoint.Endpoint
+	DeleteEndpoint  endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s CptService) Endpoints {
 	eps := Endpoints{
-		GetSpecEndpoint:   MakeGetSpecEndpoint(s),
-		GetAllEndpoint:    MakeGetAllEndpoint(s),
-		PostClaimEndpoint: MakePostClaimEndpoint(s),
-		PostEndpoint:      MakePostEndpoint(s),
-		PutEndpoint:       MakePutEndpoint(s),
-		DeleteEndpoint:    MakeDeleteEndpoint(s),
+		GetSpecEndpoint: MakeGetSpecEndpoint(s),
+		GetAllEndpoint:  MakeGetAllEndpoint(s),
+		PostEndpoint:    MakePostEndpoint(s),
+		PutEndpoint:     MakePutEndpoint(s),
+		DeleteEndpoint:  MakeDeleteEndpoint(s),
 	}
 	return eps
 }
 
-// GetSpecRequest collects the request parameters for the GetSpec method.
-type GetSpecRequest struct {
-	UserId string `json:"userId"`
-	TaskId string `json:"taskId"`
+// Request collects the request parameters for the All method.
+type Request struct {
+	TaskId string     `json:"taskId"`
+	State  string     `json:"state"`
+	Action string     `json:"action"`
+	Task   model.Task `json:"task"`
 }
 
-// GetSpecResponse collects the response parameters for the GetSpec method.
-type GetSpecResponse struct {
+// Response collects the response parameters for the All method.
+type Response struct {
 	Status  bool        `json:"status"`
 	Errinfo string      `json:"errinfo"`
-	Data    *model.Task `json:"data"`
+	Data    interface{} `json:"data"`
 }
 
 // MakeGetSpecEndpoint returns an endpoint that invokes GetSpec on the service.
 func MakeGetSpecEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetSpecRequest)
-		status, errinfo, data := s.GetSpec(ctx, req.UserId, req.TaskId)
-		return GetSpecResponse{
+		req := request.(Request)
+		status, errinfo, data := s.GetSpec(ctx, req.TaskId)
+		return Response{
 			Status:  status,
 			Errinfo: errinfo,
 			Data:    data,
@@ -54,24 +54,24 @@ func MakeGetSpecEndpoint(s CptService) endpoint.Endpoint {
 	}
 }
 
-// GetAllRequest collects the request parameters for the GetAll method.
-type GetAllRequest struct {
-	UserId string `json:"userId"`
-}
+// // GetAllRequest collects the request parameters for the GetAll method.
+// type GetAllRequest struct {
+// 	UserId string `json:"userId"`
+// }
 
-// GetAllResponse collects the response parameters for the GetAll method.
-type GetAllResponse struct {
-	Status  bool         `json:"status"`
-	Errinfo string       `json:"errinfo"`
-	Data    []model.Task `json:"data"`
-}
+// // GetAllResponse collects the response parameters for the GetAll method.
+// type GetAllResponse struct {
+// 	Status  bool         `json:"status"`
+// 	Errinfo string       `json:"errinfo"`
+// 	Data    []model.Task `json:"data"`
+// }
 
 // MakeGetAllEndpoint returns an endpoint that invokes GetAll on the service.
 func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetAllRequest)
-		status, errinfo, data := s.GetAll(ctx, req.UserId)
-		return GetAllResponse{
+		req := request.(Request)
+		status, errinfo, data := s.GetAll(ctx, req.State)
+		return Response{
 			Status:  status,
 			Errinfo: errinfo,
 			Data:    data,
@@ -79,25 +79,25 @@ func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 	}
 }
 
-// PostRequest collects the response parameters for the Post method.
-type PostRequest struct {
-	UserId string     `json:"userId"`
-	Task   model.Task `json:"task"`
-}
+// // PostRequest collects the response parameters for the Post method.
+// type PostRequest struct {
+// 	UserId string     `json:"userId"`
+// 	Task   model.Task `json:"task"`
+// }
 
-// PostResponse collects the response parameters for the Post method.
-type PostResponse struct {
-	Status  bool        `json:"status"`
-	Errinfo string      `json:"errinfo"`
-	Data    *model.Task `json:"data"`
-}
+// // PostResponse collects the response parameters for the Post method.
+// type PostResponse struct {
+// 	Status  bool        `json:"status"`
+// 	Errinfo string      `json:"errinfo"`
+// 	Data    *model.Task `json:"data"`
+// }
 
 // MakePostEndpoint returns an endpoint that invokes Post on the service.
 func MakePostEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(PostRequest)
-		status, errinfo, data := s.Post(ctx, req.UserId, req.Task)
-		return PostResponse{
+		req := request.(Request)
+		status, errinfo, data := s.Post(ctx, req.Task)
+		return Response{
 			Status:  status,
 			Errinfo: errinfo,
 			Data:    data,
@@ -105,52 +105,26 @@ func MakePostEndpoint(s CptService) endpoint.Endpoint {
 	}
 }
 
-// PostClaimRequest collects the response parameters for the PostClaim method.
-type PostClaimRequest struct {
-	UserId string `json:"userId"`
-	TaskId string `json:"taskId"`
-}
+// // DeleteRequest collects the response parameters for the Delete method.
+// type DeleteRequest struct {
+// 	UserId string `json:"userId"`
+// 	TaskId string `json:"taskId"`
+// 	Status string `json:"status"`
+// }
 
-// PostClaimResponse collects the response parameters for the PostClaim method.
-type PostClaimResponse struct {
-	Status  bool        `json:"status"`
-	Errinfo string      `json:"errinfo"`
-	Data    *model.Task `json:"data"`
-}
-
-// MakePostClaimEndpoint returns an endpoint that invokes PostClaim on the service.
-func MakePostClaimEndpoint(s CptService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(PostClaimRequest)
-		status, errinfo, data := s.PostClaim(ctx, req.UserId, req.TaskId)
-		return PostClaimResponse{
-			Status:  status,
-			Errinfo: errinfo,
-			Data:    data,
-		}, nil
-	}
-}
-
-// DeleteRequest collects the response parameters for the Delete method.
-type DeleteRequest struct {
-	UserId string `json:"userId"`
-	TaskId string `json:"taskId"`
-	Status string `json:"status"`
-}
-
-// DeleteResponse collects the response parameters for the Delete method.
-type DeleteResponse struct {
-	Status  bool        `json:"status"`
-	Errinfo string      `json:"errinfo"`
-	Data    *model.Task `json:"data"`
-}
+// // DeleteResponse collects the response parameters for the Delete method.
+// type DeleteResponse struct {
+// 	Status  bool        `json:"status"`
+// 	Errinfo string      `json:"errinfo"`
+// 	Data    *model.Task `json:"data"`
+// }
 
 // MakeDeleteEndpoint returns an endpoint that invokes Delete on the service.
 func MakeDeleteEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(DeleteRequest)
-		status, errinfo, data := s.Delete(ctx, req.UserId, req.TaskId, req.Status)
-		return DeleteResponse{
+		req := request.(Request)
+		status, errinfo, data := s.Delete(ctx, req.TaskId, req.State)
+		return Response{
 			Status:  status,
 			Errinfo: errinfo,
 			Data:    data,
@@ -158,26 +132,26 @@ func MakeDeleteEndpoint(s CptService) endpoint.Endpoint {
 	}
 }
 
-// PutRequest collects the response parameters for the Put method.
-type PutRequest struct {
-	UserId string     `json:"userId"`
-	TaskId string     `json:"taskId"`
-	Task   model.Task `json:"task"`
-}
+// // PutRequest collects the response parameters for the Put method.
+// type PutRequest struct {
+// 	UserId string     `json:"userId"`
+// 	TaskId string     `json:"taskId"`
+// 	Task   model.Task `json:"task"`
+// }
 
-// PutResponse collects the response parameters for the Put method.
-type PutResponse struct {
-	Status  bool        `json:"status"`
-	Errinfo string      `json:"errinfo"`
-	Data    *model.Task `json:"data"`
-}
+// // PutResponse collects the response parameters for the Put method.
+// type PutResponse struct {
+// 	Status  bool        `json:"status"`
+// 	Errinfo string      `json:"errinfo"`
+// 	Data    *model.Task `json:"data"`
+// }
 
 // MakePutEndpoint returns an endpoint that invokes Put on the service.
 func MakePutEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(PutRequest)
-		status, errinfo, data := s.Put(ctx, req.UserId, req.TaskId, req.Task)
-		return PutResponse{
+		req := request.(Request)
+		status, errinfo, data := s.Put(ctx, req.TaskId, req.Action, req.Task)
+		return Response{
 			Status:  status,
 			Errinfo: errinfo,
 			Data:    data,
