@@ -3,7 +3,6 @@ package cpt
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/money-hub/MoneyDodo.service/db"
 	"github.com/money-hub/MoneyDodo.service/model"
@@ -12,15 +11,15 @@ import (
 // BASE_URL=http://hostname:port/api/tasks
 
 type CptService interface {
-	// 查询所有任务、未发布的任务、已发布但未被领取、正在进行、已经完成
-	GetAll(ctx context.Context, state string) (status bool, errinfo string, data []model.Task)
-	// 查询某个任务
-	GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data *model.Task)
-	// 创建任务
-	Post(ctx context.Context, task model.Task) (status bool, errinfo string, data *model.Task)
+	// 查询所有任务，kind和state为可选参数，返回值为缩略信息
+	GetAll(ctx context.Context, kind string, state string) (status bool, errinfo string, data []model.Task)
+	// 查询某个任务，返回值为相应类型的详细信息
+	GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data interface{})
+	// 创建任务，上传任务为详细信息
+	Post(ctx context.Context, kind string, task interface{}) (status bool, errinfo string, data interface{})
 	// 发布任务、领取任务、完成任务
-	Put(ctx context.Context, taskId string, action string, task model.Task) (status bool, errinfo string, data *model.Task)
-	// 取消领取任务、删除已完成任务、取消发布任务
+	Put(ctx context.Context, taskId string, task interface{}) (status bool, errinfo string, data interface{})
+	// // 取消领取任务、删除已完成任务、取消发布任务
 	Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task)
 }
 
@@ -28,13 +27,17 @@ type basicCptService struct {
 	*db.DBService
 }
 
-func (b *basicCptService) GetAll(ctx context.Context, state string) (status bool, errinfo string, data []model.Task) {
+func (b *basicCptService) GetAll(ctx context.Context, kind string, state string) (status bool, errinfo string, data []model.Task) {
 	data = make([]model.Task, 0)
 	var err error
-	if state == "" {
+	if kind == "" && state == "" {
 		err = b.Engine().Find(&data)
-	} else {
+	} else if kind == "" {
 		err = b.Engine().Where("state = ?", state).Find(&data)
+	} else if state == "" {
+		err = b.Engine().Where("kind = ?", kind).Find(&data)
+	} else {
+		err = b.Engine().Where("kind = ? and state = ?", kind, state).Find(&data)
 	}
 	status = err == nil
 	if err != nil {
@@ -43,121 +46,117 @@ func (b *basicCptService) GetAll(ctx context.Context, state string) (status bool
 	return
 }
 
-func (b *basicCptService) GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data *model.Task) {
-	data = &model.Task{
-		Id: taskId,
-	}
-	status, err := b.Engine().Get(data)
-	if status == false {
-		data = nil
-	}
-	if err != nil {
-		errinfo = err.Error()
-	}
-	return
-}
-
-func (b *basicCptService) Post(ctx context.Context, task model.Task) (status bool, errinfo string, data *model.Task) {
+func (b *basicCptService) GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data interface{}) {
 	var err error
-	sess := b.Engine().NewSession()
-	defer sess.Close()
-	if err = sess.Begin(); err != nil {
-		return false, err.Error(), nil
+	var ok bool
+	task := model.Task{
+		Id: taskId,
 	}
-	if _, err = sess.Insert(task); err != nil {
-		sess.Rollback()
-		return false, err.Error(), nil
+	status, err = b.Engine().Get(&task)
+	if status == false {
+		return false, "The query task is not existed.", nil
 	}
-	lastTask := &model.Task{}
-	if _, err = sess.Limit(1, 0).Desc("Id").Get(lastTask); err != nil {
-		sess.Rollback()
-		return false, err.Error(), nil
-	}
-	err = sess.Commit()
 	if err != nil {
 		return false, err.Error(), nil
 	}
-	return true, "", lastTask
+	if task.Kind == model.TaskKindQuestionnaire {
+		qtnr := model.Questionnaire{
+			TaskId: taskId,
+		}
+		if ok, err = b.Engine().Get(&qtnr); err != nil {
+			return false, err.Error(), nil
+		}
+		if !ok {
+			return false, "The questionnaire has not been created.", nil
+		}
+		data = model.Qtnr{
+			Task: task,
+			Qtnr: &qtnr,
+		}
+		return true, "", data
+	} else {
+		return false, "The task kind is not true", nil
+	}
 }
 
-func (b *basicCptService) Put(ctx context.Context, taskId string, action string, task model.Task) (status bool, errinfo string, data *model.Task) {
+func (b *basicCptService) Post(ctx context.Context, kind string, taskUnknown interface{}) (status bool, errinfo string, data interface{}) {
+	var err error
+	if kind == model.TaskKindQuestionnaire {
+		qtnr, ok := taskUnknown.(model.Qtnr)
+		if !ok {
+			return false, "The task kind is not matching to the uploaded task.", nil
+		}
+		sess := b.Engine().NewSession()
+		defer sess.Close()
+		if err = sess.Begin(); err != nil {
+			return false, err.Error(), nil
+		}
+		qtnr.State = model.TaskStateNonReleased
+		if _, err = sess.Insert(qtnr.Task); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
+		}
+		lastTask := &model.Task{}
+		if _, err = sess.Limit(1, 0).Desc("Id").Get(lastTask); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
+		}
+		qtnr.Id = lastTask.Id
+		qtnr.Qtnr.TaskId = lastTask.Id
+		if _, err = sess.Insert(qtnr.Qtnr); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
+		}
+		err = sess.Commit()
+		if err != nil {
+			return false, err.Error(), nil
+		}
+		return true, "", qtnr
+	} else {
+		return false, "The task kind is not true", nil
+	}
+}
+
+func (b *basicCptService) Put(ctx context.Context, taskId string, taskUnknown interface{}) (status bool, errinfo string, data interface{}) {
 	// 判断当前任务是否存在
-	task1 := &model.Task{
+	task := &model.Task{
 		Id: taskId,
 	}
-	ok, err := b.Engine().Get(task1)
+	ok, err := b.Engine().Get(task)
 	if err != nil {
 		return false, err.Error(), nil
 	}
 	if !ok {
 		return false, "The task doesn't existed.", nil
 	}
-
-	// 判断action与task.State是否一致
-	if task.State != action {
-		return false, "The task.State is not equal to action", nil
-	}
-
-	// 获取进行此操作的用户ID
-	id := ctx.Value("Id").(string)
-
-	// 进行具体的action
 	sess := b.Engine().NewSession()
 	defer sess.Close()
 	if err = sess.Begin(); err != nil {
 		return false, err.Error(), nil
 	}
-	// 任务创建者
-	if task1.Publisher == id {
-		// 1. 如果当前操作为release，则需要满足之前task的state为non-released
-		// 2. 如果当前操作为finish，则需要满足之前task的state为claimed
-		if (action == model.TaskActionRelease && task1.State == model.TaskStateNonReleased) || (action == model.TaskActionFinish && task1.State == model.TaskStateClaimed) {
-			if action == model.TaskActionRelease {
-				task.Pubdate = time.Now()
-			} else if action == model.TaskActionFinish {
-				task.Enddate = time.Now()
-				task.ConfirmFinish = true
-			}
-			_, err := sess.Where("id = ?", taskId).Update(task)
-			if err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
-		} else {
-			return false, "The url parameter action is not matching to task.State.", nil
+
+	if task.Kind == model.TaskKindQuestionnaire {
+		qtnr, ok := taskUnknown.(model.Qtnr)
+		if !ok {
+			return false, "The task kind is not matching to the uploaded task.", nil
 		}
-	} else if task1.Recipient == id {
-		// 任务接受者
-		// 1. 如果当前操作为claim，则需要满足之前task的state为released
-		// 2. 如果当前操作为finish，则需要满足之前task的state为claimed
-		if (action == model.TaskActionClaim && task1.State == model.TaskStateReleased) || (action == model.TaskActionFinish && task1.State == model.TaskStateClaimed) {
-			if action == model.TaskActionFinish {
-				task.RecipientFinish = true
-			}
-			_, err := sess.Where("id = ?", taskId).Update(task)
-			if err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
-			if action == model.TaskActionClaim {
-				deal := model.Deal{
-					TaskId:    taskId,
-					Publisher: task.Publisher,
-					Recipient: task.Recipient,
-					Since:     time.Now(),
-					Reward:    task.Reward,
-					State:     model.DealStateUnderway,
-				}
-				if _, err = sess.Insert(deal); err != nil {
-					sess.Rollback()
-					return false, err.Error(), nil
-				}
-			}
-		} else {
-			return false, "The url parameter action is not matching to task.State.", nil
+		// 判断当前用户是否是任务的发布者
+		if qtnr.Publisher != ctx.Value("Id").(string) {
+			return false, "You are not permitted to modify others' task.", nil
+		}
+		if qtnr.State == model.TaskStateReleased {
+			return false, "You can't modify the task which has been released.", nil
+		}
+		if _, err := sess.Where("id = ?", qtnr.Id).AllCols().Update(qtnr.Task); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
+		}
+		if _, err := sess.Where("taskId = ?", qtnr.Id).AllCols().Update(qtnr.Qtnr); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
 		}
 	} else {
-		return false, "The user is not involved in this task.", nil
+		return false, "The task kind is not true", nil
 	}
 	err = sess.Commit()
 	if err != nil {
@@ -167,7 +166,7 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, action string,
 }
 
 func (b *basicCptService) Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task) {
-	if state != model.TaskStateNonReleased && state != model.TaskStateReleased && state != model.TaskStateClaimed && state != model.TaskStateFinished {
+	if state != model.TaskStateNonReleased && state != model.TaskStateReleased && state != model.TaskStateClosed {
 		return false, "The query parameter status is not correct!", nil
 	}
 	var err error
@@ -176,9 +175,6 @@ func (b *basicCptService) Delete(ctx context.Context, taskId string, state strin
 	if err = sess.Begin(); err != nil {
 		return false, err.Error(), nil
 	}
-	deal := model.Deal{
-		TaskId: taskId,
-	}
 
 	task := &model.Task{
 		Id: taskId,
@@ -186,89 +182,50 @@ func (b *basicCptService) Delete(ctx context.Context, taskId string, state strin
 	if _, err = sess.Get(task); err != nil {
 		return false, err.Error(), nil
 	}
+	deal := make([]model.Deal, 0)
+	if err = sess.Where("TaskId = ?", taskId).Find(deal); err != nil {
+		return false, err.Error(), nil
+	}
 
 	// 获取进行此操作的用户ID
-	id := ctx.Value("Id").(string)
-	// 发布者
-	if task.Publisher == id {
-		if state == model.TaskStateClaimed {
-			return false, "The query parameter state is not correct!", nil
+	id := "16340157"
+	if task.Publisher != id {
+		return false, "You are not permitted to modify others' task.", nil
+	}
+
+	if state == model.TaskStateReleased {
+		if task.State == model.TaskStateNonReleased {
+			return true, "The task doesn't released, you don't need to cancel it.", nil
 		}
-		if state == model.TaskStateReleased {
-			if task.State == model.TaskStateNonReleased {
-				return true, "The task doesn't released, you don't need to cancel it.", nil
-			}
-			// 发布者不能取消一个被接受的任务
-			if task.State == model.TaskStateClaimed {
-				return false, "The task has been claimed, you can't cancel it.", nil
-			}
-
-			if task.State == model.TaskStateFinished {
-				return false, "The task has been finished, you can't cancel it", nil
-			}
-
-			// 发布者取消发布，更新任务状态为未发布
-			task.State = model.TaskStateNonReleased
-			if _, err = sess.Where("Id = ?", taskId).Update(task); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
+		// 发布者不能取消一个被接受的任务
+		if len(deal) > 0 {
+			return false, "You can't cancel task that has been claimed.", nil
 		}
 
-		// 发布者删除未发布的任务
-		if state == model.TaskStateNonReleased {
-			if _, err = sess.Delete(task); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
+		if task.State == model.TaskStateClosed {
+			return false, "The task has been finished, you can't cancel it", nil
 		}
-		// 发布者删除已完成的任务
-		if state == model.TaskStateFinished {
-			// 如果接收者已经删除了此任务，则将任务从数据库中删除
-			if task.Recipient != "" {
-				if _, err = sess.Delete(task); err != nil {
-					sess.Rollback()
-					return false, err.Error(), nil
-				}
-			} else {
-				// 否则，只需要将task.Publisher置为空即可
-				task.Publisher = ""
-				if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
-					sess.Rollback()
-					return false, err.Error(), nil
-				}
-			}
+
+		// 发布者取消发布，更新任务状态为未发布
+		task.State = model.TaskStateNonReleased
+		if _, err = sess.Where("Id = ?", taskId).Update(task); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
 		}
-	} else if task.Recipient == id {
-		// 接收者
-		// 取消接受任务，删除deal交易信息，更新任务状态为为发布状态
-		if state == model.TaskStateClaimed {
-			if _, err = sess.Delete(deal); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
-			task.State = model.TaskStateReleased
-			if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
-				sess.Rollback()
-				return false, err.Error(), nil
-			}
-		} else if state == model.TaskStateFinished {
-			// 如果发布者已经删除了此任务，则将任务从数据库中删除
-			if task.Publisher != "" {
-				if _, err = sess.Delete(task); err != nil {
-					sess.Rollback()
-					return false, err.Error(), nil
-				}
-			} else {
-				// 否则，只需要将task.Recipient置为空即可
-				task.Recipient = ""
-				if _, err = sess.Where("Id = ?", taskId).AllCols().Update(task); err != nil {
-					sess.Rollback()
-					return false, err.Error(), nil
-				}
-			}
-		} else {
-			return false, "The query parameter status is not correct!", nil
+	}
+
+	// 发布者删除未发布的任务或者删除已完成的任务
+	if state == model.TaskStateNonReleased || state == model.TaskStateClosed {
+		questionnaire := model.Questionnaire{
+			TaskId: taskId,
+		}
+		if _, err = sess.Delete(questionnaire); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
+		}
+		if _, err = sess.Delete(task); err != nil {
+			sess.Rollback()
+			return false, err.Error(), nil
 		}
 	}
 	err = sess.Commit()
@@ -279,11 +236,11 @@ func (b *basicCptService) Delete(ctx context.Context, taskId string, state strin
 }
 
 // NewBasicCptService returns a naive, stateless implementation of CptService.
-func NewBasicCptService() CptService {
+func NewBasicCptService(conf string) CptService {
 	basicCptSvc := &basicCptService{
 		&db.DBService{},
 	}
-	err := basicCptSvc.Bind("conf/conf.lyh.yml")
+	err := basicCptSvc.Bind(conf)
 	if err != nil {
 		log.Printf("The CptService failed to bind with mysql")
 	}

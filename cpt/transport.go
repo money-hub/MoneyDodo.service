@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/money-hub/MoneyDodo.service/model"
 )
 
 type Decodes struct {
@@ -57,18 +58,27 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	if !ok {
 		log.Println("state is not in the request URL.")
 	}
-	action, ok := vars["action"]
-	if !ok {
-		log.Println("action is not in the request URL.")
-	}
 	req := Request{
 		TaskId: taskId,
 		State:  state,
-		Action: action,
 	}
-	err := json.NewDecoder(r.Body).Decode(&req.Task)
-	if err != nil {
-		log.Println("task is not in the request Body.")
+	if r.Method == "POST" || r.Method == "PUT" {
+		wrapper := model.Wrapper{}
+		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		if err != nil {
+			log.Println("The upload wrapper is not correct.")
+		}
+		req.Kind = wrapper.Kind
+		if req.Kind == model.TaskKindQuestionnaire {
+			t := model.Qtnr{
+				Qtnr: &model.Questionnaire{},
+			}
+			err := json.Unmarshal(wrapper.Raw, &t)
+			if err != nil {
+				log.Println("task is not in the request Body.")
+			}
+			req.Task = t
+		}
 	}
 	return req, nil
 }

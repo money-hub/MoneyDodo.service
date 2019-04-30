@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/money-hub/MoneyDodo.service/model"
 )
 
 type Endpoints struct {
@@ -28,10 +27,10 @@ func MakeServerEndpoints(s CptService) Endpoints {
 
 // Request collects the request parameters for the All method.
 type Request struct {
-	TaskId string     `json:"taskId"`
-	State  string     `json:"state"`
-	Action string     `json:"action"`
-	Task   model.Task `json:"task"`
+	TaskId string      `json:"taskId"`
+	Kind   string      `json:"kind"`
+	State  string      `json:"state"`
+	Task   interface{} `json:"task"`
 }
 
 // Response collects the response parameters for the All method.
@@ -70,7 +69,7 @@ func MakeGetSpecEndpoint(s CptService) endpoint.Endpoint {
 func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(Request)
-		status, errinfo, data := s.GetAll(ctx, req.State)
+		status, errinfo, data := s.GetAll(ctx, req.Kind, req.State)
 		return Response{
 			Status:  status,
 			Errinfo: errinfo,
@@ -96,7 +95,7 @@ func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 func MakePostEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(Request)
-		status, errinfo, data := s.Post(ctx, req.Task)
+		status, errinfo, data := s.Post(ctx, req.Kind, req.Task)
 		return Response{
 			Status:  status,
 			Errinfo: errinfo,
@@ -150,7 +149,7 @@ func MakeDeleteEndpoint(s CptService) endpoint.Endpoint {
 func MakePutEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(Request)
-		status, errinfo, data := s.Put(ctx, req.TaskId, req.Action, req.Task)
+		status, errinfo, data := s.Put(ctx, req.TaskId, req.State)
 		return Response{
 			Status:  status,
 			Errinfo: errinfo,

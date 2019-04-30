@@ -13,9 +13,9 @@ create table if not exists user (
     icon mediumtext COMMENT '头像',
     phone varchar(11) COMMENT '电话号码',
     creditScore int COMMENT '信用分数',
-    email varchar(20) COMMENT '邮箱',
+    email varchar(50) COMMENT '邮箱',
     certificationStatus int DEFAULT 0 COMMENT '0-未提交，1-已提交未认证，2-审核通过，3-审核驳回',
-    certifiedPic MEDIUMBLOB COMMENT '认证图片'
+    certifiedPic mediumtext COMMENT '认证图片'
 );
 
 # 管理员
@@ -33,15 +33,27 @@ create table if not exists enterprise (
 # 任务
 create table if not exists task (
 	id int AUTO_INCREMENT primary key COMMENT '任务id',
-    type varchar(20) not null COMMENT '任务类型',
+    kind varchar(20) not null COMMENT '任务类型',
     publisher varchar(20) not null COMMENT '发布者',
-    recipient varchar(20) COMMENT '接收者',
+    -- recipient varchar(20) COMMENT '接收者',
     restrain text COMMENT '任务限制',
     pubdate text COMMENT '发布时间',
     cutoff text COMMENT '截至时间',
+    -- enddate text COMMENT '结束时间',
     reward double COMMENT '赏金金额',
+    -- recipientFinish bool COMMENT '接收者确认完成',
+    -- ConfirmFinish bool COMMENT '接收者确认完成',
     state varchar(20) COMMENT '任务状态'
 );
+
+# 问卷
+create table if not exists questionnaire (
+    taskId int not null COMMENT '任务Id',
+    query mediumtext COMMENT '填空',
+    singleChoice mediumtext COMMENT '单项选择',
+    primary key(taskId),
+    foreign Key(taskId) references task(id)
+)
 
 # 交易
 create table if not exists deal (
