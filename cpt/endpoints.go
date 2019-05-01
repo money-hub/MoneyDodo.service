@@ -27,10 +27,14 @@ func MakeServerEndpoints(s CptService) Endpoints {
 
 // Request collects the request parameters for the All method.
 type Request struct {
-	TaskId string      `json:"taskId"`
-	Kind   string      `json:"kind"`
-	State  string      `json:"state"`
-	Task   interface{} `json:"task"`
+	TaskId  string      `json:"taskId"`
+	Kind    string      `json:"kind"`
+	State   string      `json:"state"`
+	Task    interface{} `json:"task"`
+	Page    int         `json:"page"`
+	Offset  int         `json:"offset"`
+	Limit   int         `json:"limit"`
+	Orderby string      `json:"orderby"`
 }
 
 // Response collects the response parameters for the All method.
@@ -69,7 +73,7 @@ func MakeGetSpecEndpoint(s CptService) endpoint.Endpoint {
 func MakeGetAllEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(Request)
-		status, errinfo, data := s.GetAll(ctx, req.Kind, req.State)
+		status, errinfo, data := s.GetAll(ctx, req.Kind, req.State, req.Page, req.Offset, req.Limit, req.Orderby)
 		return Response{
 			Status:  status,
 			Errinfo: errinfo,

@@ -27,6 +27,32 @@
         ],
         "summary": "Get all tasks.",
         "operationId": "swaggGetAllReq",
+        "parameters": [
+          {
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/swaggTasksResp"
@@ -140,7 +166,7 @@
             "type": "string",
             "description": "state can be one of \"non-released\", \"released\" and \"closed\"",
             "name": "state",
-            "in": "path",
+            "in": "query",
             "required": true
           }
         ],

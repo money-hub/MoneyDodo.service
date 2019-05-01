@@ -45,10 +45,30 @@ func (b *basicUserService) GetAll(ctx context.Context, page, offset, limit int, 
 	// TODO implement the business logic of GetAll
 	data = make([]model.User, 0)
 	err := b.Engine().Find(&data)
+
+	if orderby == "-id" {
+		for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+			data[i], data[j] = data[j], data[i]
+		}
+	}
+
+	if limit > 0 {
+		res := make([]model.User, 0)
+		for i, user := range data {
+			if i >= offset && i < offset+page*limit {
+				res = append(res, user)
+			}
+		}
+
+		status = err == nil
+		if err != nil {
+			errinfo = err.Error()
+		}
+		return status, errinfo, res
+	}
+
 	status = err == nil
-	if err == nil {
-		errinfo = ""
-	} else {
+	if err != nil {
 		errinfo = err.Error()
 	}
 	return

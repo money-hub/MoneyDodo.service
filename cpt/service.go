@@ -12,7 +12,7 @@ import (
 
 type CptService interface {
 	// 查询所有任务，kind和state为可选参数，返回值为缩略信息
-	GetAll(ctx context.Context, kind string, state string) (status bool, errinfo string, data []model.Task)
+	GetAll(ctx context.Context, kind string, state string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.Task)
 	// 查询某个任务，返回值为相应类型的详细信息
 	GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data interface{})
 	// 创建任务，上传任务为详细信息
@@ -27,7 +27,7 @@ type basicCptService struct {
 	*db.DBService
 }
 
-func (b *basicCptService) GetAll(ctx context.Context, kind string, state string) (status bool, errinfo string, data []model.Task) {
+func (b *basicCptService) GetAll(ctx context.Context, kind string, state string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.Task) {
 	data = make([]model.Task, 0)
 	var err error
 	if kind == "" && state == "" {
@@ -39,11 +39,32 @@ func (b *basicCptService) GetAll(ctx context.Context, kind string, state string)
 	} else {
 		err = b.Engine().Where("kind = ? and state = ?", kind, state).Find(&data)
 	}
+	if orderby == "-id" {
+		for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+			data[i], data[j] = data[j], data[i]
+		}
+	}
+
+	if limit > 0 {
+		res := make([]model.Task, 0)
+		for i, task := range data {
+			if i >= offset && i < offset+page*limit {
+				res = append(res, task)
+			}
+		}
+
+		status = err == nil
+		if err != nil {
+			errinfo = err.Error()
+		}
+		return status, errinfo, res
+	}
+
 	status = err == nil
 	if err != nil {
 		errinfo = err.Error()
 	}
-	return
+	return status, errinfo, data
 }
 
 func (b *basicCptService) GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data interface{}) {

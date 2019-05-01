@@ -107,6 +107,23 @@ func main() {
 	// ---
 	// summary: Get all tasks.
 	// description: Get all task without detail.
+	// parameters:
+	// - name: page
+	//   in: query
+	//   description: page indicates the number of pages you want to get from server.
+	//   type: int
+	// - name: offset
+	//   in: query
+	//   description: offset indicates the number of targets you want to skip.
+	//   type: int
+	// - name: limit
+	//   in: query
+	//   description: limit indicates the number of targets in one page you want to get from server.
+	//   type: int
+	// - name: orderby
+	//   in: query
+	//   description: orderby indicates the order of targets you want to get from server.
+	//   type: int
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggTasksResp"
@@ -158,7 +175,7 @@ func main() {
 	//   description: id of task
 	//   required: true
 	// - name: state
-	//   in: path
+	//   in: query
 	//   description: state can be one of "non-released", "released" and "closed"
 	//   type: string
 	//   required: true

@@ -27,7 +27,7 @@ func (l *LoggingMiddleware) GetSpec(ctx context.Context, taskId string) (status 
 	return
 }
 
-func (l *LoggingMiddleware) GetAll(ctx context.Context, kind, state string) (status bool, errinfo string, data []model.Task) {
+func (l *LoggingMiddleware) GetAll(ctx context.Context, kind, state string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.Task) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetAll",
@@ -36,7 +36,7 @@ func (l *LoggingMiddleware) GetAll(ctx context.Context, kind, state string) (sta
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status, errinfo, data = l.Next.GetAll(ctx, kind, state)
+	status, errinfo, data = l.Next.GetAll(ctx, kind, state, page, offset, limit, orderby)
 	return
 }
 
