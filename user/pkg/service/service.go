@@ -13,8 +13,8 @@ type UserService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
 	GetSpec(ctx context.Context, id string) (status bool, errinfo string, data *model.User)
-	GetAll(ctx context.Context) (status bool, errinfo string, data []model.User)
-	GetUDF(ctx context.Context, name string) (status bool, errinfo string, data []model.User)
+	GetAll(ctx context.Context, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User)
+	GetUDF(ctx context.Context, name string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User)
 	Post(ctx context.Context, user model.User) (status bool, errinfo string, data *model.User)
 	Patch(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User)
 	Put(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User)
@@ -41,7 +41,7 @@ func (b *basicUserService) GetSpec(ctx context.Context, id string) (status bool,
 	}
 	return
 }
-func (b *basicUserService) GetAll(ctx context.Context) (status bool, errinfo string, data []model.User) {
+func (b *basicUserService) GetAll(ctx context.Context, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	// TODO implement the business logic of GetAll
 	data = make([]model.User, 0)
 	err := b.Engine().Find(&data)
@@ -53,9 +53,9 @@ func (b *basicUserService) GetAll(ctx context.Context) (status bool, errinfo str
 	}
 	return
 }
-func (b *basicUserService) GetUDF(ctx context.Context, name string) (status bool, errinfo string, data []model.User) {
+func (b *basicUserService) GetUDF(ctx context.Context, name string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	// TODO implement the business logic of GetUDF
-	_, err, users := b.GetAll(ctx)
+	_, err, users := b.GetAll(ctx, page, offset, limit, orderby)
 	udfUsers := make([]model.User, 0)
 	for _, user := range users {
 		if user.Name == name {
