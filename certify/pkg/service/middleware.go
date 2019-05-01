@@ -30,7 +30,7 @@ func (l loggingMiddleware) GetAuthInfo(ctx context.Context, id string) (status b
 	}()
 	return l.next.GetAuthInfo(ctx, id)
 }
-func (l loggingMiddleware) PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User) {
+func (l loggingMiddleware) PostAuthInfo(ctx context.Context, id string, img string) (status bool, errinfo string, data model.User) {
 	defer func() {
 		l.logger.Log("method", "PostAuthInfo", "id", id, "img", img, "status", status, "errinfo", errinfo, "data", data)
 	}()
