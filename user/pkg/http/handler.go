@@ -4,13 +4,50 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	http1 "net/http"
+	"strconv"
 
 	http "github.com/go-kit/kit/transport/http"
 	handlers "github.com/gorilla/handlers"
 	mux "github.com/gorilla/mux"
 	endpoint "github.com/money-hub/MoneyDodo.service/user/pkg/endpoint"
 )
+
+func getQueries(r *http1.Request) (error, int, int, int, string) {
+	vars := mux.Vars(r)
+	var page, offset, limit int
+	var err error
+	pageStr, ok := vars["page"]
+	if !ok {
+		log.Println("page is not in the request URL.")
+	}
+	page, err = strconv.Atoi(pageStr)
+	if err != nil {
+		return err, 0, 0, 0, ""
+	}
+	offsetStr, ok := vars["offset"]
+	if !ok {
+		log.Println("offset is not in the request URL.")
+	}
+	offset, err = strconv.Atoi(offsetStr)
+	if err != nil {
+		return err, 0, 0, 0, ""
+	}
+	limitStr, ok := vars["limit"]
+	if !ok {
+		log.Println("limit is not in the request URL.")
+	}
+	limit, err = strconv.Atoi(limitStr)
+	if err != nil {
+		return err, 0, 0, 0, ""
+	}
+	orderby, ok := vars["orderby"]
+	if !ok {
+		log.Println("orderby is not in the request URL.")
+	}
+	return nil, page, offset, limit, orderby
+}
 
 // makeGetSpecHandler creates the handler logic
 func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
@@ -75,15 +112,20 @@ func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
 		)(http.NewServer(endpoints.GetAllEndpoint, decodeGetAllRequest, encodeGetAllResponse, options...)),
-	)
+	).Queries("page", "{page}", "offset", "{offset}", "limit", "{limit}", "orderby", "{orderby}")
 }
 
 // decodeGetAllRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeGetAllRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.GetAllRequest{}
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	return req, nil
+	err, page, offset, limit, orderby := getQueries(r)
+	req := endpoint.GetAllRequest{
+		Page:    page,
+		Offset:  offset,
+		Limit:   limit,
+		Orderby: orderby,
+	}
+	return req, err
 }
 
 // encodeGetAllResponse is a transport/http.EncodeResponseFunc that encodes
@@ -116,7 +158,7 @@ func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
 		)(http.NewServer(endpoints.GetUDFEndpoint, decodeGetUDFRequest, encodeGetUDFResponse, options...)),
-	)
+	).Queries("page", "{page}", "offset", "{offset}", "limit", "{limit}", "orderby", "{orderby}")
 }
 
 // decodeGetUDFRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -127,10 +169,15 @@ func decodeGetUDFRequest(_ context.Context, r *http1.Request) (interface{}, erro
 	if !ok {
 		return nil, errors.New("not a valid username")
 	}
+	err, page, offset, limit, orderby := getQueries(r)
 	req := endpoint.GetUDFRequest{
-		Name: name,
+		Name:    name,
+		Page:    page,
+		Offset:  offset,
+		Limit:   limit,
+		Orderby: orderby,
 	}
-	return req, nil
+	return req, err
 }
 
 // encodeGetUDFResponse is a transport/http.EncodeResponseFunc that encodes
