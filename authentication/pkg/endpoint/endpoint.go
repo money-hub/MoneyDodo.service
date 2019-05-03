@@ -14,9 +14,9 @@ type GetOpenidRequest struct {
 
 // GetOpenidResponse collects the response parameters for the GetOpenid method.
 type GetOpenidResponse struct {
-	Status  bool   `json:"status"`
-	Errinfo string `json:"errinfo"`
-	Data    string `json:"data"`
+	Status  bool             `json:"status"`
+	Errinfo string           `json:"errinfo"`
+	Data    *service.UserRes `json:"data"`
 }
 
 // MakeGetOpenidEndpoint returns an endpoint that invokes GetOpenid on the service.
@@ -59,7 +59,7 @@ func MakeAdminLoginEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 }
 
 // GetOpenid implements Service. Primarily useful in a client.
-func (e Endpoints) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
+func (e Endpoints) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data *service.UserRes) {
 	request := GetOpenidRequest{Code: code}
 	response, err := e.GetOpenidEndpoint(ctx, request)
 	if err != nil {
