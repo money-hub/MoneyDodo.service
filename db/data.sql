@@ -2,7 +2,6 @@
 create database if not exists MoneyDodo;
 
 use MoneyDodo;
-drop table user;
 # 用户
 create table if not exists user (
 	id varchar(20) not null primary key COMMENT 'OpenId',
@@ -20,13 +19,13 @@ create table if not exists user (
 
 # 管理员
 create table if not exists admin (
-    name varchar(20) not null COMMENT '姓名',
+    name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
 );
 
 # 企业
 create table if not exists enterprise (
-    name varchar(20) not null COMMENT '姓名',
+    name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
 );
 
@@ -53,5 +52,5 @@ create table if not exists deal (
     reward double COMMENT '交易额',
     state varchar(20) COMMENT '交易状态',
     primary key(taskId),
-    foreign Key(taskId) references task(id)
+    foreign key(taskId) references task(id)
 );
