@@ -5,12 +5,50 @@ import (
 	"encoding/json"
 	"errors"
 	http1 "net/http"
+	"strconv"
 
 	http "github.com/go-kit/kit/transport/http"
 	handlers "github.com/gorilla/handlers"
 	mux "github.com/gorilla/mux"
 	endpoint "github.com/money-hub/MoneyDodo.service/user/pkg/endpoint"
 )
+
+func getQueries(r *http1.Request) (error, int, int, int, string) {
+	page, offset, limit := 1, 0, -1
+	orderby := "id"
+	var err error
+	// 解析Queries
+	vals := r.URL.Query()
+	pages, ok := vals["page"]
+	if ok {
+		page, err = strconv.Atoi(pages[0])
+		if err != nil {
+			return err, 0, 0, 0, ""
+		}
+	}
+	offsets, ok := vals["offset"]
+	if ok {
+		offset, err = strconv.Atoi(offsets[0])
+		if err != nil {
+			return err, 0, 0, 0, ""
+		}
+	}
+	limits, ok := vals["limit"]
+	if ok {
+		limit, err = strconv.Atoi(limits[0])
+		if err != nil {
+			return err, 0, 0, 0, ""
+		}
+	}
+	orderbys, ok := vals["orderby"]
+	if ok {
+		orderby = orderbys[0]
+	}
+	if page <= 0 || offset < 0 || (orderby != "id" && orderby != "-id") {
+		return errors.New("The url queries are not correct."), 0, 0, 0, ""
+	}
+	return nil, page, offset, limit, orderby
+}
 
 // makeGetSpecHandler creates the handler logic
 func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
@@ -65,6 +103,23 @@ func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 	// ---
 	// summary: Get all users' profiles
 	// description: Get all users' profiles
+	// parameters:
+	// - name: page
+	//   in: query
+	//   description: page indicates the number of pages you want to get from server.
+	//   type: int
+	// - name: offset
+	//   in: query
+	//   description: offset indicates the number of targets you want to skip.
+	//   type: int
+	// - name: limit
+	//   in: query
+	//   description: limit indicates the number of targets in one page you want to get from server.
+	//   type: int
+	// - name: orderby
+	//   in: query
+	//   description: orderby indicates the order of targets you want to get from server.
+	//   type: int
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggUsersResp"
@@ -81,9 +136,14 @@ func makeGetAllHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 // decodeGetAllRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeGetAllRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.GetAllRequest{}
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	return req, nil
+	err, page, offset, limit, orderby := getQueries(r)
+	req := endpoint.GetAllRequest{
+		Page:    page,
+		Offset:  offset,
+		Limit:   limit,
+		Orderby: orderby,
+	}
+	return req, err
 }
 
 // encodeGetAllResponse is a transport/http.EncodeResponseFunc that encodes
@@ -106,6 +166,22 @@ func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 	//   description: name of user
 	//   type: string
 	//   required: true
+	// - name: page
+	//   in: query
+	//   description: page indicates the number of pages you want to get from server.
+	//   type: int
+	// - name: offset
+	//   in: query
+	//   description: offset indicates the number of targets you want to skip.
+	//   type: int
+	// - name: limit
+	//   in: query
+	//   description: limit indicates the number of targets in one page you want to get from server.
+	//   type: int
+	// - name: orderby
+	//   in: query
+	//   description: orderby indicates the order of targets you want to get from server.
+	//   type: int
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggUsersResp"
@@ -127,10 +203,15 @@ func decodeGetUDFRequest(_ context.Context, r *http1.Request) (interface{}, erro
 	if !ok {
 		return nil, errors.New("not a valid username")
 	}
+	err, page, offset, limit, orderby := getQueries(r)
 	req := endpoint.GetUDFRequest{
-		Name: name,
+		Name:    name,
+		Page:    page,
+		Offset:  offset,
+		Limit:   limit,
+		Orderby: orderby,
 	}
-	return req, nil
+	return req, err
 }
 
 // encodeGetUDFResponse is a transport/http.EncodeResponseFunc that encodes

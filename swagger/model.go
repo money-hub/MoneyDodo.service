@@ -49,7 +49,7 @@ type swaggTaskResp struct {
 		// Detailed error message
 		Errinfo string `json:"errinfo"`
 		// Task model
-		Data *model.Task `json:"data"`
+		Data *model.Qtnr `json:"data"`
 	}
 }
 

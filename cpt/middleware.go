@@ -14,7 +14,7 @@ type LoggingMiddleware struct {
 	Next   CptService
 }
 
-func (l *LoggingMiddleware) GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data *model.Task) {
+func (l *LoggingMiddleware) GetSpec(ctx context.Context, taskId string) (status bool, errinfo string, data interface{}) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetSpec",
@@ -27,54 +27,54 @@ func (l *LoggingMiddleware) GetSpec(ctx context.Context, taskId string) (status 
 	return
 }
 
-func (l *LoggingMiddleware) GetAll(ctx context.Context, state string) (status bool, errinfo string, data []model.Task) {
+func (l *LoggingMiddleware) GetAll(ctx context.Context, kind, state string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.Task) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetAll",
-			"input", Request{State: state},
+			"input", Request{Kind: kind, State: state},
 			"output", Response{status, errinfo, data},
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status, errinfo, data = l.Next.GetAll(ctx, state)
+	status, errinfo, data = l.Next.GetAll(ctx, kind, state, page, offset, limit, orderby)
 	return
 }
 
-func (l *LoggingMiddleware) Post(ctx context.Context, task model.Task) (status bool, errinfo string, data *model.Task) {
+func (l *LoggingMiddleware) Post(ctx context.Context, kind string, task interface{}) (status bool, errinfo string, data interface{}) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Post",
-			"input", Request{Task: task},
+			"input", Request{Kind: kind, Task: task},
 			"output", Response{status, errinfo, data},
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status, errinfo, data = l.Next.Post(ctx, task)
+	status, errinfo, data = l.Next.Post(ctx, kind, task)
 	return
 }
 
-func (l *LoggingMiddleware) Put(ctx context.Context, taskId string, action string, task model.Task) (status bool, errinfo string, data *model.Task) {
+func (l *LoggingMiddleware) Put(ctx context.Context, taskId string, task interface{}) (status bool, errinfo string, data interface{}) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Put",
-			"input", Request{TaskId: taskId, Action: action, Task: task},
+			"input", Request{TaskId: taskId, Task: task},
 			"output", Response{status, errinfo, data},
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status, errinfo, data = l.Next.Put(ctx, taskId, action, task)
+	status, errinfo, data = l.Next.Put(ctx, taskId, task)
 	return
 }
 
-func (l *LoggingMiddleware) Delete(ctx context.Context, taskId string, state string) (status1 bool, errinfo string, data *model.Task) {
+func (l *LoggingMiddleware) Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task) {
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Delete",
 			"input", Request{TaskId: taskId, State: state},
-			"output", Response{status1, errinfo, data},
+			"output", Response{status, errinfo, data},
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	status1, errinfo, data = l.Next.Delete(ctx, taskId, state)
+	status, errinfo, data = l.Next.Delete(ctx, taskId, state)
 	return
 }

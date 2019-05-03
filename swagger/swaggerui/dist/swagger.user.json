@@ -27,6 +27,32 @@
         ],
         "summary": "Get all users' profiles",
         "operationId": "swaggGetAllReq",
+        "parameters": [
+          {
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/swaggUsersResp"
@@ -161,6 +187,30 @@
             "name": "username",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
           }
         ],
         "responses": {
@@ -175,26 +225,21 @@
     }
   },
   "definitions": {
-    "Task": {
+    "Qtnr": {
       "type": "object",
       "properties": {
-        "confirmFinish": {
-          "type": "boolean",
-          "x-go-name": "ConfirmFinish"
-        },
         "cutoff": {
           "type": "string",
           "format": "date-time",
           "x-go-name": "Cutoff"
         },
-        "enddate": {
-          "type": "string",
-          "format": "date-time",
-          "x-go-name": "Enddate"
-        },
         "id": {
           "type": "string",
           "x-go-name": "Id"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
         },
         "pubdate": {
           "type": "string",
@@ -205,30 +250,92 @@
           "type": "string",
           "x-go-name": "Publisher"
         },
-        "recipient": {
-          "type": "string",
-          "x-go-name": "Recipient"
-        },
-        "recipientFinish": {
-          "type": "boolean",
-          "x-go-name": "RecipientFinish"
+        "qtnr": {
+          "$ref": "#/definitions/Questionnaire"
         },
         "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
           "type": "string",
           "x-go-name": "Restrain"
         },
         "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
           "type": "number",
           "format": "double",
           "x-go-name": "Reward"
         },
         "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
           "type": "string",
           "x-go-name": "State"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Questionnaire": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/query"
+          },
+          "x-go-name": "Query"
         },
-        "type": {
+        "singleChoice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/singleChoice"
+          },
+          "x-go-name": "SingleChoice"
+        },
+        "taskId": {
           "type": "string",
-          "x-go-name": "Type"
+          "x-go-name": "TaskId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "cutoff": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Cutoff"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
+        },
+        "pubdate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Pubdate"
+        },
+        "publisher": {
+          "type": "string",
+          "x-go-name": "Publisher"
+        },
+        "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
+          "type": "string",
+          "x-go-name": "Restrain"
+        },
+        "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Reward"
+        },
+        "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
+          "type": "string",
+          "x-go-name": "State"
         }
       },
       "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
@@ -247,11 +354,7 @@
           "x-go-name": "CertificationStatus"
         },
         "certifiedPic": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "CertifiedPic"
         },
         "creditScore": {
@@ -286,6 +389,41 @@
         "sId": {
           "type": "string",
           "x-go-name": "SId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "query": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "singleChoice": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Choices"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
         }
       },
       "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
@@ -380,7 +518,7 @@
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/definitions/Task"
+            "$ref": "#/definitions/Qtnr"
           },
           "errinfo": {
             "description": "Detailed error message",

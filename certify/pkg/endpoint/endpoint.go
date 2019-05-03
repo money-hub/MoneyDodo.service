@@ -36,7 +36,7 @@ func MakeGetAuthInfoEndpoint(s service.CertifyService) endpoint.Endpoint {
 // PostAuthInfoRequest collects the request parameters for the PostAuthInfo method.
 type PostAuthInfoRequest struct {
 	Id           string `json:"id"`
-	CertifiedPic []byte `json:"certifiedPic"`
+	CertifiedPic string `json:"certifiedPic"`
 }
 
 // PostAuthInfoResponse collects the response parameters for the PostAuthInfo method.
@@ -143,7 +143,7 @@ func (e Endpoints) GetAuthInfo(ctx context.Context, id string) (status bool, err
 }
 
 // PostAuthInfo implements Service. Primarily useful in a client.
-func (e Endpoints) PostAuthInfo(ctx context.Context, id string, certifiedPic []byte) (status bool, errinfo string, data model.User) {
+func (e Endpoints) PostAuthInfo(ctx context.Context, id string, certifiedPic string) (status bool, errinfo string, data model.User) {
 	request := PostAuthInfoRequest{
 		Id:           id,
 		CertifiedPic: certifiedPic,

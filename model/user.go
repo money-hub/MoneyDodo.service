@@ -10,6 +10,6 @@ type User struct {
 	Phone               string  `json:"phone"`
 	CreditScore         int     `json:"creditScore" xorm:"creditScore"`
 	Email               string  `json:"email"`
-	CertifiedPic        []byte  `json:"certifiedPic" xorm:"certifiedPic"`
+	CertifiedPic        string  `json:"certifiedPic" xorm:"certifiedPic"`
 	CertificationStatus int     `json:"certificationStatus" xorm:"certificationStatus"`
 }

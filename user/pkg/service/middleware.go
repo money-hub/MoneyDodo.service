@@ -30,17 +30,17 @@ func (l loggingMiddleware) GetSpec(ctx context.Context, id string) (status bool,
 	}()
 	return l.next.GetSpec(ctx, id)
 }
-func (l loggingMiddleware) GetAll(ctx context.Context) (status bool, errinfo string, data []model.User) {
+func (l loggingMiddleware) GetAll(ctx context.Context, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	defer func() {
 		l.logger.Log("method", "GetAll", "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.GetAll(ctx)
+	return l.next.GetAll(ctx, page, offset, limit, orderby)
 }
-func (l loggingMiddleware) GetUDF(ctx context.Context, name string) (status bool, errinfo string, data []model.User) {
+func (l loggingMiddleware) GetUDF(ctx context.Context, name string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	defer func() {
 		l.logger.Log("method", "GetUDF", "name", name, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.GetUDF(ctx, name)
+	return l.next.GetUDF(ctx, name, page, offset, limit, orderby)
 }
 func (l loggingMiddleware) Post(ctx context.Context, user model.User) (status bool, errinfo string, data *model.User) {
 	defer func() {

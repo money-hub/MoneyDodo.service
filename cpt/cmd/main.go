@@ -29,6 +29,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -40,11 +41,14 @@ import (
 	_ "github.com/money-hub/MoneyDodo.service/swagger"
 )
 
+const defaultConf = "conf/conf.lyh.yml"
 const defaultPort = "8005"
 
 func main() {
+	conf := flag.String("conf", defaultConf, "database config file")
+
 	logger := kitlog.NewLogfmtLogger(os.Stderr)
-	svc := cpt.NewBasicCptService()
+	svc := cpt.NewBasicCptService(*conf)
 	svc = &cpt.LoggingMiddleware{Logger: logger, Next: svc}
 	eps := cpt.MakeServerEndpoints(svc)
 	decodes := cpt.MakeServerDecodes()
@@ -86,7 +90,7 @@ func main() {
 	// swagger:operation GET /api/tasks/{taskId} cpt swaggGetSpecReq
 	// ---
 	// summary: Get the specical task of the user (with id=userId).
-	// description: Get the specical task. You need to specify the userId and taskId.
+	// description: Get the specical task with detail(Now only support questionnaire). You need to specify and taskId.
 	// parameters:
 	// - name: taskId
 	//   in: path
@@ -101,8 +105,25 @@ func main() {
 	sub.Methods("GET").Path("/{taskId:[0-9]+}").Handler(getSpecHandler)
 	// swagger:operation GET /api/tasks cpt swaggGetAllReq
 	// ---
-	// summary: Get all tasks of the user (with id=userId).
-	// description: Get all task of the user. You need to specify the userId and taskId.
+	// summary: Get all tasks.
+	// description: Get all task without detail.
+	// parameters:
+	// - name: page
+	//   in: query
+	//   description: page indicates the number of pages you want to get from server.
+	//   type: int
+	// - name: offset
+	//   in: query
+	//   description: offset indicates the number of targets you want to skip.
+	//   type: int
+	// - name: limit
+	//   in: query
+	//   description: limit indicates the number of targets in one page you want to get from server.
+	//   type: int
+	// - name: orderby
+	//   in: query
+	//   description: orderby indicates the order of targets you want to get from server.
+	//   type: int
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggTasksResp"
@@ -112,55 +133,50 @@ func main() {
 	// swagger:operation POST /api/tasks cpt swaggPostReq
 	// ---
 	// summary: Create a task.
-	// description: Create a task. Also, you need to specify the userId and taskId.
+	// description: Create a task(Now only support questionnaire). The upload parameter needs to be a wrapper of model.Qtnr and has one extra field called "kind" which indicates the task type.
 	// parameters:
 	// - name: Body
 	//   in: body
 	//   schema:
-	//     "$ref": "#/definitions/Task"
+	//     "$ref": "#/definitions/Qtnr"
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggTaskResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
 	sub.Methods("POST").Path("").Handler(postHandler)
-	// swagger:operation PUT /api/tasks/{taskId}?action={action} cpt swaggPutReq
+	// swagger:operation PUT /api/tasks/{taskId} cpt swaggPutReq
 	// ---
 	// summary: Update the task information
-	// description: Update the task information. Also, you need to specify the user ID and task ID.
+	// description: Update the task information(Now only support questionnaire). Also, you need to specify the taskId. The upload parameter needs to be a wrapper of model.Qtnr and has one extra field called "kind" which indicates the task type.
 	// parameters:
 	// - name: taskId
 	//   in: path
 	//   description: id of task
 	//   type: string
 	//   required: true
-	// - name: action
-	//   in: path
-	//   description: action can be one of "release", "claim" and "finish"
-	//   type: string
-	//   required: true
 	// - name: Body
 	//   in: body
 	//   schema:
-	//     "$ref": "#/definitions/Task"
+	//     "$ref": "#/definitions/Qtnr"
 	// responses:
 	//   "200":
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	sub.Methods("PUT").Path("/{taskId:[0-9]+}?action={action}").Handler(putHandler)
-	// swagger:operation DELETE /api/users/{userId}/tasks/{taskId}?status={status} cpt swaggDeleteReq
+	sub.Methods("PUT").Path("/{taskId:[0-9]+}").Handler(putHandler)
+	// swagger:operation DELETE /api/tasks/{taskId}?state={state} cpt swaggDeleteReq
 	// ---
-	// summary: Delete\Cancel to Release\Cancel to Claim a task.
-	// description: When status is equal to "non-released" or "finished", it means the creator want to delete it. When status is equal to "released", it means the creator want to cancel to release it. When status is equal to "claimed", it means the recipient want to cancel to claim it. Also, you need to specify the user ID and task ID.
+	// summary: Delete\Cancel a task.
+	// description: When state is equal to "non-released" or "closed", it means the creator want to delete it. When state is equal to "released", it means the creator want to cancel to release it. Also, you need to specify the taskId.
 	// parameters:
 	// - name: taskId
 	//   in: path
 	//   description: id of task
 	//   required: true
 	// - name: state
-	//   in: path
-	//   description: state can be one of "non-released", "released", "claimed" and "finished"
+	//   in: query
+	//   description: state can be one of "non-released", "released" and "closed"
 	//   type: string
 	//   required: true
 	// responses:
@@ -168,7 +184,7 @@ func main() {
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	sub.Methods("DELETE").Path("/{taskId:[0-9]+}?state={state}").Handler(deleteHandler).Queries("status", "{status}")
+	sub.Methods("DELETE").Path("/{taskId:[0-9]+}").Handler(deleteHandler).Queries("state", "{state}")
 
 	n.UseHandler(router)
 	port := os.Getenv("PORT")

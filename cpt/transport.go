@@ -3,10 +3,14 @@ package cpt
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/money-hub/MoneyDodo.service/model"
 )
 
 type Decodes struct {
@@ -48,28 +52,84 @@ func MakeServerEncodes() Encodes {
 // decodeRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded requestfrom the HTTP request body.
 func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	page, offset, limit := 1, 0, -1
+	kind, state, orderby := "", "", "+id"
+	var err error
+	// 解析Queries
+	vals := r.URL.Query()
+	kinds, ok := vals["kind"]
+	if ok {
+		kind = kinds[0]
+	}
+	states, ok := vals["state"]
+	if ok {
+		state = states[0]
+	}
+	pages, ok := vals["page"]
+	if ok {
+		page, err = strconv.Atoi(pages[0])
+		if err != nil {
+			return Request{}, err
+		}
+	}
+	offsets, ok := vals["offset"]
+	if ok {
+		offset, err = strconv.Atoi(offsets[0])
+		if err != nil {
+			return Request{}, err
+		}
+	}
+	limits, ok := vals["limit"]
+	if ok {
+		limit, err = strconv.Atoi(limits[0])
+		if err != nil {
+			return Request{}, nil
+		}
+	}
+	orderbys, ok := vals["orderby"]
+	if ok {
+		orderby = orderbys[0]
+	}
+
+	//解析路径中显示定义的参数
 	vars := mux.Vars(r)
-	taskId, ok := vars["taskId"]
-	if !ok {
-		log.Println("taskId is not in the request URL.")
-	}
-	state, ok := vars["state"]
-	if !ok {
-		log.Println("state is not in the request URL.")
-	}
-	action, ok := vars["action"]
-	if !ok {
-		log.Println("action is not in the request URL.")
+	taskId := vars["taskId"]
+	if r.Method == "DELETE" {
+		state, _ = vars["state"]
 	}
 	req := Request{
-		TaskId: taskId,
-		State:  state,
-		Action: action,
+		TaskId:  taskId,
+		Kind:    kind,
+		State:   state,
+		Page:    page,
+		Offset:  offset,
+		Limit:   limit,
+		Orderby: orderby,
 	}
-	err := json.NewDecoder(r.Body).Decode(&req.Task)
-	if err != nil {
-		log.Println("task is not in the request Body.")
+
+	if page <= 0 || offset < 0 || (orderby != "+id" && orderby != "-id") {
+		return Request{}, errors.New("The url queries are not correct.")
 	}
+
+	if r.Method == "POST" || r.Method == "PUT" {
+		wrapper := model.Wrapper{}
+		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		if err != nil {
+			log.Println("The upload wrapper is not correct.")
+		}
+		req.Kind = wrapper.Kind
+		if req.Kind == model.TaskKindQuestionnaire {
+			t := model.Qtnr{
+				Qtnr: &model.Questionnaire{},
+			}
+			err := json.Unmarshal(wrapper.Raw, &t)
+			if err != nil {
+				log.Println("task is not in the request Body.")
+			}
+			req.Task = t
+		}
+	}
+	fmt.Printf("%#v", req)
 	return req, nil
 }
 

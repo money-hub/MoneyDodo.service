@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	model "github.com/money-hub/MoneyDodo.service/model"
 	service "github.com/money-hub/MoneyDodo.service/user/pkg/service"
@@ -33,7 +34,12 @@ func MakeGetSpecEndpoint(s service.UserService) endpoint.Endpoint {
 }
 
 // GetAllRequest collects the request parameters for the GetAll method.
-type GetAllRequest struct{}
+type GetAllRequest struct {
+	Page    int    `json:"page"`
+	Offset  int    `json:"offset"`
+	Limit   int    `json:"limit"`
+	Orderby string `json:"orderby"`
+}
 
 // GetAllResponse collects the response parameters for the GetAll method.
 type GetAllResponse struct {
@@ -45,7 +51,8 @@ type GetAllResponse struct {
 // MakeGetAllEndpoint returns an endpoint that invokes GetAll on the service.
 func MakeGetAllEndpoint(s service.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		status, errinfo, data := s.GetAll(ctx)
+		req := request.(GetAllRequest)
+		status, errinfo, data := s.GetAll(ctx, req.Page, req.Offset, req.Limit, req.Orderby)
 		return GetAllResponse{
 			Data:    data,
 			Errinfo: errinfo,
@@ -56,7 +63,11 @@ func MakeGetAllEndpoint(s service.UserService) endpoint.Endpoint {
 
 // GetUDFRequest collects the request parameters for the GetUDF method.
 type GetUDFRequest struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	Page    int    `json:"page"`
+	Offset  int    `json:"offset"`
+	Limit   int    `json:"limit"`
+	Orderby string `json:"orderby"`
 }
 
 // GetUDFResponse collects the response parameters for the GetUDF method.
@@ -70,7 +81,7 @@ type GetUDFResponse struct {
 func MakeGetUDFEndpoint(s service.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetUDFRequest)
-		status, errinfo, data := s.GetUDF(ctx, req.Name)
+		status, errinfo, data := s.GetUDF(ctx, req.Name, req.Page, req.Offset, req.Limit, req.Orderby)
 		return GetUDFResponse{
 			Data:    data,
 			Errinfo: errinfo,
