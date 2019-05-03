@@ -8,6 +8,7 @@ const (
 )
 
 type Deal struct {
+	Id        string    `json:"id" xorm:"<-"`
 	TaskId    string    `json:"taskId" xorm:"taskId"`
 	Publisher string    `json:"publisher" xorm:"publisher"`
 	Recipient string    `json:"recipient" xorm:"recipient"`

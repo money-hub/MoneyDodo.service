@@ -2,7 +2,13 @@
 create database if not exists MoneyDodo;
 
 use MoneyDodo;
-drop table user;
+drop table if exists enterprise;
+drop table if exists admin;
+drop table if exists deal;
+drop table if exists comment;
+drop table if exists questionnaire;
+drop table if exists user;
+drop table if exists task;
 # 用户
 create table if not exists user (
 	id varchar(20) not null primary key COMMENT 'OpenId',
@@ -25,7 +31,7 @@ create table if not exists admin (
 );
 
 # 企业
-create table if not exists enterprise (
+create table if not exists firm (
     name varchar(20) not null COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
 );
@@ -53,10 +59,11 @@ create table if not exists questionnaire (
     singleChoice mediumtext COMMENT '单项选择',
     primary key(taskId),
     foreign Key(taskId) references task(id)
-)
+);
 
 # 交易
 create table if not exists deal (
+    id int AUTO_INCREMENT COMMENT '交易Id',
     taskId int not null COMMENT '任务Id',
     publisher varchar(20) COMMENT '发布者',
     recipient varchar(20) COMMENT '接受者',
@@ -64,6 +71,21 @@ create table if not exists deal (
     until text COMMENT '交易结束时间',
     reward double COMMENT '交易额',
     state varchar(20) COMMENT '交易状态',
-    primary key(taskId),
-    foreign Key(taskId) references task(id)
+    primary key(id),
+    foreign key(taskId) references task(id),
+    foreign key(publisher) references user(id),
+    foreign key(recipient) references user(id)
+);
+
+# 评论
+create table if not exists comment (
+    id int AUTO_INCREMENT COMMENT '评论Id',
+    taskId int not null COMMENT '任务Id',
+    userId varchar(20) not null COMMENT '用户Id',
+    timestamp text COMMENT '评论时间戳',
+    content mediumtext COMMENT '评论内容，支持图片评论',
+    stars int default 0 COMMENT '评论点赞数量',
+    primary key(id),
+    foreign key(taskId) references task(id),
+    foreign key(uesrId) references user(id)
 );
