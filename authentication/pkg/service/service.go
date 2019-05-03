@@ -21,13 +21,19 @@ type WeChatRes struct {
 	Errmsg      string `json:"errmsg"`
 }
 
+// User验证Response
+type UserRes struct {
+	Openid string `json:"openid"`
+	Token  string `json:"token"`
+}
+
 // AuthenticationService describes the service.
 type AuthenticationService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
 
 	// Students-微信小程序
-	GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string)
+	GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data *UserRes)
 
 	// Admin-Web
 	AdminLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string)
@@ -38,7 +44,7 @@ type basicAuthenticationService struct {
 }
 
 // 微信小程序用户获取OpenId
-func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
+func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data *UserRes) {
 	// TODO implement the business logic of GetOpenid
 
 	// https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
@@ -56,7 +62,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 	res, err := http.Get(url)
 
 	if err != nil {
-		return false, err.Error(), ""
+		return false, err.Error(), nil
 	}
 
 	defer res.Body.Close() //关闭链接
@@ -77,17 +83,22 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 				}
 			}
 			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
-			return true, "", token
+			data = &UserRes{
+				Openid: info.Openid,
+				Token:  token,
+			}
+			return true, "", data
 		}
-		return false, info.Errmsg, ""
+		return false, info.Errmsg, nil
 	}
-	return false, err.Error(), ""
+	return false, err.Error(), nil
 }
 
 // 验证Admin登陆
 func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of AdminLogin
 	// 判断是否已经记录
+	fmt.Println(name, password)
 	admin := &model.Admin{
 		Name: name,
 	}

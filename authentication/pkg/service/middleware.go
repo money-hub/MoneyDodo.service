@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	log "github.com/go-kit/kit/log"
 )
 
@@ -22,7 +23,7 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data string) {
+func (l loggingMiddleware) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data *UserRes) {
 	defer func() {
 		l.logger.Log("method", "GetOpenid", "code", code, "status", status, "errinfo", errinfo, "data", data)
 	}()

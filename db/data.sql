@@ -26,13 +26,13 @@ create table if not exists user (
 
 # 管理员
 create table if not exists admin (
-    name varchar(20) not null COMMENT '姓名',
+    name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
 );
 
 # 企业
-create table if not exists firm (
-    name varchar(20) not null COMMENT '姓名',
+create table if not exists enterprise (
+    name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
 );
 
