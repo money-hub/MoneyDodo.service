@@ -60,14 +60,14 @@ func (b *basicUserService) GetAll(ctx context.Context, page, offset, limit int, 
 			}
 		}
 
-		status = err == nil
+		status = len(res) > 0
 		if err != nil {
 			errinfo = err.Error()
 		}
 		return status, errinfo, res
 	}
 
-	status = err == nil
+	status = len(data) > 0
 	if err != nil {
 		errinfo = err.Error()
 	}
@@ -103,6 +103,9 @@ func (b *basicUserService) Patch(ctx context.Context, id string, user model.User
 }
 func (b *basicUserService) Put(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User) {
 	// TODO implement the business logic of Put
+	if id != user.Id {
+		return false, "The user.Id can not be modified.", nil
+	}
 	row, err := b.Engine().Where("id = ?", id).AllCols().Update(user)
 	if err == nil {
 		errinfo = ""
