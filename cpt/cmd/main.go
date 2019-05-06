@@ -41,7 +41,7 @@ import (
 	_ "github.com/money-hub/MoneyDodo.service/swagger"
 )
 
-const defaultConf = "conf/conf.lyh.yml"
+const defaultConf = "conf/conf.moneydodo.yml"
 const defaultPort = "8005"
 
 func main() {
