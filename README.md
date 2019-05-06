@@ -162,3 +162,46 @@ type swaggNoReturnValue struct {
 #### C. 说明
 
 每个服务各自生成相应的文档，命名格式为`swagger.XXX.json`。`XXX`为服务名称，方便查询。
+
+## 四、镜像管理
+
+### dockerfiles
+
+此文件夹中包含各个微服务的dockerfile，用于构建镜像。
+
+```dockerfile
+# 栗子cpt：
+#源镜像
+FROM golang:1.12
+#设置镜像工作目录
+WORKDIR $GOPATH/src/github.com/money-hub/MoneyDodo.service
+#将宿主机的go工程代码加入到docker容器中
+ADD . $GOPATH/src/github.com/money-hub/MoneyDodo.service
+# 安装依赖包
+RUN go get ./...
+#暴露端口
+EXPOSE 8005
+#最终运行docker的命令
+ENTRYPOINT  ["go", "run", "./cpt/cmd/main.go"]
+```
+
+### 构建镜像
+
+在项目根目录（`MoneyDodo.service/`）下运行以下命令：
+
+```bash
+$ sudo docker build -f dockerfiles/cpt.Dockerfile -t moneydodo.cpt . 
+```
+
+### 测试服务
+
+```bash
+$ sudo docker run -p 8005:8005 --name moneydodo.cpt --link moneydodo.db:moneydodo.db -d moneydodo.cpt
+```
+之后即可使用8005端口来测试此服务。
+【注】在启动上述服务之前，需要确保moneydodo.db已经启动，启动方法类似：
+
+```bash
+$ sudo docker build -f dockerfiles/mysql.dockerfile -t moneydodo.db . 
+$ sudo docker run -p 3306:3306 --name moneydodo.db -d moneydodo.db
+```

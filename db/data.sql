@@ -88,5 +88,5 @@ create table if not exists comment (
     stars int default 0 COMMENT '评论点赞数量',
     primary key(id),
     foreign key(taskId) references task(id),
-    foreign key(uesrId) references user(id)
+    foreign key(userId) references user(id)
 );
