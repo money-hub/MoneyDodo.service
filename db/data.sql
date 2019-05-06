@@ -9,6 +9,7 @@ drop table if exists comment;
 drop table if exists questionnaire;
 drop table if exists user;
 drop table if exists task;
+
 # 用户
 create table if not exists user (
 	id varchar(20) not null primary key COMMENT 'OpenId',
