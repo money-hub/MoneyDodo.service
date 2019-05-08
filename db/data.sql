@@ -9,6 +9,7 @@ drop table if exists comment;
 drop table if exists questionnaire;
 drop table if exists user;
 drop table if exists task;
+drop table if exists token;
 
 # 用户
 create table if not exists user (
@@ -89,4 +90,10 @@ create table if not exists comment (
     primary key(id),
     foreign key(taskId) references task(id),
     foreign key(userId) references user(id)
+);
+
+create table if not exists token(
+	id char(255) COMMENT '唯一标识，包含管理员、企业、学生',
+    token char(255),
+    primary key(id)
 );
