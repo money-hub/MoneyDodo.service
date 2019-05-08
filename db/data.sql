@@ -92,6 +92,7 @@ create table if not exists comment (
     foreign key(userId) references user(id)
 );
 
+# Token
 create table if not exists token(
 	id char(255) COMMENT '唯一标识，包含管理员、企业、学生',
     token char(255),
