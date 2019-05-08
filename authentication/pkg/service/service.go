@@ -37,10 +37,43 @@ type AuthenticationService interface {
 
 	// Admin-Web
 	AdminLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string)
+
+	// 企业
+	EnterpriseLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string)
+
+	// 登出
+	Logout(ctx context.Context) (status bool, errinfo string, data string)
 }
 
 type basicAuthenticationService struct {
 	*db.DBService
+}
+
+func saveToken(b *basicAuthenticationService, token string, id string) (err error) {
+	// 将token保存或者更新进数据库中
+	item := &model.Token{
+		Id: id,
+	}
+	if has, _ := b.Engine().Get(item); !has {
+		item.Token = token
+		_, err = b.Engine().Insert(item)
+		if err != nil {
+			fmt.Println("[Authentication log] Insert token failed")
+		}
+	} else {
+		item.Token = token
+		_, err = b.Engine().Update(item)
+		if err != nil {
+			fmt.Println("[Authentication log] Update token failed")
+		}
+	}
+	return
+}
+
+func checkErr(err error) {
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // 微信小程序用户获取OpenId
@@ -48,11 +81,8 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 	// TODO implement the business logic of GetOpenid
 
 	// https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
-	// var AppID = "wx6f4b63c2710e1bae"
-	// var AppSecret = "2f11628e5f62c350247e8deb24a9814b"
-	var AppID = "wx25915d3c4f6a78f3"
-	var AppSecret = "133e74afeca06c60a597cf3b694a6c87"
-
+	var AppID = "wx6f4b63c2710e1bae"
+	var AppSecret = "2f11628e5f62c350247e8deb24a9814b"
 	//构造url
 	url := "https://api.weixin.qq.com/sns/jscode2session?appid=" + AppID +
 		"&secret=" + AppSecret +
@@ -83,6 +113,11 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 				}
 			}
 			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
+
+			// 将token保存或者更新进数据库中
+			err := saveToken(b, token, info.Openid)
+			checkErr(err)
+
 			data = &UserRes{
 				Openid: info.Openid,
 				Token:  token,
@@ -104,7 +139,10 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	}
 	has, _ := b.Engine().Get(admin)
 	if has == true && admin.Password == password {
-		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, 0)
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, 2)
+		// 将token保存或者更新进数据库中
+		err := saveToken(b, token, name)
+		checkErr(err)
 		return true, "", token
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
@@ -113,16 +151,35 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	}
 }
 
+func (b *basicAuthenticationService) EnterpriseLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
+	// TODO implement the business logic of EnterpriseLogin
+	return status, errinfo, data
+}
+
+// 登出
+func (b *basicAuthenticationService) Logout(ctx context.Context) (status bool, errinfo string, data string) {
+	// TODO implement the business logic of Logout
+	item := model.Token{
+		Id: ctx.Value("id").(string),
+	}
+	_, err := b.Engine().Delete(item)
+	if err != nil {
+		checkErr(err)
+		return false, "Exit Unsuccessfully", ""
+	}
+	return true, "Exit Successfully", ""
+}
+
 // NewBasicAuthenticationService returns a naive, stateless implementation of AuthenticationService.
 func NewBasicAuthenticationService() AuthenticationService {
-	basicUserSvc := &basicAuthenticationService{
+	basicAuthSvc := &basicAuthenticationService{
 		&db.DBService{},
 	}
-	err := basicUserSvc.Bind("conf/conf.lyt.yml")
+	err := basicAuthSvc.Bind("conf/conf.lyt.yml")
 	if err != nil {
-		log.Printf("The UserService failed to bind with mysql")
+		log.Printf("The AuthService failed to bind with mysql")
 	}
-	return basicUserSvc
+	return basicAuthSvc
 }
 
 // New returns a AuthenticationService with all of the expected middleware wired in.

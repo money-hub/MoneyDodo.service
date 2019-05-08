@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-
 	log "github.com/go-kit/kit/log"
 )
 
@@ -34,4 +33,16 @@ func (l loggingMiddleware) AdminLogin(ctx context.Context, name string, password
 		l.logger.Log("method", "AdminLogin", "name", name, "password", password, "status", status, "errinfo", errinfo, "data", data)
 	}()
 	return l.next.AdminLogin(ctx, name, password)
+}
+func (l loggingMiddleware) EnterpriseLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
+	defer func() {
+		l.logger.Log("method", "EnterpriseLogin", "name", name, "password", password, "status", status, "errinfo", errinfo, "data", data)
+	}()
+	return l.next.EnterpriseLogin(ctx, name, password)
+}
+func (l loggingMiddleware) Logout(ctx context.Context) (status bool, errinfo string, data string) {
+	defer func() {
+		l.logger.Log("method", "Logout", "status", status, "errinfo", errinfo, "data", data)
+	}()
+	return l.next.Logout(ctx)
 }

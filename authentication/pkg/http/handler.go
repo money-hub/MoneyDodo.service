@@ -87,3 +87,57 @@ func encodeAdminLoginResponse(ctx context.Context, w http1.ResponseWriter, respo
 	err = json.NewEncoder(w).Encode(response)
 	return
 }
+
+// makeEnterpriseLoginHandler creates the handler logic
+func makeEnterpriseLoginHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	m.Methods("POST").Path("/api/auth/firm").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.EnterpriseLoginEndpoint, decodeEnterpriseLoginRequest, encodeEnterpriseLoginResponse, options...)))
+}
+
+// decodeEnterpriseLoginRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeEnterpriseLoginRequest(_ context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.EnterpriseLoginRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodeEnterpriseLoginResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeEnterpriseLoginResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}
+
+// makeLogoutHandler creates the handler logic
+func makeLogoutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	// swagger:operation Get /api/auth/logout authentication swaggAuthLogoutReq
+	// ---
+	// summary: Logout
+	// description: Logout
+	// responses:
+	//   "200":
+	//     "$ref": "#/responses/swaggNoReturnValue"
+	//   "400":
+	//     "$ref": "#/responses/swaggBadReq"
+	m.Methods("Get").Path("/api/auth/logout").Handler(handlers.CORS(
+		handlers.AllowedMethods([]string{"Get"}),
+		handlers.AllowedOrigins([]string{"*"}),
+	)(http.NewServer(endpoints.LogoutEndpoint, decodeLogoutRequest, encodeLogoutResponse, options...)))
+}
+
+// decodeLogoutRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeLogoutRequest(ctx context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.LogoutRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodeLogoutResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeLogoutResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}

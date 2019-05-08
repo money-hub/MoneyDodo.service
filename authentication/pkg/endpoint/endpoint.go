@@ -58,6 +58,54 @@ func MakeAdminLoginEndpoint(s service.AuthenticationService) endpoint.Endpoint {
 	}
 }
 
+// EnterpriseLoginRequest collects the request parameters for the EnterpriseLogin method.
+type EnterpriseLoginRequest struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+// EnterpriseLoginResponse collects the response parameters for the EnterpriseLogin method.
+type EnterpriseLoginResponse struct {
+	Status  bool   `json:"status"`
+	Errinfo string `json:"errinfo"`
+	Data    string `json:"data"`
+}
+
+// MakeEnterpriseLoginEndpoint returns an endpoint that invokes EnterpriseLogin on the service.
+func MakeEnterpriseLoginEndpoint(s service.AuthenticationService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(EnterpriseLoginRequest)
+		status, errinfo, data := s.EnterpriseLogin(ctx, req.Name, req.Password)
+		return EnterpriseLoginResponse{
+			Data:    data,
+			Errinfo: errinfo,
+			Status:  status,
+		}, nil
+	}
+}
+
+// LogoutRequest collects the request parameters for the Logout method.
+type LogoutRequest struct{}
+
+// LogoutResponse collects the response parameters for the Logout method.
+type LogoutResponse struct {
+	Status  bool   `json:"status"`
+	Errinfo string `json:"errinfo"`
+	Data    string `json:"data"`
+}
+
+// MakeLogoutEndpoint returns an endpoint that invokes Logout on the service.
+func MakeLogoutEndpoint(s service.AuthenticationService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		status, errinfo, data := s.Logout(ctx)
+		return LogoutResponse{
+			Data:    data,
+			Errinfo: errinfo,
+			Status:  status,
+		}, nil
+	}
+}
+
 // GetOpenid implements Service. Primarily useful in a client.
 func (e Endpoints) GetOpenid(ctx context.Context, code string) (status bool, errinfo string, data *service.UserRes) {
 	request := GetOpenidRequest{Code: code}
@@ -79,4 +127,27 @@ func (e Endpoints) AdminLogin(ctx context.Context, name string, password string)
 		return
 	}
 	return response.(AdminLoginResponse).Status, response.(AdminLoginResponse).Errinfo, response.(AdminLoginResponse).Data
+}
+
+// EnterpriseLogin implements Service. Primarily useful in a client.
+func (e Endpoints) EnterpriseLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
+	request := EnterpriseLoginRequest{
+		Name:     name,
+		Password: password,
+	}
+	response, err := e.EnterpriseLoginEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(EnterpriseLoginResponse).Status, response.(EnterpriseLoginResponse).Errinfo, response.(EnterpriseLoginResponse).Data
+}
+
+// Logout implements Service. Primarily useful in a client.
+func (e Endpoints) Logout(ctx context.Context) (status bool, errinfo string, data string) {
+	request := LogoutRequest{}
+	response, err := e.LogoutEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(LogoutResponse).Status, response.(LogoutResponse).Errinfo, response.(LogoutResponse).Data
 }
