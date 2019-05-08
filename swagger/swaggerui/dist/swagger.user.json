@@ -80,7 +80,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggUserResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -139,7 +139,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggUserResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"

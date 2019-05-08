@@ -98,3 +98,9 @@ create table if not exists token(
     token char(255),
     primary key(id)
 );
+
+create table if not exists recharge(
+    id int AUTO_INCREMENT COMMENT '余额Id',
+    amount int COMMENT '充值金额',
+    timestamp text COMMENT '充值时间戳',
+);

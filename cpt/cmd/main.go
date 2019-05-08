@@ -38,6 +38,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/money-hub/MoneyDodo.service/cpt"
+	"github.com/money-hub/MoneyDodo.service/middleware"
 	_ "github.com/money-hub/MoneyDodo.service/swagger"
 )
 
@@ -86,6 +87,7 @@ func main() {
 
 	n := negroni.Classic()
 	router := mux.NewRouter()
+	router.Use(middleware.GetTokenInfo)
 	sub := router.PathPrefix("/api/tasks").Subrouter()
 	// swagger:operation GET /api/tasks/{taskId} cpt swaggGetSpecReq
 	// ---
@@ -161,7 +163,7 @@ func main() {
 	//     "$ref": "#/definitions/Qtnr"
 	// responses:
 	//   "200":
-	//	   "$ref": "#/responses/swaggNoReturnValue"
+	//	   "$ref": "#/responses/swaggTaskResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
 	sub.Methods("PUT").Path("/{taskId:[0-9]+}").Handler(putHandler)

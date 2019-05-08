@@ -139,7 +139,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggTaskResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"

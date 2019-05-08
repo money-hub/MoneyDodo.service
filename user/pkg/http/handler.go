@@ -228,7 +228,7 @@ func makePostHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http
 	// Create a new user with the profile.
 	// If the user's id is "exists", error will be returned.
 	// responses:
-	//   200: swaggNoReturnValue
+	//   200: swaggUserResp
 	//   400: swaggBadReq
 	m.Methods("POST").Path("/api/users").Handler(
 		handlers.CORS(
@@ -293,7 +293,7 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 	//     "$ref": "#/definitions/User"
 	// responses:
 	//   "200":
-	//	   "$ref": "#/responses/swaggNoReturnValue"
+	//	   "$ref": "#/responses/swaggUserResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
 	m.Methods("PUT").Path("/api/users/{userid:[0-9]+}").Handler(

@@ -162,7 +162,7 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, taskUnknown in
 			return false, "The task kind is not matching to the uploaded task.", nil
 		}
 		// 判断当前用户是否是任务的发布者
-		if qtnr.Publisher != ctx.Value("Id").(string) {
+		if qtnr.Publisher != ctx.Value("id").(string) {
 			return false, "You are not permitted to modify others' task.", nil
 		}
 		if qtnr.State == model.TaskStateReleased {
@@ -176,14 +176,18 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, taskUnknown in
 			sess.Rollback()
 			return false, err.Error(), nil
 		}
+		err = sess.Commit()
+		if err != nil {
+			return false, err.Error(), nil
+		}
+		return true, "", qtnr
 	} else {
+		err = sess.Commit()
+		if err != nil {
+			return false, err.Error(), nil
+		}
 		return false, "The task kind is not true", nil
 	}
-	err = sess.Commit()
-	if err != nil {
-		return false, err.Error(), nil
-	}
-	return true, "", nil
 }
 
 func (b *basicCptService) Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task) {
@@ -209,8 +213,7 @@ func (b *basicCptService) Delete(ctx context.Context, taskId string, state strin
 	}
 
 	// 获取进行此操作的用户ID
-	id := "16340157"
-	if task.Publisher != id {
+	if task.Publisher != ctx.Value("id") {
 		return false, "You are not permitted to modify others' task.", nil
 	}
 
