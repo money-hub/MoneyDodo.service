@@ -95,7 +95,7 @@ func (b *basicUserService) Post(ctx context.Context, user model.User) (status bo
 	} else {
 		errinfo = err.Error()
 	}
-	return row > 0, errinfo, nil
+	return row > 0, errinfo, &user
 }
 func (b *basicUserService) Patch(ctx context.Context, id string, user model.User) (b0 bool, e1 string, i2 *model.User) {
 	// TODO implement the business logic of Patch
@@ -112,7 +112,7 @@ func (b *basicUserService) Put(ctx context.Context, id string, user model.User) 
 	} else {
 		errinfo = err.Error()
 	}
-	return row > 0, errinfo, nil
+	return row > 0, errinfo, &user
 }
 func (b *basicUserService) Delete(ctx context.Context, id string) (status bool, errinfo string, data *model.User) {
 	// TODO implement the business logic of Delete

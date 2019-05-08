@@ -163,7 +163,7 @@ func main() {
 	//     "$ref": "#/definitions/Qtnr"
 	// responses:
 	//   "200":
-	//	   "$ref": "#/responses/swaggNoReturnValue"
+	//	   "$ref": "#/responses/swaggTaskResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
 	sub.Methods("PUT").Path("/{taskId:[0-9]+}").Handler(putHandler)

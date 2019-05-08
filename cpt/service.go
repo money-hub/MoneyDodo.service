@@ -176,14 +176,18 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, taskUnknown in
 			sess.Rollback()
 			return false, err.Error(), nil
 		}
+		err = sess.Commit()
+		if err != nil {
+			return false, err.Error(), nil
+		}
+		return true, "", qtnr
 	} else {
+		err = sess.Commit()
+		if err != nil {
+			return false, err.Error(), nil
+		}
 		return false, "The task kind is not true", nil
 	}
-	err = sess.Commit()
-	if err != nil {
-		return false, err.Error(), nil
-	}
-	return true, "", nil
 }
 
 func (b *basicCptService) Delete(ctx context.Context, taskId string, state string) (status bool, errinfo string, data *model.Task) {
