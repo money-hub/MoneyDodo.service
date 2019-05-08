@@ -111,19 +111,74 @@ func (b *basicCommentService) PostComment(ctx context.Context, taskId string, co
 // 修改评论
 func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data *model.Comment) {
 	// TODO implement the business logic of ChangeComment
+
+	// 判断对应任务和评论是否存在
 	item := &model.Comment{
-		Id:        cId,
-		TaskId:    taskId,
-		UserId:    strconv.Itoa(ctx.Value("id").(int)),
-		Timestamp: time.Now(),
+		Id:     cId,
+		TaskId: taskId,
 	}
-	return status, errinfo, data
+	ok, err := b.Engine().Get(item)
+	if err != nil {
+		return false, err.Error(), nil
+	}
+	if !ok {
+		return false, "Post the comment failed, no corresponding comment", nil
+	}
+
+	// 只有本人可以编辑评论
+	if item.UserId != ctx.Value("id").(string) {
+		return false, "Edit comment failed, only modify your own comments", nil
+	} else {
+		item.Timestamp = time.Now()
+		item.Content = comment
+		_, err := b.Engine().Update(item)
+		if err != nil {
+			checkErr(err)
+			return false, "Update comment failed, please try again", nil
+		}
+		return true, "", item
+	}
 }
 
 // 删除评论
 func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of DeleteComment
-	return status, errinfo, data
+
+	// 判断对应任务和评论是否存在
+	item := &model.Comment{
+		Id:     cId,
+		TaskId: taskId,
+	}
+	ok, err := b.Engine().Get(item)
+	if err != nil {
+		return false, err.Error(), "Delete comment failed"
+	}
+	if !ok {
+		return false, "Post the comment failed, no corresponding comment", "Delete comment failed"
+	}
+
+	// 获取评论的发布者
+	task := &model.Task{
+		Id: taskId,
+	}
+	ok, err = b.Engine().Get(task)
+	if err != nil {
+		return false, err.Error(), "Delete comment failed"
+	}
+	if !ok {
+		return false, "Post the comment failed, no corresponding comment", "Delete comment failed"
+	}
+
+	// 管理员和本人可以删除评论
+	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 2 {
+		return false, "Delete the comment failed, Deleting a comment failed, only the person making the comment, the task publisher, and the administrator can delete", "Delete the comment failed"
+	} else {
+		_, err := b.Engine().Delete(item)
+		if err != nil {
+			return false, err.Error(), "Delete the comment failed"
+		}
+		return true, "", ""
+	}
 }
 
 // 点赞评论

@@ -3,16 +3,17 @@ package http
 import (
 	"context"
 	"encoding/json"
+	http1 "net/http"
+
 	http "github.com/go-kit/kit/transport/http"
 	handlers "github.com/gorilla/handlers"
 	mux "github.com/gorilla/mux"
 	endpoint "github.com/money-hub/MoneyDodo.service/comment/pkg/endpoint"
-	http1 "net/http"
 )
 
 // makeGetCommentHandler creates the handler logic
 func makeGetCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/get-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetCommentEndpoint, decodeGetCommentRequest, encodeGetCommentResponse, options...)))
+	m.Methods("GET").Path("/api/tasks/{taskId:[0-9]+}/comments").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetCommentEndpoint, decodeGetCommentRequest, encodeGetCommentResponse, options...)))
 }
 
 // decodeGetCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -33,7 +34,7 @@ func encodeGetCommentResponse(ctx context.Context, w http1.ResponseWriter, respo
 
 // makePostCommentHandler creates the handler logic
 func makePostCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/post-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PostCommentEndpoint, decodePostCommentRequest, encodePostCommentResponse, options...)))
+	m.Methods("POST").Path("/api/tasks/{taskId:[0-9]+}/comments").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PostCommentEndpoint, decodePostCommentRequest, encodePostCommentResponse, options...)))
 }
 
 // decodePostCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -54,7 +55,7 @@ func encodePostCommentResponse(ctx context.Context, w http1.ResponseWriter, resp
 
 // makeChangeCommentHandler creates the handler logic
 func makeChangeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/change-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.ChangeCommentEndpoint, decodeChangeCommentRequest, encodeChangeCommentResponse, options...)))
+	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.ChangeCommentEndpoint, decodeChangeCommentRequest, encodeChangeCommentResponse, options...)))
 }
 
 // decodeChangeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -75,7 +76,7 @@ func encodeChangeCommentResponse(ctx context.Context, w http1.ResponseWriter, re
 
 // makeDeleteCommentHandler creates the handler logic
 func makeDeleteCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/delete-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.DeleteCommentEndpoint, decodeDeleteCommentRequest, encodeDeleteCommentResponse, options...)))
+	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.DeleteCommentEndpoint, decodeDeleteCommentRequest, encodeDeleteCommentResponse, options...)))
 }
 
 // decodeDeleteCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -96,7 +97,7 @@ func encodeDeleteCommentResponse(ctx context.Context, w http1.ResponseWriter, re
 
 // makeLikeCommentHandler creates the handler logic
 func makeLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/like-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.LikeCommentEndpoint, decodeLikeCommentRequest, encodeLikeCommentResponse, options...)))
+	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.LikeCommentEndpoint, decodeLikeCommentRequest, encodeLikeCommentResponse, options...)))
 }
 
 // decodeLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -117,7 +118,7 @@ func encodeLikeCommentResponse(ctx context.Context, w http1.ResponseWriter, resp
 
 // makeCancelLikeCommentHandler creates the handler logic
 func makeCancelLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/cancel-like-comment").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.CancelLikeCommentEndpoint, decodeCancelLikeCommentRequest, encodeCancelLikeCommentResponse, options...)))
+	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.CancelLikeCommentEndpoint, decodeCancelLikeCommentRequest, encodeCancelLikeCommentResponse, options...)))
 }
 
 // decodeCancelLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
