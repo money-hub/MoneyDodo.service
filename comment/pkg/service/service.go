@@ -122,7 +122,7 @@ func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, 
 		return false, err.Error(), nil
 	}
 	if !ok {
-		return false, "Post the comment failed, no corresponding comment", nil
+		return false, "Edit the comment failed, no corresponding comment", nil
 	}
 
 	// 只有本人可以编辑评论
@@ -134,7 +134,7 @@ func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, 
 		_, err := b.Engine().Update(item)
 		if err != nil {
 			checkErr(err)
-			return false, "Update comment failed, please try again", nil
+			return false, "Edit comment failed, please try again", nil
 		}
 		return true, "", item
 	}
@@ -154,7 +154,7 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 		return false, err.Error(), "Delete comment failed"
 	}
 	if !ok {
-		return false, "Post the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
 	}
 
 	// 获取评论的发布者
@@ -166,7 +166,7 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 		return false, err.Error(), "Delete comment failed"
 	}
 	if !ok {
-		return false, "Post the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
 	}
 
 	// 管理员和本人可以删除评论
@@ -184,13 +184,63 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 // 点赞评论
 func (b *basicCommentService) LikeComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data *model.Comment) {
 	// TODO implement the business logic of LikeComment
-	return status, errinfo, data
+	// 判断对应任务和评论是否存在
+	item := &model.Comment{
+		Id:     cId,
+		TaskId: taskId,
+	}
+	ok, err := b.Engine().Get(item)
+	if err != nil {
+		return false, err.Error(), nil
+	}
+	if !ok {
+		return false, "Star the comment failed, no corresponding comment", nil
+	}
+
+	// 判断是否曾经点赞
+	for _, p := range item.Stargazers {
+		if p == ctx.Value("id").(string) {
+			return false, "You have already liked the comment", nil
+		}
+	}
+
+	item.Stars = item.Stars + 1
+	item.Stargazers = append(item.Stargazers, ctx.Value("id").(string))
+
+	if _, err := b.Engine().Update(item); err != nil {
+		return false, err.Error(), nil
+	}
+	return true, "", item
 }
 
 // 取消点赞评论
 func (b *basicCommentService) CancelLikeComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data *model.Comment) {
 	// TODO implement the business logic of CancelLikeComment
-	return status, errinfo, data
+	item := &model.Comment{
+		Id:     cId,
+		TaskId: taskId,
+	}
+	ok, err := b.Engine().Get(item)
+	if err != nil {
+		return false, err.Error(), nil
+	}
+	if !ok {
+		return false, "Unstar the comment failed, no corresponding comment", nil
+	}
+
+	// 判断是否曾经点赞
+	for i, p := range item.Stargazers {
+		if p == ctx.Value("id").(string) {
+			item.Stars = item.Stars - 1
+			item.Stargazers = append(item.Stargazers[:i], item.Stargazers[i+1:]...)
+
+			if _, err := b.Engine().Update(item); err != nil {
+				return false, err.Error(), nil
+			}
+			return true, "", item
+		}
+	}
+	return false, "You have not already liked the comment", nil
 }
 
 // NewBasicCommentService returns a naive, stateless implementation of CommentService.

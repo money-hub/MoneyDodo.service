@@ -137,3 +137,40 @@ type swaggAuthOfAdminResp struct {
 		Token string `json:"data"`
 	}
 }
+
+// HTTP status code 200 and comment model in data
+// swagger:response swaggCommentsResp
+type swaggCommentsResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Comment model
+		Data []model.Comment `json:"data"`
+	}
+}
+
+// Post Comment request
+// swagger:parameters swaggCommentReq
+type swaggCommentReq struct {
+	// in:body
+	Body struct {
+		comment string
+	}
+}
+
+// HTTP status code 200 and comment model in data
+// swagger:response swaggCommentResp
+type swaggCommentResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Comment model
+		Data *model.Comment `json:"data"`
+	}
+}

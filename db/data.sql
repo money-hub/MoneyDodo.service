@@ -87,6 +87,7 @@ create table if not exists comment (
     timestamp text COMMENT '评论时间戳',
     content mediumtext COMMENT '评论内容，支持图片评论',
     stars int default 0 COMMENT '评论点赞数量',
+    stargazers text COMMENT '评论者的id'
     primary key(id),
     foreign key(taskId) references task(id),
     foreign key(userId) references user(id)
