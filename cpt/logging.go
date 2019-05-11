@@ -2,9 +2,10 @@ package cpt
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	log "github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log"
 	"github.com/money-hub/MoneyDodo.service/model"
 )
 
@@ -18,8 +19,8 @@ func (l *LoggingMiddleware) GetSpec(ctx context.Context, taskId string) (status 
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetSpec",
-			"input", Request{TaskId: taskId},
-			"output", Response{status, errinfo, data},
+			"input", fmt.Sprintf("%#v", Request{TaskId: taskId}),
+			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -31,8 +32,8 @@ func (l *LoggingMiddleware) GetAll(ctx context.Context, kind, state string, page
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetAll",
-			"input", Request{Kind: kind, State: state},
-			"output", Response{status, errinfo, data},
+			"input", fmt.Sprintf("%#v", Request{Kind: kind, State: state}),
+			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -44,8 +45,8 @@ func (l *LoggingMiddleware) Post(ctx context.Context, kind string, task interfac
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Post",
-			"input", Request{Kind: kind, Task: task},
-			"output", Response{status, errinfo, data},
+			"input", fmt.Sprintf("%#v", Request{Kind: kind, Task: task}),
+			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -57,8 +58,8 @@ func (l *LoggingMiddleware) Put(ctx context.Context, taskId string, task interfa
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Put",
-			"input", Request{TaskId: taskId, Task: task},
-			"output", Response{status, errinfo, data},
+			"input", fmt.Sprintf("%#v", Request{TaskId: taskId, Task: task}),
+			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -70,8 +71,8 @@ func (l *LoggingMiddleware) Delete(ctx context.Context, taskId string, state str
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "Delete",
-			"input", Request{TaskId: taskId, State: state},
-			"output", Response{status, errinfo, data},
+			"input", fmt.Sprintf("%#v", Request{TaskId: taskId, State: state}),
+			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
 	}(time.Now())
