@@ -14,7 +14,7 @@ type CertifyService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
 	GetAuthInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User)
-	PostAuthInfo(ctx context.Context, id string, certifiedPic []byte) (status bool, errinfo string, data model.User)
+	PostAuthInfo(ctx context.Context, id string, certifiedPic string) (status bool, errinfo string, data model.User)
 	GetAllUnCertify(ctx context.Context) (status bool, errinfo string, data []model.User)
 	GetUnCertifyInfo(ctx context.Context, id string) (status bool, errinfo string, data model.User)
 	PostCertifyState(ctx context.Context, id string, pass bool) (status bool, errinfo string, data model.User)
@@ -34,7 +34,7 @@ func (b *basicCertifyService) GetAuthInfo(ctx context.Context, id string) (statu
 	return false, err.Error(), data
 }
 
-func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img []byte) (status bool, errinfo string, data model.User) {
+func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img string) (status bool, errinfo string, data model.User) {
 	// TODO implement the business logic of PostAuthInfo
 	user := model.User{
 		Id: id,
@@ -114,7 +114,7 @@ func NewBasicCertifyService() CertifyService {
 	basicCertifyService := &basicCertifyService{
 		&db.DBService{},
 	}
-	err := basicCertifyService.Bind("conf/conf.users.yml")
+	err := basicCertifyService.Bind("conf/conf.lyh.yml")
 	if err != nil {
 		log.Printf("The UserService failed to bind with mysql")
 	}

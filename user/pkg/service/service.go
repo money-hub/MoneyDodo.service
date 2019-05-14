@@ -13,8 +13,8 @@ type UserService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
 	GetSpec(ctx context.Context, id string) (status bool, errinfo string, data *model.User)
-	GetAll(ctx context.Context) (status bool, errinfo string, data []model.User)
-	GetUDF(ctx context.Context, name string) (status bool, errinfo string, data []model.User)
+	GetAll(ctx context.Context, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User)
+	GetUDF(ctx context.Context, name string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User)
 	Post(ctx context.Context, user model.User) (status bool, errinfo string, data *model.User)
 	Patch(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User)
 	Put(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User)
@@ -41,21 +41,41 @@ func (b *basicUserService) GetSpec(ctx context.Context, id string) (status bool,
 	}
 	return
 }
-func (b *basicUserService) GetAll(ctx context.Context) (status bool, errinfo string, data []model.User) {
+func (b *basicUserService) GetAll(ctx context.Context, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	// TODO implement the business logic of GetAll
 	data = make([]model.User, 0)
 	err := b.Engine().Find(&data)
-	status = err == nil
-	if err == nil {
-		errinfo = ""
-	} else {
+
+	if orderby == "-id" {
+		for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+			data[i], data[j] = data[j], data[i]
+		}
+	}
+
+	if limit > 0 {
+		res := make([]model.User, 0)
+		for i, user := range data {
+			if i >= offset && i < offset+page*limit {
+				res = append(res, user)
+			}
+		}
+
+		status = len(res) > 0
+		if err != nil {
+			errinfo = err.Error()
+		}
+		return status, errinfo, res
+	}
+
+	status = len(data) > 0
+	if err != nil {
 		errinfo = err.Error()
 	}
 	return
 }
-func (b *basicUserService) GetUDF(ctx context.Context, name string) (status bool, errinfo string, data []model.User) {
+func (b *basicUserService) GetUDF(ctx context.Context, name string, page, offset, limit int, orderby string) (status bool, errinfo string, data []model.User) {
 	// TODO implement the business logic of GetUDF
-	_, err, users := b.GetAll(ctx)
+	_, err, users := b.GetAll(ctx, page, offset, limit, orderby)
 	udfUsers := make([]model.User, 0)
 	for _, user := range users {
 		if user.Name == name {
@@ -75,7 +95,7 @@ func (b *basicUserService) Post(ctx context.Context, user model.User) (status bo
 	} else {
 		errinfo = err.Error()
 	}
-	return row > 0, errinfo, nil
+	return row > 0, errinfo, &user
 }
 func (b *basicUserService) Patch(ctx context.Context, id string, user model.User) (b0 bool, e1 string, i2 *model.User) {
 	// TODO implement the business logic of Patch
@@ -83,13 +103,16 @@ func (b *basicUserService) Patch(ctx context.Context, id string, user model.User
 }
 func (b *basicUserService) Put(ctx context.Context, id string, user model.User) (status bool, errinfo string, data *model.User) {
 	// TODO implement the business logic of Put
+	if id != user.Id {
+		return false, "The user.Id can not be modified.", nil
+	}
 	row, err := b.Engine().Where("id = ?", id).AllCols().Update(user)
 	if err == nil {
 		errinfo = ""
 	} else {
 		errinfo = err.Error()
 	}
-	return row > 0, errinfo, nil
+	return row > 0, errinfo, &user
 }
 func (b *basicUserService) Delete(ctx context.Context, id string) (status bool, errinfo string, data *model.User) {
 	// TODO implement the business logic of Delete
@@ -110,7 +133,7 @@ func NewBasicUserService() UserService {
 	basicUserSvc := &basicUserService{
 		&db.DBService{},
 	}
-	err := basicUserSvc.Bind("conf/conf.lyh.yml")
+	err := basicUserSvc.Bind("conf/conf.moneydodo.yml")
 	if err != nil {
 		log.Printf("The UserService failed to bind with mysql")
 	}

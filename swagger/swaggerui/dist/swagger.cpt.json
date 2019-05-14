@@ -10,8 +10,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "This documentation describes example APIs found under https://github.com/ribice/golang-swaggerui-example",
-    "title": "money-hub MoneyDodo/personalTasks",
+    "description": "This documentation describes example APIs found under https://github.com/money-hub/MoneyDodo.service",
+    "title": "money-hub MoneyDodo/cpt",
     "license": {
       "name": "MIT",
       "url": "http://opensource.org/licenses/MIT"
@@ -19,21 +19,38 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/users/{userId}/tasks": {
+    "/api/tasks": {
       "get": {
-        "description": "Get all task of the user. You need to specify the userId and taskId.",
+        "description": "Get all task without detail.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
-        "summary": "Get all tasks of the user (with id=userId).",
+        "summary": "Get all tasks.",
         "operationId": "swaggGetAllReq",
         "parameters": [
           {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
           }
         ],
         "responses": {
@@ -46,25 +63,18 @@
         }
       },
       "post": {
-        "description": "Create a task. Also, you need to specify the userId and taskId.",
+        "description": "Create a task(Now only support questionnaire). The upload parameter needs to be a wrapper of model.Qtnr and has one extra field called \"kind\" which indicates the task type.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Create a task.",
         "operationId": "swaggPostReq",
         "parameters": [
           {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/Qtnr"
             }
           }
         ],
@@ -78,22 +88,15 @@
         }
       }
     },
-    "/api/users/{userId}/tasks/{taskId}": {
+    "/api/tasks/{taskId}": {
       "get": {
-        "description": "Get the specical task. You need to specify the userId and taskId.",
+        "description": "Get the specical task with detail(Now only support questionnaire). You need to specify and taskId.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Get the specical task of the user (with id=userId).",
         "operationId": "swaggGetSpecReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "type": "string",
             "description": "id of task",
@@ -112,20 +115,13 @@
         }
       },
       "put": {
-        "description": "Update the task information. Also, you need to specify the user ID and task ID.",
+        "description": "Update the task information(Now only support questionnaire). Also, you need to specify the taskId. The upload parameter needs to be a wrapper of model.Qtnr and has one extra field called \"kind\" which indicates the task type.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
         "summary": "Update the task information",
         "operationId": "swaggPutReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "type": "string",
             "description": "id of task",
@@ -137,45 +133,13 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/Qtnr"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
-          },
-          "400": {
-            "$ref": "#/responses/swaggBadReq"
-          }
-        }
-      },
-      "post": {
-        "description": "The user (with id=userId) claims the task (with id=taskId). You need to specify the userId and taskId.",
-        "tags": [
-          "personalTasks"
-        ],
-        "summary": "Claim the task (with id=taskId).",
-        "operationId": "swaggPostClaimReq",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of task",
-            "name": "taskId",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/swaggNoReturnValue"
+            "$ref": "#/responses/swaggTaskResp"
           },
           "400": {
             "$ref": "#/responses/swaggBadReq"
@@ -183,22 +147,15 @@
         }
       }
     },
-    "/api/users/{userId}/tasks/{taskId}?status={status}": {
+    "/api/tasks/{taskId}?state={state}": {
       "delete": {
-        "description": "When status is equal to \"non-released\" or \"finished\", it means the creator want to delete it. When status is equal to \"released\", it means the creator want to cancel to release it. When status is equal to \"claimed\", it means the recipient want to cancel to claim it. Also, you need to specify the user ID and task ID.",
+        "description": "When state is equal to \"non-released\" or \"closed\", it means the creator want to delete it. When state is equal to \"released\", it means the creator want to cancel to release it. Also, you need to specify the taskId.",
         "tags": [
-          "personalTasks"
+          "cpt"
         ],
-        "summary": "Delete\\Cancel to Release\\Cancel to Claim a task.",
+        "summary": "Delete\\Cancel a task.",
         "operationId": "swaggDeleteReq",
         "parameters": [
-          {
-            "type": "string",
-            "description": "id of user",
-            "name": "userId",
-            "in": "path",
-            "required": true
-          },
           {
             "description": "id of task",
             "name": "taskId",
@@ -207,9 +164,9 @@
           },
           {
             "type": "string",
-            "description": "status of task",
-            "name": "status",
-            "in": "path",
+            "description": "state can be one of \"non-released\", \"released\" and \"closed\"",
+            "name": "state",
+            "in": "query",
             "required": true
           }
         ],
@@ -225,6 +182,77 @@
     }
   },
   "definitions": {
+    "Qtnr": {
+      "type": "object",
+      "properties": {
+        "cutoff": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Cutoff"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
+        },
+        "pubdate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Pubdate"
+        },
+        "publisher": {
+          "type": "string",
+          "x-go-name": "Publisher"
+        },
+        "qtnr": {
+          "$ref": "#/definitions/Questionnaire"
+        },
+        "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
+          "type": "string",
+          "x-go-name": "Restrain"
+        },
+        "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Reward"
+        },
+        "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
+          "type": "string",
+          "x-go-name": "State"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Questionnaire": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/query"
+          },
+          "x-go-name": "Query"
+        },
+        "singleChoice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/singleChoice"
+          },
+          "x-go-name": "SingleChoice"
+        },
+        "taskId": {
+          "type": "string",
+          "x-go-name": "TaskId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
     "Task": {
       "type": "object",
       "properties": {
@@ -237,6 +265,10 @@
           "type": "string",
           "x-go-name": "Id"
         },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
+        },
         "pubdate": {
           "type": "string",
           "format": "date-time",
@@ -246,26 +278,21 @@
           "type": "string",
           "x-go-name": "Publisher"
         },
-        "recipient": {
-          "type": "string",
-          "x-go-name": "Recipient"
-        },
         "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
           "type": "string",
           "x-go-name": "Restrain"
         },
         "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
           "type": "number",
           "format": "double",
           "x-go-name": "Reward"
         },
-        "status": {
+        "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
           "type": "string",
-          "x-go-name": "Status"
-        },
-        "type": {
-          "type": "string",
-          "x-go-name": "Type"
+          "x-go-name": "State"
         }
       },
       "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
@@ -284,11 +311,7 @@
           "x-go-name": "CertificationStatus"
         },
         "certifiedPic": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          },
+          "type": "string",
           "x-go-name": "CertifiedPic"
         },
         "creditScore": {
@@ -301,11 +324,7 @@
           "x-go-name": "Email"
         },
         "icon": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int8"
-          },
+          "type": "string",
           "x-go-name": "Icon"
         },
         "id": {
@@ -320,10 +339,6 @@
           "type": "string",
           "x-go-name": "Name"
         },
-        "password": {
-          "type": "string",
-          "x-go-name": "Password"
-        },
         "phone": {
           "type": "string",
           "x-go-name": "Phone"
@@ -334,9 +349,90 @@
         }
       },
       "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "query": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "singleChoice": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Choices"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
     }
   },
   "responses": {
+    "swaggAuthOfAdminResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggAuthOfUserResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
     "swaggBadReq": {
       "description": "Error Fail",
       "schema": {
@@ -379,7 +475,7 @@
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/definitions/Task"
+            "$ref": "#/definitions/Qtnr"
           },
           "errinfo": {
             "description": "Detailed error message",

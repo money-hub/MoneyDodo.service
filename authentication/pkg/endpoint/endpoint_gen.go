@@ -10,22 +10,32 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	GetOpenidEndpoint  endpoint.Endpoint
-	AdminLoginEndpoint endpoint.Endpoint
+	GetOpenidEndpoint       endpoint.Endpoint
+	AdminLoginEndpoint      endpoint.Endpoint
+	EnterpriseLoginEndpoint endpoint.Endpoint
+	LogoutEndpoint          endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func New(s service.AuthenticationService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
-		AdminLoginEndpoint: MakeAdminLoginEndpoint(s),
-		GetOpenidEndpoint:  MakeGetOpenidEndpoint(s),
+		AdminLoginEndpoint:      MakeAdminLoginEndpoint(s),
+		EnterpriseLoginEndpoint: MakeEnterpriseLoginEndpoint(s),
+		GetOpenidEndpoint:       MakeGetOpenidEndpoint(s),
+		LogoutEndpoint:          MakeLogoutEndpoint(s),
 	}
 	for _, m := range mdw["GetOpenid"] {
 		eps.GetOpenidEndpoint = m(eps.GetOpenidEndpoint)
 	}
 	for _, m := range mdw["AdminLogin"] {
 		eps.AdminLoginEndpoint = m(eps.AdminLoginEndpoint)
+	}
+	for _, m := range mdw["EnterpriseLogin"] {
+		eps.EnterpriseLoginEndpoint = m(eps.EnterpriseLoginEndpoint)
+	}
+	for _, m := range mdw["Logout"] {
+		eps.LogoutEndpoint = m(eps.LogoutEndpoint)
 	}
 	return eps
 }
