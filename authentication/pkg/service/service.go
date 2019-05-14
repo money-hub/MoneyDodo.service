@@ -54,17 +54,17 @@ func saveToken(b *basicAuthenticationService, token string, id string) (err erro
 	item := &model.Token{
 		Id: id,
 	}
-	if has, _ := b.Engine().Get(item); !has {
+	if has, _ := b.Engine().Get(item); has == false {
 		item.Token = token
 		_, err = b.Engine().Insert(item)
 		if err != nil {
-			fmt.Println("[Authentication log] Insert token failed")
+			fmt.Println(err.Error())
 		}
 	} else {
 		item.Token = token
-		_, err = b.Engine().Update(item)
+		_, err = b.Engine().Where("id=?", item.Id).Update(item)
 		if err != nil {
-			fmt.Println("[Authentication log] Update token failed")
+			fmt.Println(err.Error())
 		}
 	}
 	return
@@ -109,8 +109,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 			if has == false {
 				_, err := b.Engine().Insert(user)
 				if err != nil {
-					fmt.Println("[Authentication log] Insert user failed")
-					return false, err.Error(), nil
+					fmt.Println(err.Error())
 				}
 			}
 			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
