@@ -32,14 +32,21 @@ import (
 	"flag"
 	"log"
 	"os"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"golang.org/x/time/rate"
 
 	"github.com/codegangsta/negroni"
 	kitlog "github.com/go-kit/kit/log"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/go-kit/kit/ratelimit"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/money-hub/MoneyDodo.service/cpt"
 	"github.com/money-hub/MoneyDodo.service/middleware"
 	_ "github.com/money-hub/MoneyDodo.service/swagger"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
 const defaultConf = "conf/conf.moneydodo.yml"
@@ -49,38 +56,55 @@ func main() {
 	conf := flag.String("conf", defaultConf, "database config file")
 
 	logger := kitlog.NewLogfmtLogger(os.Stderr)
+	fieldKeys := []string{"method", "error"}
+	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Namespace: "moneydodo",
+		Subsystem: "cpt_service",
+		Name:      "request_count",
+		Help:      "Number of requests received.",
+	}, fieldKeys)
+	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "moneydodo",
+		Subsystem: "cpt_service",
+		Name:      "request_latency_microseconds",
+		Help:      "Total duration of requests in microseconds.",
+	}, fieldKeys)
+
+	limiter := rate.NewLimiter(rate.Every(time.Second*1), 1)
+
 	svc := cpt.NewBasicCptService(*conf)
 	svc = &cpt.LoggingMiddleware{Logger: logger, Next: svc}
+	svc = &cpt.InstrumentingMiddleware{RequestCount: requestCount, RequestLatency: requestLatency, Next: svc}
 	eps := cpt.MakeServerEndpoints(svc)
 	decodes := cpt.MakeServerDecodes()
 	encodes := cpt.MakeServerEncodes()
 
 	getSpecHandler := httptransport.NewServer(
-		eps.GetSpecEndpoint,
+		ratelimit.NewDelayingLimiter(limiter)(eps.GetSpecEndpoint),
 		decodes.GetSpecDecode,
 		encodes.GetSpecEncode,
 	)
 
 	getAllHandler := httptransport.NewServer(
-		eps.GetAllEndpoint,
+		ratelimit.NewDelayingLimiter(limiter)(eps.GetAllEndpoint),
 		decodes.GetAllDecode,
 		encodes.GetAllEncode,
 	)
 
 	postHandler := httptransport.NewServer(
-		eps.PostEndpoint,
+		ratelimit.NewDelayingLimiter(limiter)(eps.PostEndpoint),
 		decodes.PostDecode,
 		encodes.PostEncode,
 	)
 
 	putHandler := httptransport.NewServer(
-		eps.PutEndpoint,
+		ratelimit.NewDelayingLimiter(limiter)(eps.PutEndpoint),
 		decodes.PutDecode,
 		encodes.PutEncode,
 	)
 
 	deleteHandler := httptransport.NewServer(
-		eps.DeleteEndpoint,
+		ratelimit.NewDelayingLimiter(limiter)(eps.DeleteEndpoint),
 		decodes.DeleteDecode,
 		encodes.DeleteEncode,
 	)
@@ -89,6 +113,7 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(middleware.GetTokenInfo)
 	sub := router.PathPrefix("/api/tasks").Subrouter()
+	sub.Path("/metrics").Handler(promhttp.Handler())
 	// swagger:operation GET /api/tasks/{taskId} cpt swaggGetSpecReq
 	// ---
 	// summary: Get the specical task of the user (with id=userId).

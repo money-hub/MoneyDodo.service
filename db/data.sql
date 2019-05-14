@@ -59,6 +59,7 @@ create table if not exists questionnaire (
     taskId int not null COMMENT '任务Id',
     query mediumtext COMMENT '填空',
     singleChoice mediumtext COMMENT '单项选择',
+    mutipleChoice mediumtext COMMENT '多项选择',
     primary key(taskId),
     foreign Key(taskId) references task(id)
 );
@@ -87,7 +88,7 @@ create table if not exists comment (
     timestamp text COMMENT '评论时间戳',
     content mediumtext COMMENT '评论内容，支持图片评论',
     stars int default 0 COMMENT '评论点赞数量',
-    stargazers text COMMENT '评论者的id'
+    stargazers text COMMENT '评论者的id',
     primary key(id),
     foreign key(taskId) references task(id),
     foreign key(userId) references user(id)
@@ -104,4 +105,5 @@ create table if not exists recharge(
     id int AUTO_INCREMENT COMMENT '余额Id',
     amount int COMMENT '充值金额',
     timestamp text COMMENT '充值时间戳',
+    primary key(id)
 );

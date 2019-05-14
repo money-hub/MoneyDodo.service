@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -129,7 +128,7 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 			req.Task = t
 		}
 	}
-	fmt.Printf("%#v", req)
+	// fmt.Printf("%#v", req)
 	return req, nil
 }
 

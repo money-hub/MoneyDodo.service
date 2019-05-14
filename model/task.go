@@ -35,10 +35,17 @@ type singleChoice struct {
 	Answer   string   `json:"answer"`
 }
 
+type mutipleChoice struct {
+	Question string   `json:"question"`
+	Choices  []string `json:"choices"`
+	Answers  []string `json:"answers"`
+}
+
 type Questionnaire struct {
-	TaskId       string         `json:"taskId" xorm:"taskId"`
-	Query        []query        `json:"query" xorm:"query"`
-	SingleChoice []singleChoice `json:"singleChoice" xorm:"singleChoice"`
+	TaskId        string          `json:"taskId" xorm:"taskId"`
+	Query         []query         `json:"query" xorm:"query"`
+	SingleChoice  []singleChoice  `json:"singleChoice" xorm:"singleChoice"`
+	MutipleChoice []mutipleChoice `json:"mutipleChoice" xorm:"mutipleChoice"`
 }
 
 type Qtnr struct {
