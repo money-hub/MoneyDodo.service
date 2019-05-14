@@ -110,6 +110,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 				_, err := b.Engine().Insert(user)
 				if err != nil {
 					fmt.Println("[Authentication log] Insert user failed")
+					return false, err.Error(), nil
 				}
 			}
 			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
@@ -175,7 +176,7 @@ func NewBasicAuthenticationService() AuthenticationService {
 	basicAuthSvc := &basicAuthenticationService{
 		&db.DBService{},
 	}
-	err := basicAuthSvc.Bind("conf/conf.lyt.yml")
+	err := basicAuthSvc.Bind("conf/conf.moneydodo.yml")
 	if err != nil {
 		log.Printf("The AuthService failed to bind with mysql")
 	}

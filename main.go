@@ -127,8 +127,14 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 			}
+			if myToken == "" {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write(writeResp(false, "Unauthorized access to this resource", nil))
+				return
+			}
+
 			mapClaims, err = MyJwt.ParseToken(myToken, []byte(MyJwt.SecretKey))
-			checkErr(err)
+			// checkErr(err)
 			if err != nil || mapClaims.Valid() != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write(writeResp(false, "Unauthorized access to this resource", nil))
@@ -233,7 +239,7 @@ func startServer() {
 		balance:  &handle{host: "127.0.0.1", port: "8009"},
 		recharge: &handle{host: "127.0.0.1", port: "8010"},
 	}
-	err := http.ListenAndServe(":8888", service)
+	err := http.ListenAndServe(":8889", service)
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
