@@ -239,7 +239,7 @@ func startServer() {
 		balance:  &handle{host: "127.0.0.1", port: "8009"},
 		recharge: &handle{host: "127.0.0.1", port: "8010"},
 	}
-	err := http.ListenAndServe(":8889", service)
+	err := http.ListenAndServe(":8888", service)
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
