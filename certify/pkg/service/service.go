@@ -39,19 +39,19 @@ func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img [
 	user := model.User{
 		Id: id,
 	}
-	status, err := b.Engine().Get(&user)
+	status, err := b.Engine().ID(id).Get(&user)
 	if status == false || err != nil {
-		return false, err.Error(), data
+		return false, "Get Failed", data
 	}
 	user.CertifiedPic = img
 	user.CertificationStatus = 1
-	_, err = b.Engine().Id(id).Update(&user)
+	_, err = b.Engine().Where("Id = ?", id).Update(user)
 	if err != nil {
-		return false, err.Error(), data
+		return false, "Update Failed", data
 	}
-	_, err = b.Engine().Id(id).Get(&data)
+	_, err = b.Engine().ID(id).Get(&data)
 	if err != nil {
-		return false, err.Error(), data
+		return false, "Update succ but get failed", data
 	}
 	return true, "", data
 }
@@ -98,11 +98,11 @@ func (b *basicCertifyService) PostCertifyState(ctx context.Context, id string, p
 	} else {
 		user.CertificationStatus = 3
 	}
-	_, err = b.Engine().Id(id).Update(&user)
+	_, err = b.Engine().Where("Id = ?", id).Update(user)
 	if err != nil {
 		return false, err.Error(), data
 	}
-	_, err = b.Engine().Id(id).Get(&data)
+	_, err = b.Engine().Get(&data)
 	if err != nil {
 		return false, err.Error(), data
 	}
