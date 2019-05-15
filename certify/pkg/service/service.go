@@ -151,7 +151,7 @@ func NewBasicCertifyService() CertifyService {
 	basicCertifyService := &basicCertifyService{
 		&db.DBService{},
 	}
-	err := basicCertifyService.Bind("conf/conf.lyh.yml")
+	err := basicCertifyService.Bind("conf/conf.moneydodo.yml")
 	if err != nil {
 		log.Printf("The UserService failed to bind with mysql")
 	}
