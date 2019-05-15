@@ -55,26 +55,28 @@ func (b *basicCertifyService) GetAuthInfo(ctx context.Context, id string) (statu
 func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img string) (status bool, errinfo string, data model.User) {
 	// TODO implement the business logic of PostAuthInfo
 	role := ctx.Value("role").(int)
-	userID := ctx.Value("id").(string)
-	if role == 1 && userID == id {
-		user := model.User{
-			Id: id,
+	if role == 1 {
+		userID := ctx.Value("id").(string)
+		if userID == id {
+			user := model.User{
+				Id: id,
+			}
+			status, err := b.Engine().ID(id).Get(&user)
+			if status == false || err != nil {
+				return false, "Get Failed", data
+			}
+			user.CertifiedPic = img
+			user.CertificationStatus = 1
+			_, err = b.Engine().Where("Id = ?", id).Update(user)
+			if err != nil {
+				return false, "Update Failed", data
+			}
+			_, err = b.Engine().ID(id).Get(&data)
+			if err != nil {
+				return false, "Update succ but get failed", data
+			}
+			return true, "", data
 		}
-		status, err := b.Engine().ID(id).Get(&user)
-		if status == false || err != nil {
-			return false, "Get Failed", data
-		}
-		user.CertifiedPic = img
-		user.CertificationStatus = 1
-		_, err = b.Engine().Where("Id = ?", id).Update(user)
-		if err != nil {
-			return false, "Update Failed", data
-		}
-		_, err = b.Engine().ID(id).Get(&data)
-		if err != nil {
-			return false, "Update succ but get failed", data
-		}
-		return true, "", data
 	}
 	return false, "Permission denied", data
 }
