@@ -67,7 +67,7 @@ func makeGetSpecHandler(m *mux.Router, endpoints endpoint.Endpoints, options []h
 	//	   "$ref": "#/responses/swaggUserResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("GET").Path("/api/users/{userId}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -187,7 +187,7 @@ func makeGetUDFHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 	//	   "$ref": "#/responses/swaggUsersResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	m.Methods("GET").Path("/api/users/{username}").Handler(
+	m.Methods("GET").Path("/api/users/{username:[a-zA-Z]}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -296,7 +296,7 @@ func makePutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.
 	//	   "$ref": "#/responses/swaggUserResp"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	m.Methods("PUT").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("PUT").Path("/api/users/{userId}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"PUT"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -343,7 +343,7 @@ func makeDeleteHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//	   "$ref": "#/responses/swaggBadReq"
-	m.Methods("DELETE").Path("/api/users/{userId:[0-9]+}").Handler(
+	m.Methods("DELETE").Path("/api/users/{userId}").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"DELETE"}),
 			handlers.AllowedOrigins([]string{"*"}),

@@ -249,7 +249,7 @@ func NewBasicCommentService() CommentService {
 		&db.DBService{},
 	}
 
-	err := basicCommentSvc.Bind("conf/conf.lyt.yml")
+	err := basicCommentSvc.Bind("conf/conf.moneydodo.yml")
 	if err != nil {
 		log.Printf("The CommentService failed to bind with mysql")
 	}

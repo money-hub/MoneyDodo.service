@@ -127,8 +127,14 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 			}
+			if myToken == "" {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write(writeResp(false, "Unauthorized access to this resource", nil))
+				return
+			}
+
 			mapClaims, err = MyJwt.ParseToken(myToken, []byte(MyJwt.SecretKey))
-			checkErr(err)
+			// checkErr(err)
 			if err != nil || mapClaims.Valid() != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write(writeResp(false, "Unauthorized access to this resource", nil))
@@ -149,7 +155,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		has, _ := basicSvc.Engine().Get(item)
 		// 判断是否为认证信息相关
-		match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/certs", r.RequestURI)
+		match, _ := regexp.MatchString("/api/users/", r.RequestURI)
 		if has == false || item.Token != myToken || (int(mapClaims["role"].(float64)) != 0 && !match && int(mapClaims["certificationStatus"].(float64)) != 2) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(writeResp(false, "Unauthorized access to this resource", nil))

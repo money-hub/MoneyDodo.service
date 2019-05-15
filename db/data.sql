@@ -13,8 +13,8 @@ drop table if exists token;
 
 # 用户
 create table if not exists user (
-	id varchar(20) not null primary key COMMENT 'OpenId',
-    name varchar(20) COMMENT '姓名',
+	id varchar(100) not null primary key COMMENT 'OpenId',
+    name varchar(100) COMMENT '姓名',
     sId varchar(20) COMMENT '学号',
     introduction text COMMENT '个人简介',
     balance double COMMENT '余额',
