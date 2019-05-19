@@ -20,32 +20,24 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
 	options := map[string][]http.ServerOption{
-		"AdminGetAllTasksByUserID":        {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminGetAllTasksByUserID", logger))},
-		"AdminGetTasksClosedByUserID":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminGetTasksClosedByUserID", logger))},
-		"AdminGetTasksReleasedByUserID":   {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminGetTasksReleasedByUserID", logger))},
-		"AdminGetTasksUnreleasedByUserID": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "AdminGetTasksUnreleasedByUserID", logger))},
-		"UserGetHisClosedTasks":           {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "UserGetHisClosedTasks", logger))},
-		"UserGetHisReleasedTasks":         {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "UserGetHisReleasedTasks", logger))},
-		"UserGetHisUnreleasedTasks":       {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "UserGetHisUnreleasedTasks", logger))},
-		"UserGetTasksByID":                {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "UserGetTasksByID", logger))},
+		"GetHisClosedTasks":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisClosedTasks", logger))},
+		"GetHisReleasedTasks":   {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisReleasedTasks", logger))},
+		"GetHisUnreleasedTasks": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisUnreleasedTasks", logger))},
+		"GetTasksByID":          {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetTasksByID", logger))},
 	}
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
-	mw["UserGetHisReleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UserGetHisReleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "UserGetHisReleasedTasks"))}
-	mw["UserGetTasksByID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UserGetTasksByID")), endpoint.InstrumentingMiddleware(duration.With("method", "UserGetTasksByID"))}
-	mw["UserGetHisUnreleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UserGetHisUnreleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "UserGetHisUnreleasedTasks"))}
-	mw["UserGetHisClosedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UserGetHisClosedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "UserGetHisClosedTasks"))}
-	mw["AdminGetAllTasksByUserID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AdminGetAllTasksByUserID")), endpoint.InstrumentingMiddleware(duration.With("method", "AdminGetAllTasksByUserID"))}
-	mw["AdminGetTasksReleasedByUserID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AdminGetTasksReleasedByUserID")), endpoint.InstrumentingMiddleware(duration.With("method", "AdminGetTasksReleasedByUserID"))}
-	mw["AdminGetTasksUnreleasedByUserID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AdminGetTasksUnreleasedByUserID")), endpoint.InstrumentingMiddleware(duration.With("method", "AdminGetTasksUnreleasedByUserID"))}
-	mw["AdminGetTasksClosedByUserID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AdminGetTasksClosedByUserID")), endpoint.InstrumentingMiddleware(duration.With("method", "AdminGetTasksClosedByUserID"))}
+	mw["GetHisReleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisReleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisReleasedTasks"))}
+	mw["GetTasksByID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetTasksByID")), endpoint.InstrumentingMiddleware(duration.With("method", "GetTasksByID"))}
+	mw["GetHisUnreleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisUnreleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisUnreleasedTasks"))}
+	mw["GetHisClosedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisClosedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisClosedTasks"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"UserGetHisReleasedTasks", "UserGetTasksByID", "UserGetHisUnreleasedTasks", "UserGetHisClosedTasks", "AdminGetAllTasksByUserID", "AdminGetTasksReleasedByUserID", "AdminGetTasksUnreleasedByUserID", "AdminGetTasksClosedByUserID"}
+	methods := []string{"GetHisReleasedTasks", "GetTasksByID", "GetHisUnreleasedTasks", "GetHisClosedTasks"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}

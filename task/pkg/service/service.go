@@ -12,22 +12,18 @@ import (
 type TaskService interface {
 	// Add your methods here
 	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
-	UserGetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	UserGetTasksByID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	UserGetHisUnreleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	UserGetHisClosedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	AdminGetAllTasksByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	AdminGetTasksReleasedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	AdminGetTasksUnreleasedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
-	AdminGetTasksClosedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
+	GetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
+	GetTasksByID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
+	GetHisUnreleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
+	GetHisClosedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task)
 }
 
 type basicTaskService struct {
 	*db.DBService
 }
 
-func (b *basicTaskService) UserGetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of UserGetHisReleasedTasks
+func (b *basicTaskService) GetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
+	// TODO implement the business logic of GetHisReleasedTasks
 	role := ctx.Value("role").(int)
 	if role == 1 {
 		userID := ctx.Value("id").(string)
@@ -46,11 +42,25 @@ func (b *basicTaskService) UserGetHisReleasedTasks(ctx context.Context, id strin
 			}
 			return false, err.Error(), data
 		}
+	} else if role == 0 {
+		task := model.Task{}
+		rows, err := b.Engine().Where("Publisher = ? and state = ?", id, "released").Rows(task)
+		if err == nil {
+			for rows.Next() {
+				err1 := rows.Scan(&task)
+				if err1 != nil {
+					return false, err1.Error(), data
+				}
+				data = append(data, task)
+			}
+			return true, "", data
+		}
+		return false, err.Error(), data
 	}
 	return false, "Permission denied", data
 }
-func (b *basicTaskService) UserGetTasksByID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of UserGetTasksByID
+func (b *basicTaskService) GetTasksByID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
+	// TODO implement the business logic of GetTasksByID
 	task := model.Task{}
 	rows, err := b.Engine().Where("Publisher = ? and State = ?", id, "released").Rows(task)
 	if err == nil {
@@ -65,8 +75,8 @@ func (b *basicTaskService) UserGetTasksByID(ctx context.Context, id string) (sta
 	}
 	return false, err.Error(), data
 }
-func (b *basicTaskService) UserGetHisUnreleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of UserGetHisUnreleasedTasks
+func (b *basicTaskService) GetHisUnreleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
+	// TODO implement the business logic of GetHisUnreleasedTasks
 	role := ctx.Value("role").(int)
 	if role == 1 {
 		userID := ctx.Value("id").(string)
@@ -85,11 +95,25 @@ func (b *basicTaskService) UserGetHisUnreleasedTasks(ctx context.Context, id str
 			}
 			return false, err.Error(), data
 		}
+	} else if role == 0 {
+		task := model.Task{}
+		rows, err := b.Engine().Where("Publisher = ? and state = ?", id, "non-released").Rows(task)
+		if err == nil {
+			for rows.Next() {
+				err1 := rows.Scan(&task)
+				if err1 != nil {
+					return false, err1.Error(), data
+				}
+				data = append(data, task)
+			}
+			return true, "", data
+		}
+		return false, err.Error(), data
 	}
 	return false, "Permission denied", data
 }
-func (b *basicTaskService) UserGetHisClosedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of UserGetHisClosedTasks
+func (b *basicTaskService) GetHisClosedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
+	// TODO implement the business logic of GetHisClosedTasks
 	role := ctx.Value("role").(int)
 	if role == 1 {
 		userID := ctx.Value("id").(string)
@@ -108,73 +132,7 @@ func (b *basicTaskService) UserGetHisClosedTasks(ctx context.Context, id string)
 			}
 			return false, err.Error(), data
 		}
-	}
-	return false, "Permission denied", data
-}
-func (b *basicTaskService) AdminGetAllTasksByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of AdminGetAllTasksByUserID
-	role := ctx.Value("role").(int)
-	if role == 0 {
-		task := model.Task{}
-		rows, err := b.Engine().Where("Publisher = ?", id).Rows(task)
-		if err == nil {
-			for rows.Next() {
-				err1 := rows.Scan(&task)
-				if err1 != nil {
-					return false, err1.Error(), data
-				}
-				data = append(data, task)
-			}
-			return true, "", data
-		}
-		return false, err.Error(), data
-	}
-	return false, "Permission denied", data
-}
-func (b *basicTaskService) AdminGetTasksReleasedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of AdminGetTasksReleasedByUserID
-	role := ctx.Value("role").(int)
-	if role == 0 {
-		task := model.Task{}
-		rows, err := b.Engine().Where("Publisher = ? and state = ?", id, "released").Rows(task)
-		if err == nil {
-			for rows.Next() {
-				err1 := rows.Scan(&task)
-				if err1 != nil {
-					return false, err1.Error(), data
-				}
-				data = append(data, task)
-			}
-			return true, "", data
-		}
-		return false, err.Error(), data
-	}
-	return false, "Permission denied", data
-}
-func (b *basicTaskService) AdminGetTasksUnreleasedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of AdminGetTasksUnreleasedByUserID
-	role := ctx.Value("role").(int)
-	if role == 0 {
-		task := model.Task{}
-		rows, err := b.Engine().Where("Publisher = ? and state = ?", id, "non-released").Rows(task)
-		if err == nil {
-			for rows.Next() {
-				err1 := rows.Scan(&task)
-				if err1 != nil {
-					return false, err1.Error(), data
-				}
-				data = append(data, task)
-			}
-			return true, "", data
-		}
-		return false, err.Error(), data
-	}
-	return false, "Permission denied", data
-}
-func (b *basicTaskService) AdminGetTasksClosedByUserID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	// TODO implement the business logic of AdminGetTasksClosedByUserID
-	role := ctx.Value("role").(int)
-	if role == 0 {
+	} else if role == 0 {
 		task := model.Task{}
 		rows, err := b.Engine().Where("Publisher = ? and state = ?", id, "closed").Rows(task)
 		if err == nil {
@@ -206,7 +164,7 @@ func NewBasicTaskService() TaskService {
 
 // New returns a TaskService with all of the expected middleware wired in.
 func New(middleware []Middleware) TaskService {
-	var svc = NewBasicTaskService()
+	var svc TaskService = NewBasicTaskService()
 	for _, m := range middleware {
 		svc = m(svc)
 	}
