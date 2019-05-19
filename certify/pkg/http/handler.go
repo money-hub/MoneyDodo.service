@@ -14,7 +14,7 @@ import (
 
 // makeGetAuthInfoHandler creates the handler logic
 func makeGetAuthInfoHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/certs").Handler(
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/certs").Handler(
 		handlers.CORS(
 			handlers.AllowedMethods([]string{"GET"}),
 			handlers.AllowedOrigins([]string{"*"}),
@@ -54,7 +54,7 @@ func encodeGetAuthInfoResponse(ctx context.Context, w http1.ResponseWriter, resp
 
 // makePostAuthInfoHandler creates the handler logic
 func makePostAuthInfoHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/api/users/{userId:[0-9]+}/certs").Handler(
+	m.Methods("POST").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/certs").Handler(
 		handlers.CORS(handlers.AllowedMethods([]string{"POST"}),
 			handlers.AllowedOrigins([]string{"*"}),
 		)(
@@ -113,7 +113,7 @@ func encodeGetAllUnCertifyResponse(ctx context.Context, w http1.ResponseWriter, 
 
 // makeGetUnCertifyInfoHandler creates the handler logic
 func makeGetUnCertifyInfoHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/certs/{userId:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetUnCertifyInfoEndpoint, decodeGetUnCertifyInfoRequest, encodeGetUnCertifyInfoResponse, options...)))
+	m.Methods("GET").Path("/api/certs/{userId:[a-zA-Z0-9_-]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetUnCertifyInfoEndpoint, decodeGetUnCertifyInfoRequest, encodeGetUnCertifyInfoResponse, options...)))
 }
 
 // decodeGetUnCertifyInfoRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -141,7 +141,7 @@ func encodeGetUnCertifyInfoResponse(ctx context.Context, w http1.ResponseWriter,
 
 // makePostCertifyStateHandler creates the handler logic
 func makePostCertifyStateHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("POST").Path("/api/certs/{userId:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PostCertifyStateEndpoint, decodePostCertifyStateRequest, encodePostCertifyStateResponse, options...)))
+	m.Methods("POST").Path("/api/certs/{userId:[a-zA-Z0-9_-]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PostCertifyStateEndpoint, decodePostCertifyStateRequest, encodePostCertifyStateResponse, options...)))
 }
 
 // decodePostCertifyStateRequest is a transport/http.DecodeRequestFunc that decodes a

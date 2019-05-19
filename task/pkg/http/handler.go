@@ -14,7 +14,7 @@ import (
 
 // makeGetHisReleasedTasksHandler creates the handler logic
 func makeGetHisReleasedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisReleasedTasksEndpoint, decodeGetHisReleasedTasksRequest, encodeGetHisReleasedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisReleasedTasksEndpoint, decodeGetHisReleasedTasksRequest, encodeGetHisReleasedTasksResponse, options...)))
 }
 
 // decodeGetHisReleasedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -41,7 +41,7 @@ func encodeGetHisReleasedTasksResponse(ctx context.Context, w http1.ResponseWrit
 
 // makeGetTasksByIDHandler creates the handler logic
 func makeGetTasksByIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetTasksByIDEndpoint, decodeGetTasksByIDRequest, encodeGetTasksByIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetTasksByIDEndpoint, decodeGetTasksByIDRequest, encodeGetTasksByIDResponse, options...)))
 }
 
 // decodeGetTasksByIDRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -69,7 +69,7 @@ func encodeGetTasksByIDResponse(ctx context.Context, w http1.ResponseWriter, res
 
 // makeGetHisUnreleasedTasksHandler creates the handler logic
 func makeGetHisUnreleasedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisUnreleasedTasksEndpoint, decodeGetHisUnreleasedTasksRequest, encodeGetHisUnreleasedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisUnreleasedTasksEndpoint, decodeGetHisUnreleasedTasksRequest, encodeGetHisUnreleasedTasksResponse, options...)))
 }
 
 // decodeGetHisUnreleasedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -97,7 +97,7 @@ func encodeGetHisUnreleasedTasksResponse(ctx context.Context, w http1.ResponseWr
 
 // makeGetHisClosedTasksHandler creates the handler logic
 func makeGetHisClosedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisClosedTasksEndpoint, decodeGetHisClosedTasksRequest, encodeGetHisClosedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetHisClosedTasksEndpoint, decodeGetHisClosedTasksRequest, encodeGetHisClosedTasksResponse, options...)))
 }
 
 // decodeGetHisClosedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
