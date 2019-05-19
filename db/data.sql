@@ -42,7 +42,7 @@ create table if not exists enterprise (
 create table if not exists task (
 	id int AUTO_INCREMENT primary key COMMENT '任务id',
     kind varchar(20) not null COMMENT '任务类型',
-    publisher varchar(20) not null COMMENT '发布者',
+    publisher varchar(100) not null COMMENT '发布者',
     -- recipient varchar(20) COMMENT '接收者',
     restrain text COMMENT '任务限制',
     pubdate text COMMENT '发布时间',

@@ -97,7 +97,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.RequestURI, "/api/auth") && r.RequestURI != "/api/auth/logout" {
 		// 登陆服务（authentication）
 		remote, _ = url.Parse("http://" + this.auth.host + ":" + this.auth.port)
-	} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9-]+/tasks?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
+	} else if match, _ := regexp.MatchString("/api/users/([a-zA-Z0-9_-]+)/tasks\\?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询某个用户发布的任务 get
 		remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
 	} else if match, _ := regexp.MatchString("/api/tasks[/0-9]*", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
@@ -110,6 +110,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
 			return []byte(MyJwt.SecretKey), nil
 		})
+
 		if token != nil {
 			var ok bool
 			mapClaims, ok = token.Claims.(jwt.MapClaims)
@@ -141,7 +142,6 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 		if myToken == "" {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(writeResp(false, "Unauthorized access to this resource", nil))
@@ -174,19 +174,19 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// 实名认证（certify）
-		if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+		if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 			remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 		}
 
 		// user相关 - /api/users
 		if strings.HasPrefix(r.RequestURI, "/api/users") {
-			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/tasks", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/tasks", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 				// 用户任务信息（task）
 				remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/deals", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/deals", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 				// 用户交易信息（deal）
 				remote, _ = url.Parse("http://" + this.deal.host + ":" + this.deal.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/balances", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/balances", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 				// 充值信息（balance）
 				remote, _ = url.Parse("http://" + this.balance.host + ":" + this.balance.port)
 			} else {
@@ -239,7 +239,7 @@ func startServer() {
 		balance:  &handle{host: "127.0.0.1", port: "8009"},
 		recharge: &handle{host: "127.0.0.1", port: "8010"},
 	}
-	err := http.ListenAndServe(":8888", service)
+	err := http.ListenAndServe(":8123", service)
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
