@@ -72,6 +72,9 @@ func ParseToken(tokenSrt string, SecretKey []byte) (claims jwt.MapClaims, err er
 	token, err = jwt.Parse(tokenSrt, func(*jwt.Token) (interface{}, error) {
 		return SecretKey, nil
 	})
+	if err != nil {
+		return claims, err
+	}
 	claims = token.Claims.(jwt.MapClaims)
 	return
 }
@@ -106,7 +109,6 @@ func GetTokenInfo(next http.Handler) http.Handler {
 				mapClaims, _ = ParseToken(myToken, []byte(SecretKey))
 			}
 		}
-
 		if myToken == "" {
 			next.ServeHTTP(w, r)
 		} else {

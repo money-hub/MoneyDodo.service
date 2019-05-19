@@ -110,6 +110,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
 			return []byte(MyJwt.SecretKey), nil
 		})
+
 		if token != nil {
 			var ok bool
 			mapClaims, ok = token.Claims.(jwt.MapClaims)
@@ -122,6 +123,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// 如果token存在于header中
 			for k, v := range r.Header {
+				fmt.Println(k, v)
 				if strings.ToLower(k) == "token" {
 					myToken = v[0]
 					break
@@ -141,7 +143,6 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 		if myToken == "" {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(writeResp(false, "Unauthorized access to this resource", nil))
