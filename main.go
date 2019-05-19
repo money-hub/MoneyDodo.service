@@ -97,7 +97,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.RequestURI, "/api/auth") && r.RequestURI != "/api/auth/logout" {
 		// 登陆服务（authentication）
 		remote, _ = url.Parse("http://" + this.auth.host + ":" + this.auth.port)
-	} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9]+/tasks?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
+	} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9-]+/tasks?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询某个用户发布的任务 get
 		remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
 	} else if match, _ := regexp.MatchString("/api/tasks[/0-9]*", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
@@ -239,7 +239,7 @@ func startServer() {
 		balance:  &handle{host: "127.0.0.1", port: "8009"},
 		recharge: &handle{host: "127.0.0.1", port: "8010"},
 	}
-	err := http.ListenAndServe(":8889", service)
+	err := http.ListenAndServe(":8888", service)
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
