@@ -14,7 +14,7 @@ import (
 
 // makeUserGetHisReleasedTasksHandler creates the handler logic
 func makeUserGetHisReleasedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisReleasedTasksEndpoint, decodeUserGetHisReleasedTasksRequest, encodeUserGetHisReleasedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisReleasedTasksEndpoint, decodeUserGetHisReleasedTasksRequest, encodeUserGetHisReleasedTasksResponse, options...)))
 }
 
 // decodeUserGetHisReleasedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -41,7 +41,7 @@ func encodeUserGetHisReleasedTasksResponse(ctx context.Context, w http1.Response
 
 // makeUserGetTasksByIDHandler creates the handler logic
 func makeUserGetTasksByIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetTasksByIDEndpoint, decodeUserGetTasksByIDRequest, encodeUserGetTasksByIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetTasksByIDEndpoint, decodeUserGetTasksByIDRequest, encodeUserGetTasksByIDResponse, options...)))
 }
 
 // decodeUserGetTasksByIDRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -69,7 +69,7 @@ func encodeUserGetTasksByIDResponse(ctx context.Context, w http1.ResponseWriter,
 
 // makeUserGetHisUnreleasedTasksHandler creates the handler logic
 func makeUserGetHisUnreleasedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisUnreleasedTasksEndpoint, decodeUserGetHisUnreleasedTasksRequest, encodeUserGetHisUnreleasedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisUnreleasedTasksEndpoint, decodeUserGetHisUnreleasedTasksRequest, encodeUserGetHisUnreleasedTasksResponse, options...)))
 }
 
 // decodeUserGetHisUnreleasedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -97,7 +97,7 @@ func encodeUserGetHisUnreleasedTasksResponse(ctx context.Context, w http1.Respon
 
 // makeUserGetHisClosedTasksHandler creates the handler logic
 func makeUserGetHisClosedTasksHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisClosedTasksEndpoint, decodeUserGetHisClosedTasksRequest, encodeUserGetHisClosedTasksResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.UserGetHisClosedTasksEndpoint, decodeUserGetHisClosedTasksRequest, encodeUserGetHisClosedTasksResponse, options...)))
 }
 
 // decodeUserGetHisClosedTasksRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -125,7 +125,7 @@ func encodeUserGetHisClosedTasksResponse(ctx context.Context, w http1.ResponseWr
 
 // makeAdminGetAllTasksByUserIDHandler creates the handler logic
 func makeAdminGetAllTasksByUserIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetAllTasksByUserIDEndpoint, decodeAdminGetAllTasksByUserIDRequest, encodeAdminGetAllTasksByUserIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetAllTasksByUserIDEndpoint, decodeAdminGetAllTasksByUserIDRequest, encodeAdminGetAllTasksByUserIDResponse, options...)))
 }
 
 // decodeAdminGetAllTasksByUserIDRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -153,7 +153,7 @@ func encodeAdminGetAllTasksByUserIDResponse(ctx context.Context, w http1.Respons
 
 // makeAdminGetTasksReleasedByUserIDHandler creates the handler logic
 func makeAdminGetTasksReleasedByUserIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksReleasedByUserIDEndpoint, decodeAdminGetTasksReleasedByUserIDRequest, encodeAdminGetTasksReleasedByUserIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksReleasedByUserIDEndpoint, decodeAdminGetTasksReleasedByUserIDRequest, encodeAdminGetTasksReleasedByUserIDResponse, options...)))
 }
 
 // decodeAdminGetTasksReleasedByUserIDRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -181,7 +181,7 @@ func encodeAdminGetTasksReleasedByUserIDResponse(ctx context.Context, w http1.Re
 
 // makeAdminGetTasksUnreleasedByUserIDHandler creates the handler logic
 func makeAdminGetTasksUnreleasedByUserIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksUnreleasedByUserIDEndpoint, decodeAdminGetTasksUnreleasedByUserIDRequest, encodeAdminGetTasksUnreleasedByUserIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=non-released").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksUnreleasedByUserIDEndpoint, decodeAdminGetTasksUnreleasedByUserIDRequest, encodeAdminGetTasksUnreleasedByUserIDResponse, options...)))
 }
 
 // decodeAdminGetTasksUnreleasedByUserIDRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -209,7 +209,7 @@ func encodeAdminGetTasksUnreleasedByUserIDResponse(ctx context.Context, w http1.
 
 // makeAdminGetTasksClosedByUserIDHandler creates the handler logic
 func makeAdminGetTasksClosedByUserIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[0-9]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksClosedByUserIDEndpoint, decodeAdminGetTasksClosedByUserIDRequest, encodeAdminGetTasksClosedByUserIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[0-9a-zA-Z_-]+}/tasks?state=closed").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AdminGetTasksClosedByUserIDEndpoint, decodeAdminGetTasksClosedByUserIDRequest, encodeAdminGetTasksClosedByUserIDResponse, options...)))
 }
 
 // decodeAdminGetTasksClosedByUserIDRequest is a transport/http.DecodeRequestFunc that decodes a

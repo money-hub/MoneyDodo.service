@@ -52,7 +52,7 @@ var PublicURL = []string{
 	// 登陆服务（authentication） get/post
 	"/api/auth",
 	// 查询某个用户发布的任务 get
-	"/api/users/[a-zA-Z0-9]+/tasks?state=released",
+	"/api/users/[a-zA-Z0-9_-]+/tasks\\?state=released",
 	// 查询某个任务 get
 	"/api/tasks[/0-9]*",
 }
@@ -78,16 +78,16 @@ func writeResp(status bool, errinfo string, data interface{}) []byte {
 		Errinfo: errinfo,
 		Data:    data,
 	}
-	respose, err := json.Marshal(RespData)
+	response, err := json.Marshal(RespData)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return respose
+	return response
 }
 
 func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method, r.RequestURI)
-	basicSvc := getBasicService("conf/conf.lyt.yml")
+	basicSvc := getBasicService("conf/conf.moneydodo.yml")
 	// w.Header().Set("Access-Control-Allow-Origin", "*")
 	// w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token")
 	// w.Header().Set("Access-Control-Allow-Methods", "*")
