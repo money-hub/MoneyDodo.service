@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/money-hub/MoneyDodo.service/db"
@@ -25,6 +26,7 @@ type basicTaskService struct {
 func (b *basicTaskService) GetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
 	// TODO implement the business logic of GetHisReleasedTasks
 	role := ctx.Value("role").(int)
+	fmt.Println(role, role == 1)
 	if role == 1 {
 		userID := ctx.Value("id").(string)
 		if userID == id {

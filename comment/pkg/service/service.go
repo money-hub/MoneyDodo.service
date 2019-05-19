@@ -131,7 +131,7 @@ func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, 
 	} else {
 		item.Timestamp = time.Now()
 		item.Content = comment
-		_, err := b.Engine().Update(item)
+		_, err := b.Engine().Where("id=?", item.Id).Update(item)
 		if err != nil {
 			checkErr(err)
 			return false, "Edit comment failed, please try again", nil
@@ -207,7 +207,7 @@ func (b *basicCommentService) LikeComment(ctx context.Context, taskId string, cI
 	item.Stars = item.Stars + 1
 	item.Stargazers = append(item.Stargazers, ctx.Value("id").(string))
 
-	if _, err := b.Engine().Update(item); err != nil {
+	if _, err := b.Engine()..Where("Id=?", item.Id).Update(item); err != nil {
 		return false, err.Error(), nil
 	}
 	return true, "", item
@@ -234,7 +234,7 @@ func (b *basicCommentService) CancelLikeComment(ctx context.Context, taskId stri
 			item.Stars = item.Stars - 1
 			item.Stargazers = append(item.Stargazers[:i], item.Stargazers[i+1:]...)
 
-			if _, err := b.Engine().Update(item); err != nil {
+			if _, err := b.Engine().Where("id=?", item.Id).Update(item); err != nil {
 				return false, err.Error(), nil
 			}
 			return true, "", item
