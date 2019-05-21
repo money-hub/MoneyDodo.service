@@ -207,7 +207,7 @@ func (b *basicCommentService) LikeComment(ctx context.Context, taskId string, cI
 	item.Stars = item.Stars + 1
 	item.Stargazers = append(item.Stargazers, ctx.Value("id").(string))
 
-	if _, err := b.Engine()..Where("Id=?", item.Id).Update(item); err != nil {
+	if _, err := b.Engine().Where("Id=?", item.Id).Update(item); err != nil {
 		return false, err.Error(), nil
 	}
 	return true, "", item
