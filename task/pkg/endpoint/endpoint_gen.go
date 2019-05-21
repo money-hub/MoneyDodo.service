@@ -10,52 +10,32 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	UserGetHisReleasedTasksEndpoint         endpoint.Endpoint
-	UserGetTasksByIDEndpoint                endpoint.Endpoint
-	UserGetHisUnreleasedTasksEndpoint       endpoint.Endpoint
-	UserGetHisClosedTasksEndpoint           endpoint.Endpoint
-	AdminGetAllTasksByUserIDEndpoint        endpoint.Endpoint
-	AdminGetTasksReleasedByUserIDEndpoint   endpoint.Endpoint
-	AdminGetTasksUnreleasedByUserIDEndpoint endpoint.Endpoint
-	AdminGetTasksClosedByUserIDEndpoint     endpoint.Endpoint
+	GetHisReleasedTasksEndpoint   endpoint.Endpoint
+	GetTasksByIDEndpoint          endpoint.Endpoint
+	GetHisUnreleasedTasksEndpoint endpoint.Endpoint
+	GetHisClosedTasksEndpoint     endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func New(s service.TaskService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
-		AdminGetAllTasksByUserIDEndpoint:        MakeAdminGetAllTasksByUserIDEndpoint(s),
-		AdminGetTasksClosedByUserIDEndpoint:     MakeAdminGetTasksClosedByUserIDEndpoint(s),
-		AdminGetTasksReleasedByUserIDEndpoint:   MakeAdminGetTasksReleasedByUserIDEndpoint(s),
-		AdminGetTasksUnreleasedByUserIDEndpoint: MakeAdminGetTasksUnreleasedByUserIDEndpoint(s),
-		UserGetHisClosedTasksEndpoint:           MakeUserGetHisClosedTasksEndpoint(s),
-		UserGetHisReleasedTasksEndpoint:         MakeUserGetHisReleasedTasksEndpoint(s),
-		UserGetHisUnreleasedTasksEndpoint:       MakeUserGetHisUnreleasedTasksEndpoint(s),
-		UserGetTasksByIDEndpoint:                MakeUserGetTasksByIDEndpoint(s),
+		GetHisClosedTasksEndpoint:     MakeGetHisClosedTasksEndpoint(s),
+		GetHisReleasedTasksEndpoint:   MakeGetHisReleasedTasksEndpoint(s),
+		GetHisUnreleasedTasksEndpoint: MakeGetHisUnreleasedTasksEndpoint(s),
+		GetTasksByIDEndpoint:          MakeGetTasksByIDEndpoint(s),
 	}
-	for _, m := range mdw["UserGetHisReleasedTasks"] {
-		eps.UserGetHisReleasedTasksEndpoint = m(eps.UserGetHisReleasedTasksEndpoint)
+	for _, m := range mdw["GetHisReleasedTasks"] {
+		eps.GetHisReleasedTasksEndpoint = m(eps.GetHisReleasedTasksEndpoint)
 	}
-	for _, m := range mdw["UserGetTasksByID"] {
-		eps.UserGetTasksByIDEndpoint = m(eps.UserGetTasksByIDEndpoint)
+	for _, m := range mdw["GetTasksByID"] {
+		eps.GetTasksByIDEndpoint = m(eps.GetTasksByIDEndpoint)
 	}
-	for _, m := range mdw["UserGetHisUnreleasedTasks"] {
-		eps.UserGetHisUnreleasedTasksEndpoint = m(eps.UserGetHisUnreleasedTasksEndpoint)
+	for _, m := range mdw["GetHisUnreleasedTasks"] {
+		eps.GetHisUnreleasedTasksEndpoint = m(eps.GetHisUnreleasedTasksEndpoint)
 	}
-	for _, m := range mdw["UserGetHisClosedTasks"] {
-		eps.UserGetHisClosedTasksEndpoint = m(eps.UserGetHisClosedTasksEndpoint)
-	}
-	for _, m := range mdw["AdminGetAllTasksByUserID"] {
-		eps.AdminGetAllTasksByUserIDEndpoint = m(eps.AdminGetAllTasksByUserIDEndpoint)
-	}
-	for _, m := range mdw["AdminGetTasksReleasedByUserID"] {
-		eps.AdminGetTasksReleasedByUserIDEndpoint = m(eps.AdminGetTasksReleasedByUserIDEndpoint)
-	}
-	for _, m := range mdw["AdminGetTasksUnreleasedByUserID"] {
-		eps.AdminGetTasksUnreleasedByUserIDEndpoint = m(eps.AdminGetTasksUnreleasedByUserIDEndpoint)
-	}
-	for _, m := range mdw["AdminGetTasksClosedByUserID"] {
-		eps.AdminGetTasksClosedByUserIDEndpoint = m(eps.AdminGetTasksClosedByUserIDEndpoint)
+	for _, m := range mdw["GetHisClosedTasks"] {
+		eps.GetHisClosedTasksEndpoint = m(eps.GetHisClosedTasksEndpoint)
 	}
 	return eps
 }

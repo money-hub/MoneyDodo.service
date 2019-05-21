@@ -6,7 +6,6 @@ import (
 
 	http "github.com/go-kit/kit/transport/http"
 	mux "github.com/gorilla/mux"
-	MyJwt "github.com/money-hub/MoneyDodo.service/middleware"
 	endpoint "github.com/money-hub/MoneyDodo.service/task/pkg/endpoint"
 )
 
@@ -14,14 +13,9 @@ import (
 // predefined paths.
 func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.ServerOption) http1.Handler {
 	m := mux.NewRouter()
-	m.Use(MyJwt.GetTokenInfo)
-	makeUserGetHisReleasedTasksHandler(m, endpoints, options["UserGetHisReleasedTasks"])
-	makeUserGetTasksByIDHandler(m, endpoints, options["UserGetTasksByID"])
-	makeUserGetHisUnreleasedTasksHandler(m, endpoints, options["UserGetHisUnreleasedTasks"])
-	makeUserGetHisClosedTasksHandler(m, endpoints, options["UserGetHisClosedTasks"])
-	makeAdminGetAllTasksByUserIDHandler(m, endpoints, options["AdminGetAllTasksByUserID"])
-	makeAdminGetTasksReleasedByUserIDHandler(m, endpoints, options["AdminGetTasksReleasedByUserID"])
-	makeAdminGetTasksUnreleasedByUserIDHandler(m, endpoints, options["AdminGetTasksUnreleasedByUserID"])
-	makeAdminGetTasksClosedByUserIDHandler(m, endpoints, options["AdminGetTasksClosedByUserID"])
+	makeGetHisReleasedTasksHandler(m, endpoints, options["GetHisReleasedTasks"])
+	makeGetTasksByIDHandler(m, endpoints, options["GetTasksByID"])
+	makeGetHisUnreleasedTasksHandler(m, endpoints, options["GetHisUnreleasedTasks"])
+	makeGetHisClosedTasksHandler(m, endpoints, options["GetHisClosedTasks"])
 	return m
 }
