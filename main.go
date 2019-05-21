@@ -152,20 +152,29 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		item := &model.Token{
 			Id: mapClaims["id"].(string),
 		}
-
 		has, _ := basicSvc.Engine().Get(item)
+
+		// 校验User是否为实名认证的
+		var user *model.User
+		if int(mapClaims["role"].(float64)) == 1 {
+			user = &model.User{
+				Id: mapClaims["id"].(string),
+			}
+			basicSvc.Engine().Get(user)
+		}
+
 		// 判断是否为认证信息相关
 		match, _ := regexp.MatchString("/api/users/", r.RequestURI)
-		if has == false || item.Token != myToken || (int(mapClaims["role"].(float64)) != 0 && !match && int(mapClaims["certificationStatus"].(float64)) != 2) {
+		if has == false || item.Token != myToken || (int(mapClaims["role"].(float64)) != 0 && !match && user.CertificationStatus != 2) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(writeResp(false, "Unauthorized access to this resource", nil))
 			return
 		}
+		// fmt.Println(myToken)
 
 		// 信息放入上下文中
 		// ctx := context.WithValue(r.Context(), "id", mapClaims["id"])
 		// ctx = context.WithValue(ctx, "role", mapClaims["role"])
-		// ctx = context.WithValue(ctx, "certificationStatus", mapClaims["certificationStatus"])
 		// r = r.WithContext(ctx)
 
 		// 登陆服务（authentication） 登出
@@ -220,6 +229,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(writeResp(false, "404 Not Found", nil))
 	}
+	fmt.Println(remote)
 	// 代理路由分发
 	proxy := httputil.NewSingleHostReverseProxy(remote)
 	proxy.ServeHTTP(w, r)

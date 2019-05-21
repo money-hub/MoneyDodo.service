@@ -22,21 +22,14 @@ const SecretKey = "MoneyDodo"
 * 	1 - student
 * 	2 - enterprise
 *
-*	CertificationStatus
-* 	0-未提交
-* 	1-已提交未认证
-* 	2-审核通过
-*	3-审核驳回
-*
  */
 
 type jwtCustomClaims struct {
 	jwt.StandardClaims
 
 	// 追加自己需要的信息
-	Id                  string `json:"id"`
-	Role                int    `json:"role"`
-	CertificationStatus int    `json:"certificationStatus"`
+	Id   string `json:"id"`
+	Role int    `json:"role"`
 }
 
 func checkErr(err error) {
@@ -49,7 +42,7 @@ func checkErr(err error) {
  * 生成 token
  * SecretKey 是一个 const 常量
  */
-func CreateToken(SecretKey []byte, issuer string, id string, role int, certificationStatus int) (tokenString string, err error) {
+func CreateToken(SecretKey []byte, issuer string, id string, role int) (tokenString string, err error) {
 	claims := &jwtCustomClaims{
 		jwt.StandardClaims{
 			ExpiresAt: int64(time.Now().Add(time.Hour * 24 * 365 * 100).Unix()),
@@ -57,7 +50,6 @@ func CreateToken(SecretKey []byte, issuer string, id string, role int, certifica
 		},
 		id,
 		role,
-		certificationStatus,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err = token.SignedString(SecretKey)
@@ -114,7 +106,6 @@ func GetTokenInfo(next http.Handler) http.Handler {
 		} else {
 			ctx := context.WithValue(r.Context(), "id", mapClaims["id"].(string))
 			ctx = context.WithValue(ctx, "role", int(mapClaims["role"].(float64)))
-			ctx = context.WithValue(ctx, "certificationStatus", int(mapClaims["certificationStatus"].(float64)))
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		}
