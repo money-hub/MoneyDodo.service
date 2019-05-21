@@ -6,6 +6,7 @@ import (
 
 	http "github.com/go-kit/kit/transport/http"
 	mux "github.com/gorilla/mux"
+	MyJwt "github.com/money-hub/MoneyDodo.service/middleware"
 	endpoint "github.com/money-hub/MoneyDodo.service/task/pkg/endpoint"
 )
 
@@ -13,6 +14,7 @@ import (
 // predefined paths.
 func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.ServerOption) http1.Handler {
 	m := mux.NewRouter()
+	m.Use(MyJwt.GetTokenInfo) // 添加中间键处理
 	makeGetHisReleasedTasksHandler(m, endpoints, options["GetHisReleasedTasks"])
 	makeGetTasksByIDHandler(m, endpoints, options["GetTasksByID"])
 	makeGetHisUnreleasedTasksHandler(m, endpoints, options["GetHisUnreleasedTasks"])
