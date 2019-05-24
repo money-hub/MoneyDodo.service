@@ -182,10 +182,6 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			remote, _ = url.Parse("http://" + this.auth.host + ":" + this.auth.port)
 		}
 
-		// 实名认证（certify）
-		if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
-			remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
-		}
 
 		// user相关 - /api/users
 		if strings.HasPrefix(r.RequestURI, "/api/users") {
@@ -198,7 +194,11 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/balances", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 				// 充值信息（balance）
 				remote, _ = url.Parse("http://" + this.balance.host + ":" + this.balance.port)
-			} else {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+				// 实名认证（certify）
+				remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
+			}
+			else {
 				// 个人信息（user）
 				remote, _ = url.Parse("http://" + this.user.host + ":" + this.user.port)
 			}
