@@ -98,9 +98,14 @@ func GetTokenInfo(next http.Handler) http.Handler {
 				}
 			}
 			if myToken != "" {
-				mapClaims, _ = ParseToken(myToken, []byte(SecretKey))
+				mapClaims, err = ParseToken(myToken, []byte(SecretKey))
+				if err != nil {
+					next.ServeHTTP(w, r)
+					return
+				}
 			}
 		}
+		// fmt.Println(myToken)
 		if myToken == "" {
 			next.ServeHTTP(w, r)
 		} else {
