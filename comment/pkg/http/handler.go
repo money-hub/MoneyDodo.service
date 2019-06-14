@@ -28,7 +28,7 @@ func makeGetCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options 
 	//	   "$ref": "#/responses/swaggCommentsResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("GET").Path("/api/tasks/{taskId:[0-9]+}/comments").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetCommentEndpoint, decodeGetCommentRequest, encodeGetCommentResponse, options...)))
+	m.Methods("GET").Path("/api/tasks/{taskId:[0-9]+}/comments").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetCommentEndpoint, decodeGetCommentRequest, encodeGetCommentResponse, options...)))
 }
 
 // decodeGetCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -115,7 +115,7 @@ func makeChangeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 	//	   "$ref": "#/responses/swaggCommentResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.ChangeCommentEndpoint, decodeChangeCommentRequest, encodeChangeCommentResponse, options...)))
+	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"PUT"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.ChangeCommentEndpoint, decodeChangeCommentRequest, encodeChangeCommentResponse, options...)))
 }
 
 // decodeChangeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -156,7 +156,7 @@ func makeDeleteCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 	//	   "$ref": "#/responses/swaggNoReturnValue"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.DeleteCommentEndpoint, decodeDeleteCommentRequest, encodeDeleteCommentResponse, options...)))
+	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"DELETE"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.DeleteCommentEndpoint, decodeDeleteCommentRequest, encodeDeleteCommentResponse, options...)))
 }
 
 // decodeDeleteCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -197,7 +197,7 @@ func makeLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options
 	//	   "$ref": "#/responses/swaggCommentResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.LikeCommentEndpoint, decodeLikeCommentRequest, encodeLikeCommentResponse, options...)))
+	m.Methods("PUT").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"PUT"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.LikeCommentEndpoint, decodeLikeCommentRequest, encodeLikeCommentResponse, options...)))
 }
 
 // decodeLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
@@ -238,7 +238,7 @@ func makeCancelLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, o
 	//	   "$ref": "#/responses/swaggCommentResp"
 	//   "400":
 	//     "$ref": "#/responses/swaggBadReq"
-	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.CancelLikeCommentEndpoint, decodeCancelLikeCommentRequest, encodeCancelLikeCommentResponse, options...)))
+	m.Methods("DELETE").Path("/api/tasks/{taskId:[0-9]+}/comments/{cid:[0-9]+}/star").Handler(handlers.CORS(handlers.AllowedMethods([]string{"DELETE"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.CancelLikeCommentEndpoint, decodeCancelLikeCommentRequest, encodeCancelLikeCommentResponse, options...)))
 }
 
 // decodeCancelLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
