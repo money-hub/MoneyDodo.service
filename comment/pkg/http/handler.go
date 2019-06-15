@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	http1 "net/http"
 
 	http "github.com/go-kit/kit/transport/http"
@@ -34,9 +35,15 @@ func makeGetCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options 
 // decodeGetCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeGetCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.GetCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodeGetCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -75,9 +82,15 @@ func makePostCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options
 // decodePostCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodePostCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.PostCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodePostCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -121,9 +134,15 @@ func makeChangeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 // decodeChangeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeChangeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.ChangeCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodeChangeCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -162,9 +181,15 @@ func makeDeleteCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 // decodeDeleteCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeDeleteCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.DeleteCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodeDeleteCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -203,9 +228,15 @@ func makeLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options
 // decodeLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeLikeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.LikeCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodeLikeCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -244,9 +275,15 @@ func makeCancelLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, o
 // decodeCancelLikeCommentRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeCancelLikeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.CancelLikeCommentRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["taskId"]
+	if !ok {
+		return nil, errors.New("not a valid taskId")
+	}
+	req := endpoint.GetCommentRequest{
+		TaskId: id,
+	}
+	return req, nil
 }
 
 // encodeCancelLikeCommentResponse is a transport/http.EncodeResponseFunc that encodes

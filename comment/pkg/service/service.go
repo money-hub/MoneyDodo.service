@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -50,6 +51,7 @@ func (b *basicCommentService) GetComment(ctx context.Context, taskId string) (st
 
 	comments := make([]model.Comment, 0)
 	err := b.Engine().Where("taskId = ?", taskId).Find(&comments)
+	fmt.Println("err.Error()")
 	if err != nil {
 		log.Println(err)
 		return false, err.Error(), nil

@@ -147,7 +147,7 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
 	} else {
-		return false, "No such a admin", ""
+		return false, "No such an admin", ""
 	}
 }
 

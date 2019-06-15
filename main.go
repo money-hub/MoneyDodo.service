@@ -100,7 +100,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if match, _ := regexp.MatchString("/api/users/([a-zA-Z0-9_-]+)/tasks\\?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询某个用户发布的任务 get
 		remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
-	} else if match, _ := regexp.MatchString("/api/tasks[/0-9]*", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
+	} else if reg2Match("/api/tasks[/0-9]*", "/api/tasks/[0-9]+/comments", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询任务 get
 		remote, _ = url.Parse("http://" + this.cpt.host + ":" + this.cpt.port)
 	} else {
@@ -204,7 +204,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// taks相关 - /api/tasks
 		if strings.HasPrefix(r.RequestURI, "/api/tasks") {
-			if match, _ := regexp.MatchString("/api/tasks/[0-9]+/comments", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			if match, _ := regexp.MatchString("/api/tasks/[0-9]+/comments", r.RequestURI); match {
 				// 任务评论（comment）
 				remote, _ = url.Parse("http://" + this.comment.host + ":" + this.comment.port)
 			} else {
@@ -251,6 +251,19 @@ func startServer() {
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
+}
+
+func reg2Match(p1 string, p2 string, s string) (bool, error) {
+	// s满足p1，不满足p2
+	match0, err := regexp.MatchString(p1, s)
+	match1, err := regexp.MatchString(p2, s)
+	if err != nil {
+		return false, err
+	}
+	if match0 && !match1 {
+		return true, nil
+	}
+	return false, nil
 }
 
 func main() {
