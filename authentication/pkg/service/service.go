@@ -112,7 +112,7 @@ func (b *basicAuthenticationService) GetOpenid(ctx context.Context, code string)
 					fmt.Println(err.Error())
 				}
 			}
-			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1, user.CertificationStatus)
+			token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, info.Openid, 1)
 
 			// 将token保存或者更新进数据库中
 			err := saveToken(b, token, info.Openid)
@@ -139,7 +139,7 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	}
 	has, _ := b.Engine().Get(admin)
 	if has == true && admin.Password == password {
-		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0, 2)
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0)
 		// 将token保存或者更新进数据库中
 		err := saveToken(b, token, name)
 		checkErr(err)
@@ -147,7 +147,7 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
 	} else {
-		return false, "No such a admin", ""
+		return false, "No such an admin", ""
 	}
 }
 
