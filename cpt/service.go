@@ -165,7 +165,8 @@ func (b *basicCptService) Put(ctx context.Context, taskId string, taskUnknown in
 		if qtnr.Publisher != ctx.Value("id").(string) {
 			return false, "You are not permitted to modify others' task.", nil
 		}
-		if qtnr.State == model.TaskStateReleased {
+
+		if task.State == model.TaskStateReleased {
 			return false, "You can't modify the task which has been released.", nil
 		}
 		if _, err := sess.Where("id = ?", qtnr.Id).AllCols().Update(qtnr.Task); err != nil {
