@@ -12,6 +12,7 @@ const (
 type Task struct {
 	Id        string `json:"id" xorm:"<-"`
 	Kind      string `json:"kind"`
+	Title     string `json:"title"`
 	Publisher string `json:"publisher"`
 	// Recipient       string    `json:"recipient"`
 	Restrain string    `json:"restrain"`

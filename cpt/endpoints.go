@@ -153,7 +153,7 @@ func MakeDeleteEndpoint(s CptService) endpoint.Endpoint {
 func MakePutEndpoint(s CptService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(Request)
-		status, errinfo, data := s.Put(ctx, req.TaskId, req.State)
+		status, errinfo, data := s.Put(ctx, req.TaskId, req.Task)
 		return Response{
 			Status:  status,
 			Errinfo: errinfo,

@@ -10,6 +10,7 @@ drop table if exists questionnaire;
 drop table if exists user;
 drop table if exists task;
 drop table if exists token;
+drop table if exists recharge;
 
 # 用户
 create table if not exists user (
@@ -24,24 +25,25 @@ create table if not exists user (
     email varchar(50) COMMENT '邮箱',
     certificationStatus int DEFAULT 0 COMMENT '0-未提交，1-已提交未认证，2-审核通过，3-审核驳回',
     certifiedPic mediumtext COMMENT '认证图片'
-);
+)charset=utf8mb4;
 
 # 管理员
 create table if not exists admin (
     name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
-);
+)charset=utf8mb4;
 
 # 企业
 create table if not exists enterprise (
     name varchar(20) not null primary key COMMENT '姓名',
     password varchar(20) not null COMMENT '密码'
-);
+)charset=utf8mb4;
 
 # 任务
 create table if not exists task (
 	id int AUTO_INCREMENT primary key COMMENT '任务id',
     kind varchar(20) not null COMMENT '任务类型',
+    title varchar(20) not null COMMENT '任务标题',
     publisher varchar(100) not null COMMENT '发布者',
     -- recipient varchar(20) COMMENT '接收者',
     restrain text COMMENT '任务限制',
@@ -52,7 +54,7 @@ create table if not exists task (
     -- recipientFinish bool COMMENT '接收者确认完成',
     -- ConfirmFinish bool COMMENT '接收者确认完成',
     state varchar(20) COMMENT '任务状态'
-);
+)charset=utf8mb4;
 
 # 问卷
 create table if not exists questionnaire (
@@ -62,7 +64,7 @@ create table if not exists questionnaire (
     mutipleChoice mediumtext COMMENT '多项选择',
     primary key(taskId),
     foreign Key(taskId) references task(id)
-);
+)charset=utf8mb4;
 
 # 交易
 create table if not exists deal (
@@ -78,7 +80,7 @@ create table if not exists deal (
     foreign key(taskId) references task(id),
     foreign key(publisher) references user(id),
     foreign key(recipient) references user(id)
-);
+)charset=utf8mb4;
 
 # 评论
 create table if not exists comment (
@@ -92,18 +94,18 @@ create table if not exists comment (
     primary key(id),
     foreign key(taskId) references task(id),
     foreign key(userId) references user(id)
-);
+)charset=utf8mb4;
 
 # Token
 create table if not exists token(
 	id char(255) COMMENT '唯一标识，包含管理员、企业、学生',
     token char(255),
     primary key(id)
-);
+)charset=utf8mb4;
 
 create table if not exists recharge(
     id int AUTO_INCREMENT COMMENT '余额Id',
     amount int COMMENT '充值金额',
     timestamp text COMMENT '充值时间戳',
     primary key(id)
-);
+)charset=utf8mb4;

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -50,6 +51,7 @@ func (b *basicCommentService) GetComment(ctx context.Context, taskId string) (st
 
 	comments := make([]model.Comment, 0)
 	err := b.Engine().Where("taskId = ?", taskId).Find(&comments)
+	fmt.Println("err.Error()")
 	if err != nil {
 		log.Println(err)
 		return false, err.Error(), nil
@@ -207,7 +209,7 @@ func (b *basicCommentService) LikeComment(ctx context.Context, taskId string, cI
 	item.Stars = item.Stars + 1
 	item.Stargazers = append(item.Stargazers, ctx.Value("id").(string))
 
-	if _, err := b.Engine()..Where("Id=?", item.Id).Update(item); err != nil {
+	if _, err := b.Engine().Where("Id=?", item.Id).Update(item); err != nil {
 		return false, err.Error(), nil
 	}
 	return true, "", item

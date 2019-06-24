@@ -100,7 +100,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if match, _ := regexp.MatchString("/api/users/([a-zA-Z0-9_-]+)/tasks\\?state=released", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询某个用户发布的任务 get
 		remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
-	} else if match, _ := regexp.MatchString("/api/tasks[/0-9]*", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
+	} else if reg2Match("/api/tasks[/0-9]*", "/api/tasks/[0-9]+/comments", r.RequestURI); match && strings.ToUpper(r.Method) == "GET" {
 		// 用户任务信息（task） - 查询任务 get
 		remote, _ = url.Parse("http://" + this.cpt.host + ":" + this.cpt.port)
 	} else {
@@ -152,30 +152,34 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		item := &model.Token{
 			Id: mapClaims["id"].(string),
 		}
-
 		has, _ := basicSvc.Engine().Get(item)
+
+		// 校验User是否为实名认证的
+		var user *model.User
+		if int(mapClaims["role"].(float64)) == 1 {
+			user = &model.User{
+				Id: mapClaims["id"].(string),
+			}
+			basicSvc.Engine().Get(user)
+		}
+
 		// 判断是否为认证信息相关
 		match, _ := regexp.MatchString("/api/users/", r.RequestURI)
-		if has == false || item.Token != myToken || (int(mapClaims["role"].(float64)) != 0 && !match && int(mapClaims["certificationStatus"].(float64)) != 2) {
+		if has == false || item.Token != myToken || (int(mapClaims["role"].(float64)) != 0 && !match && user.CertificationStatus != 2) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(writeResp(false, "Unauthorized access to this resource", nil))
 			return
 		}
+		// fmt.Println(myToken)
 
 		// 信息放入上下文中
 		// ctx := context.WithValue(r.Context(), "id", mapClaims["id"])
 		// ctx = context.WithValue(ctx, "role", mapClaims["role"])
-		// ctx = context.WithValue(ctx, "certificationStatus", mapClaims["certificationStatus"])
 		// r = r.WithContext(ctx)
 
 		// 登陆服务（authentication） 登出
 		if r.RequestURI == "/api/auth/logout" {
 			remote, _ = url.Parse("http://" + this.auth.host + ":" + this.auth.port)
-		}
-
-		// 实名认证（certify）
-		if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
-			remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 		}
 
 		// user相关 - /api/users
@@ -189,6 +193,9 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/balances", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
 				// 充值信息（balance）
 				remote, _ = url.Parse("http://" + this.balance.host + ":" + this.balance.port)
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+				// 实名认证（certify）
+				remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 			} else {
 				// 个人信息（user）
 				remote, _ = url.Parse("http://" + this.user.host + ":" + this.user.port)
@@ -197,7 +204,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// taks相关 - /api/tasks
 		if strings.HasPrefix(r.RequestURI, "/api/tasks") {
-			if match, _ := regexp.MatchString("/api/tasks/[0-9]+/comments", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			if match, _ := regexp.MatchString("/api/tasks/[0-9]+/comments", r.RequestURI); match {
 				// 任务评论（comment）
 				remote, _ = url.Parse("http://" + this.comment.host + ":" + this.comment.port)
 			} else {
@@ -220,6 +227,7 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(writeResp(false, "404 Not Found", nil))
 	}
+	fmt.Println(remote)
 	// 代理路由分发
 	proxy := httputil.NewSingleHostReverseProxy(remote)
 	proxy.ServeHTTP(w, r)
@@ -243,6 +251,19 @@ func startServer() {
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
+}
+
+func reg2Match(p1 string, p2 string, s string) (bool, error) {
+	// s满足p1，不满足p2
+	match0, err := regexp.MatchString(p1, s)
+	match1, err := regexp.MatchString(p2, s)
+	if err != nil {
+		return false, err
+	}
+	if match0 && !match1 {
+		return true, nil
+	}
+	return false, nil
 }
 
 func main() {

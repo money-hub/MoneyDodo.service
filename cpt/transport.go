@@ -117,6 +117,7 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 			log.Println("The upload wrapper is not correct.")
 		}
 		req.Kind = wrapper.Kind
+
 		if req.Kind == model.TaskKindQuestionnaire {
 			t := model.Qtnr{
 				Qtnr: &model.Questionnaire{},

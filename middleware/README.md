@@ -25,5 +25,4 @@ func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.Serv
 eg:
 ctx.Value("id").(string)
 ctx.Value("role").(int)
-ctx.Value("certificationStatus").(int)
 ```
