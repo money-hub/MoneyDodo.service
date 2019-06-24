@@ -23,7 +23,7 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 	// TODO implement the business logic of GetTasksByID
 	task := model.Task{}
 	role := ctx.Value("role").(int)
-	tokenID := ctx.Value("id").(string)
+	userID := ctx.Value("id").(string)
 	if state == "released" {
 		rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
 		if err == nil {
@@ -39,7 +39,6 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 		return false, err.Error(), data
 	} else if state == "" {
 		if role == 1 {
-			userID := ctx.Value("id").(string)
 			if userID == id {
 				rows, err := b.Engine().Where("publisher = ?", id).Rows(task)
 				if err == nil {
@@ -55,25 +54,21 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 				return false, err.Error(), data
 			}
 		} else if role == 0 {
-			if id == tokenID {
-				rows, err := b.Engine().Where("publisher = ?", id).Rows(task)
-				if err == nil {
-					for rows.Next() {
-						err1 := rows.Scan(&task)
-						if err1 != nil {
-							return false, err1.Error(), data
-						}
-						data = append(data, task)
+			rows, err := b.Engine().Where("publisher = ?", id).Rows(task)
+			if err == nil {
+				for rows.Next() {
+					err1 := rows.Scan(&task)
+					if err1 != nil {
+						return false, err1.Error(), data
 					}
-					return true, "", data
+					data = append(data, task)
 				}
-				return false, err.Error(), data
+				return true, "", data
 			}
+			return false, err.Error(), data
 		}
-		return false, "Permission denied", data
 	} else {
 		if role == 1 {
-			userID := ctx.Value("id").(string)
 			if userID == id {
 				rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
 				if err == nil {
@@ -89,24 +84,22 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 				return false, err.Error(), data
 			}
 		} else if role == 0 {
-			if id == tokenID {
-				rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
-				if err == nil {
-					for rows.Next() {
-						err1 := rows.Scan(&task)
-						if err1 != nil {
-							return false, err1.Error(), data
-						}
-						data = append(data, task)
+			rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
+			if err == nil {
+				for rows.Next() {
+					err1 := rows.Scan(&task)
+					if err1 != nil {
+						return false, err1.Error(), data
 					}
-					return true, "", data
+					data = append(data, task)
 				}
-				return false, err.Error(), data
+				return true, "", data
 			}
+			return false, err.Error(), data
 		}
-		return false, "Permission denied", data
 	}
-	return status, errinfo, data
+
+	return false, "Permission denied", data
 }
 
 // NewBasicTaskService returns a naive, stateless implementation of TaskService.
