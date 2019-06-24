@@ -14,7 +14,7 @@ import (
 
 // makeGetTasksByIDHandler creates the handler logic
 func makeGetTasksByIDHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/task").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetTasksByIDEndpoint, decodeGetTasksByIDRequest, encodeGetTasksByIDResponse, options...)))
+	m.Methods("GET").Path("/api/users/{userId:[a-zA-Z0-9_-]+}/tasks").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetTasksByIDEndpoint, decodeGetTasksByIDRequest, encodeGetTasksByIDResponse, options...)))
 }
 
 // decodeGetTasksByIDRequest is a transport/http.DecodeRequestFunc that decodes a
