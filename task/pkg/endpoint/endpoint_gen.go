@@ -10,32 +10,15 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
-	GetHisReleasedTasksEndpoint   endpoint.Endpoint
-	GetTasksByIDEndpoint          endpoint.Endpoint
-	GetHisUnreleasedTasksEndpoint endpoint.Endpoint
-	GetHisClosedTasksEndpoint     endpoint.Endpoint
+	GetTasksByIDEndpoint endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func New(s service.TaskService, mdw map[string][]endpoint.Middleware) Endpoints {
-	eps := Endpoints{
-		GetHisClosedTasksEndpoint:     MakeGetHisClosedTasksEndpoint(s),
-		GetHisReleasedTasksEndpoint:   MakeGetHisReleasedTasksEndpoint(s),
-		GetHisUnreleasedTasksEndpoint: MakeGetHisUnreleasedTasksEndpoint(s),
-		GetTasksByIDEndpoint:          MakeGetTasksByIDEndpoint(s),
-	}
-	for _, m := range mdw["GetHisReleasedTasks"] {
-		eps.GetHisReleasedTasksEndpoint = m(eps.GetHisReleasedTasksEndpoint)
-	}
+	eps := Endpoints{GetTasksByIDEndpoint: MakeGetTasksByIDEndpoint(s)}
 	for _, m := range mdw["GetTasksByID"] {
 		eps.GetTasksByIDEndpoint = m(eps.GetTasksByIDEndpoint)
-	}
-	for _, m := range mdw["GetHisUnreleasedTasks"] {
-		eps.GetHisUnreleasedTasksEndpoint = m(eps.GetHisUnreleasedTasksEndpoint)
-	}
-	for _, m := range mdw["GetHisClosedTasks"] {
-		eps.GetHisClosedTasksEndpoint = m(eps.GetHisClosedTasksEndpoint)
 	}
 	return eps
 }

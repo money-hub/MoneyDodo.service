@@ -61,7 +61,7 @@ func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img s
 			user := model.User{
 				Id: id,
 			}
-			status, err := b.Engine().ID(id).Get(&user)
+			status, err := b.Engine().Where("id = ?", id).Get(&user)
 			if status == false || err != nil {
 				return false, "Get Failed", data
 			}
@@ -71,7 +71,7 @@ func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img s
 			if err != nil {
 				return false, "Update Failed", data
 			}
-			_, err = b.Engine().ID(id).Get(&data)
+			_, err = b.Engine().Where("id = ?", id).Get(&data)
 			if err != nil {
 				return false, "Update succ but get failed", data
 			}

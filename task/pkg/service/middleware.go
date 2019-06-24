@@ -24,27 +24,9 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) GetHisReleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
+func (l loggingMiddleware) GetTasksByID(ctx context.Context, id string, state string) (status bool, errinfo string, data []model.Task) {
 	defer func() {
-		l.logger.Log("method", "GetHisReleasedTasks", "id", id, "status", status, "errinfo", errinfo, "data", data)
+		l.logger.Log("method", "GetTasksByID", "id", id, "state", state, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.GetHisReleasedTasks(ctx, id)
-}
-func (l loggingMiddleware) GetTasksByID(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	defer func() {
-		l.logger.Log("method", "GetTasksByID", "id", id, "status", status, "errinfo", errinfo, "data", data)
-	}()
-	return l.next.GetTasksByID(ctx, id)
-}
-func (l loggingMiddleware) GetHisUnreleasedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	defer func() {
-		l.logger.Log("method", "GetHisUnreleasedTasks", "id", id, "status", status, "errinfo", errinfo, "data", data)
-	}()
-	return l.next.GetHisUnreleasedTasks(ctx, id)
-}
-func (l loggingMiddleware) GetHisClosedTasks(ctx context.Context, id string) (status bool, errinfo string, data []model.Task) {
-	defer func() {
-		l.logger.Log("method", "GetHisClosedTasks", "id", id, "status", status, "errinfo", errinfo, "data", data)
-	}()
-	return l.next.GetHisClosedTasks(ctx, id)
+	return l.next.GetTasksByID(ctx, id, state)
 }

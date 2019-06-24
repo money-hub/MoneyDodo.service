@@ -19,25 +19,17 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 	return g
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
-	options := map[string][]http.ServerOption{
-		"GetHisClosedTasks":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisClosedTasks", logger))},
-		"GetHisReleasedTasks":   {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisReleasedTasks", logger))},
-		"GetHisUnreleasedTasks": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetHisUnreleasedTasks", logger))},
-		"GetTasksByID":          {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetTasksByID", logger))},
-	}
+	options := map[string][]http.ServerOption{"GetTasksByID": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetTasksByID", logger))}}
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
-	mw["GetHisReleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisReleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisReleasedTasks"))}
 	mw["GetTasksByID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetTasksByID")), endpoint.InstrumentingMiddleware(duration.With("method", "GetTasksByID"))}
-	mw["GetHisUnreleasedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisUnreleasedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisUnreleasedTasks"))}
-	mw["GetHisClosedTasks"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetHisClosedTasks")), endpoint.InstrumentingMiddleware(duration.With("method", "GetHisClosedTasks"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"GetHisReleasedTasks", "GetTasksByID", "GetHisUnreleasedTasks", "GetHisClosedTasks"}
+	methods := []string{"GetTasksByID"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}

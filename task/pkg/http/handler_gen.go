@@ -15,9 +15,6 @@ import (
 func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.ServerOption) http1.Handler {
 	m := mux.NewRouter()
 	m.Use(MyJwt.GetTokenInfo) // 添加中间键处理
-	makeGetHisReleasedTasksHandler(m, endpoints, options["GetHisReleasedTasks"])
 	makeGetTasksByIDHandler(m, endpoints, options["GetTasksByID"])
-	makeGetHisUnreleasedTasksHandler(m, endpoints, options["GetHisUnreleasedTasks"])
-	makeGetHisClosedTasksHandler(m, endpoints, options["GetHisClosedTasks"])
 	return m
 }
