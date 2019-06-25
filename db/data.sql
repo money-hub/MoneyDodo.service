@@ -103,18 +103,23 @@ create table if not exists token(
     primary key(id)
 )charset=utf8mb4;
 
-create table if not exists recharge(
-    id int AUTO_INCREMENT COMMENT '余额Id',
+# 充值或体现
+create table if not exists charge(
+    id int AUTO_INCREMENT COMMENT 'Id',
     userId varchar(20) not null COMMENT '用户Id',
-    amount int COMMENT '充值金额',
-    timestamp text COMMENT '充值时间戳',
-    primary key(id)
+    amount int COMMENT '金额',
+    timestamp text COMMENT '时间戳',
+    primary key(id),
+    foreign key(userId) references user(id)
 )charset=utf8mb4;
 
+# 任务审核
 create table if not exists review(
-    id int AUTO_INCREMENT COMMENT '余额Id',
-    userId varchar(20) not null COMMENT '用户Id',
+    id int AUTO_INCREMENT COMMENT '审核Id',
+    name varchar(20) not null COMMENT '商家名称',
     taskId int not null COMMENT '任务Id',
     state varchar(20) COMMENT '审核状态',
-    primary key(id)
+    primary key(id),
+    foreign key(name) references enterprise(name),
+    foreign key(taskId) references task(id)
 )charset=utf8mb4;
