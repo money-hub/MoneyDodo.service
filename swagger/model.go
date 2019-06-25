@@ -174,3 +174,31 @@ type swaggCommentResp struct {
 		Data *model.Comment `json:"data"`
 	}
 }
+
+// HTTP status code 200 and charge model in data
+// swagger:response swaggChargeResp
+type swaggChargeResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Charge model
+		Data *model.Charge `json:"data"`
+	}
+}
+
+// HTTP status code 200 and charge models in data
+// swagger:response swaggChargesResp
+type swaggChargesResp struct {
+	// in:body
+	Body struct {
+		// Boolean true/false
+		Status bool `json:"status"`
+		// Detailed error message
+		Errinfo string `json:"errinfo"`
+		// Charge models
+		Data []model.Charge `json:"data"`
+	}
+}
