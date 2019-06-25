@@ -80,7 +80,7 @@ func main() {
 	encodes := charge.MakeServerEncodes()
 
 	getAllOfUserHandler := httptransport.NewServer(
-		ratelimit.NewDelayingLimiter(limiter)(eps.GetSpecEndpoint),
+		ratelimit.NewDelayingLimiter(limiter)(eps.GetAllOfUserEndpoint),
 		decodes.GetAllOfUserDecode,
 		encodes.GetAllOfUserEncode,
 	)
