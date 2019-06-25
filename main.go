@@ -185,22 +185,27 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// user相关 - /api/users
 		if strings.HasPrefix(r.RequestURI, "/api/users") {
-			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/tasks", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/tasks", r.RequestURI); match {
 				// 用户任务信息（task）
 				remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/deals", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/deals", r.RequestURI); match {
 				// 用户交易信息（deal）
 				remote, _ = url.Parse("http://" + this.deal.host + ":" + this.deal.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/charges", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
-				// 充值信息（balance）
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/charges", r.RequestURI); match {
+				// 充值提现信息（charge）
 				remote, _ = url.Parse("http://" + this.charge.host + ":" + this.charge.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match {
 				// 实名认证（certify）
 				remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 			} else {
 				// 个人信息（user）
 				remote, _ = url.Parse("http://" + this.user.host + ":" + this.user.port)
 			}
+		}
+
+		// certify 相关
+		if strings.HasPrefix(r.RequestURI, "/api/certs") {
+			remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 		}
 
 		// taks相关 - /api/tasks
