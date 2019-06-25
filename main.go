@@ -23,16 +23,17 @@ type handle struct {
 }
 
 type Service struct {
-	auth     *handle
-	certify  *handle
-	user     *handle
-	task     *handle
-	cpt      *handle
-	comment  *handle
-	deal     *handle
-	txn      *handle
-	balance  *handle
-	recharge *handle
+	auth    *handle
+	certify *handle
+	user    *handle
+	task    *handle
+	cpt     *handle
+	comment *handle
+	deal    *handle
+	txn     *handle
+	balance *handle
+	charge  *handle
+	review  *handle
 }
 
 type RespData struct {
@@ -184,22 +185,27 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// user相关 - /api/users
 		if strings.HasPrefix(r.RequestURI, "/api/users") {
-			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/tasks", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/tasks", r.RequestURI); match {
 				// 用户任务信息（task）
 				remote, _ = url.Parse("http://" + this.task.host + ":" + this.task.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/deals", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/deals", r.RequestURI); match {
 				// 用户交易信息（deal）
 				remote, _ = url.Parse("http://" + this.deal.host + ":" + this.deal.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/balances", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
-				// 充值信息（balance）
-				remote, _ = url.Parse("http://" + this.balance.host + ":" + this.balance.port)
-			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match || strings.HasPrefix(r.RequestURI, "/api/certs") {
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/charges", r.RequestURI); match {
+				// 充值提现信息（charge）
+				remote, _ = url.Parse("http://" + this.charge.host + ":" + this.charge.port)
+			} else if match, _ := regexp.MatchString("/api/users/[a-zA-Z0-9_-]+/certs", r.RequestURI); match {
 				// 实名认证（certify）
 				remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 			} else {
 				// 个人信息（user）
 				remote, _ = url.Parse("http://" + this.user.host + ":" + this.user.port)
 			}
+		}
+
+		// certify 相关
+		if strings.HasPrefix(r.RequestURI, "/api/certs") {
+			remote, _ = url.Parse("http://" + this.certify.host + ":" + this.certify.port)
 		}
 
 		// taks相关 - /api/tasks
@@ -213,14 +219,19 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// 交易操作（txn）
+		// 用户交易(deal)
 		if strings.HasPrefix(r.RequestURI, "/api/deals") {
-			remote, _ = url.Parse("http://" + this.txn.host + ":" + this.txn.port)
+			remote, _ = url.Parse("http://" + this.deal.host + ":" + this.deal.port)
 		}
 
-		// 充值（recharge）
-		if strings.HasPrefix(r.RequestURI, "/api/balances") {
-			remote, _ = url.Parse("http://" + this.recharge.host + ":" + this.recharge.port)
+		// 充值与提现（charge）
+		if strings.HasPrefix(r.RequestURI, "/api/charges") {
+			remote, _ = url.Parse("http://" + this.charge.host + ":" + this.charge.port)
+		}
+
+		// 商家任务审核(review)
+		if strings.HasPrefix(r.RequestURI, "/api/reviews") {
+			remote, _ = url.Parse("http://" + this.review.host + ":" + this.review.port)
 		}
 	}
 	if remote == nil {
@@ -236,16 +247,15 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func startServer() {
 	// 注册被代理的服务器 (host， port)
 	service := &Service{
-		auth:     &handle{host: "127.0.0.1", port: "8001"},
-		certify:  &handle{host: "127.0.0.1", port: "8002"},
-		user:     &handle{host: "127.0.0.1", port: "8003"},
-		task:     &handle{host: "127.0.0.1", port: "8004"},
-		cpt:      &handle{host: "127.0.0.1", port: "8005"},
-		comment:  &handle{host: "127.0.0.1", port: "8006"},
-		deal:     &handle{host: "127.0.0.1", port: "8007"},
-		txn:      &handle{host: "127.0.0.1", port: "8008"},
-		balance:  &handle{host: "127.0.0.1", port: "8009"},
-		recharge: &handle{host: "127.0.0.1", port: "8010"},
+		auth:    &handle{host: "127.0.0.1", port: "8001"},
+		certify: &handle{host: "127.0.0.1", port: "8002"},
+		user:    &handle{host: "127.0.0.1", port: "8003"},
+		task:    &handle{host: "127.0.0.1", port: "8004"},
+		cpt:     &handle{host: "127.0.0.1", port: "8005"},
+		comment: &handle{host: "127.0.0.1", port: "8006"},
+		deal:    &handle{host: "127.0.0.1", port: "8007"},
+		charge:  &handle{host: "127.0.0.1", port: "8008"},
+		review:  &handle{host: "127.0.0.1", port: "8009"},
 	}
 	err := http.ListenAndServe(":8998", service)
 	if err != nil {

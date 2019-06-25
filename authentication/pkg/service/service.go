@@ -146,14 +146,28 @@ func (b *basicAuthenticationService) AdminLogin(ctx context.Context, name string
 		return true, "", token
 	} else if has == true && admin.Password != password {
 		return false, "Password is incorrect", ""
-	} else {
-		return false, "No such an admin", ""
 	}
+	return false, "No such an admin", ""
 }
 
 func (b *basicAuthenticationService) EnterpriseLogin(ctx context.Context, name string, password string) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of EnterpriseLogin
-	return status, errinfo, data
+
+	enterprise := &model.Enterprise{
+		Name: name,
+	}
+
+	has, _ := b.Engine().Get(enterprise)
+	if has == true && enterprise.Password == password {
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0)
+		// 将token保存或者更新进数据库中
+		err := saveToken(b, token, name)
+		checkErr(err)
+		return true, "", token
+	} else if has == true && enterprise.Password != password {
+		return false, "Password is incorrect", ""
+	}
+	return false, "No such an enterprise", ""
 }
 
 // 登出
