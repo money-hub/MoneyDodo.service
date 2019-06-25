@@ -54,13 +54,10 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	page, offset, limit := 1, 0, -1
 	orderby := "+id"
 	var err error
-	var userId string
 	// 解析Queries
 	vals := r.URL.Query()
-	userIds, ok := vals["userId"]
-	if ok {
-		userId = userIds[0]
-	}
+	vars := mux.Vars(r)
+	userId := vars["userId"]
 	offsets, ok := vals["offset"]
 	if ok {
 		offset, err = strconv.Atoi(offsets[0])
@@ -88,7 +85,6 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	//解析路径中显示定义的参数
-	vars := mux.Vars(r)
 	chargeId := vars["chargeId"]
 	req := Request{
 		ChargeId: chargeId,
