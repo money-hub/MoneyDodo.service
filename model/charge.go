@@ -2,9 +2,9 @@ package model
 
 import "time"
 
-type Recharge struct {
+type Charge struct {
 	Id        string    `json:"id" xorm:"<-"`
 	UserId    string    `json:"userId" xorm:"userId"`
-	Amount    string    `json:"rechargeAmount" xorm:"rechargeAmount"`
+	Amount    float64   `json:"amount" xorm:"amount"`
 	Timestamp time.Time `json:"timestamp" xorm:"timestamp"`
 }

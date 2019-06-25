@@ -1,0 +1,779 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "This documentation describes example APIs found under https://github.com/money-hub/MoneyDodo.service",
+    "title": "money-hub MoneyDodo/charge",
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/charges": {
+      "get": {
+        "description": "Get all charges.",
+        "tags": [
+          "charge"
+        ],
+        "summary": "Get all charges.",
+        "operationId": "swaggGetAllReq",
+        "parameters": [
+          {
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggChargesResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a charge and the upload parameter needs to be model.Charge.",
+        "tags": [
+          "charge"
+        ],
+        "summary": "Create a charge.",
+        "operationId": "swaggPostReq",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Charge"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggChargeResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    },
+    "/api/charges/{chargeId}": {
+      "get": {
+        "description": "Get the specical charge and you need to specify and chargeId.",
+        "tags": [
+          "charge"
+        ],
+        "summary": "Get the specical charge of the user (with id=userId).",
+        "operationId": "swaggGetSpecReq",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id of charge",
+            "name": "chargeId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggChargeResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a charge and you need to specify and chargeId.",
+        "tags": [
+          "charge"
+        ],
+        "summary": "Delete a charge.",
+        "operationId": "swaggDeleteReq",
+        "parameters": [
+          {
+            "description": "id of charge",
+            "name": "chargeId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggNoReturnValue"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/charges": {
+      "get": {
+        "description": "Get all charges of user.",
+        "tags": [
+          "charge"
+        ],
+        "summary": "Get all charges of user.",
+        "operationId": "swaggGetAllOfUserReq",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "id of user",
+            "name": "userId",
+            "in": "path"
+          },
+          {
+            "type": "int",
+            "description": "page indicates the number of pages you want to get from server.",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "offset indicates the number of targets you want to skip.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "limit indicates the number of targets in one page you want to get from server.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "int",
+            "description": "orderby indicates the order of targets you want to get from server.",
+            "name": "orderby",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/swaggChargesResp"
+          },
+          "400": {
+            "$ref": "#/responses/swaggBadReq"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Charge": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Amount"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Timestamp"
+        },
+        "userId": {
+          "type": "string",
+          "x-go-name": "UserId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Comment": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "x-go-name": "Content"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "stargazers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Stargazers"
+        },
+        "stars": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Stars"
+        },
+        "taskId": {
+          "type": "string",
+          "x-go-name": "TaskId"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Timestamp"
+        },
+        "userId": {
+          "type": "string",
+          "x-go-name": "UserId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Qtnr": {
+      "type": "object",
+      "properties": {
+        "cutoff": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Cutoff"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
+        },
+        "pubdate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Pubdate"
+        },
+        "publisher": {
+          "type": "string",
+          "x-go-name": "Publisher"
+        },
+        "qtnr": {
+          "$ref": "#/definitions/Questionnaire"
+        },
+        "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
+          "type": "string",
+          "x-go-name": "Restrain"
+        },
+        "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Reward"
+        },
+        "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
+          "type": "string",
+          "x-go-name": "State"
+        },
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Questionnaire": {
+      "type": "object",
+      "properties": {
+        "mutipleChoice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mutipleChoice"
+          },
+          "x-go-name": "MutipleChoice"
+        },
+        "query": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/query"
+          },
+          "x-go-name": "Query"
+        },
+        "singleChoice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/singleChoice"
+          },
+          "x-go-name": "SingleChoice"
+        },
+        "taskId": {
+          "type": "string",
+          "x-go-name": "TaskId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "cutoff": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Cutoff"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "kind": {
+          "type": "string",
+          "x-go-name": "Kind"
+        },
+        "pubdate": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Pubdate"
+        },
+        "publisher": {
+          "type": "string",
+          "x-go-name": "Publisher"
+        },
+        "restrain": {
+          "description": "Recipient       string    `json:\"recipient\"`",
+          "type": "string",
+          "x-go-name": "Restrain"
+        },
+        "reward": {
+          "description": "Enddate         time.Time `json:\"enddate\"`",
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Reward"
+        },
+        "state": {
+          "description": "RecipientFinish bool      `json:\"recipientFinish\" xorm:\"recipientFinish\"`\nConfirmFinish   bool      `json:\"confirmFinish\" xorm:\"confirmFinish\"`",
+          "type": "string",
+          "x-go-name": "State"
+        },
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Balance"
+        },
+        "certificationStatus": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CertificationStatus"
+        },
+        "certifiedPic": {
+          "type": "string",
+          "x-go-name": "CertifiedPic"
+        },
+        "creditScore": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CreditScore"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "icon": {
+          "type": "string",
+          "x-go-name": "Icon"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "Id"
+        },
+        "introduction": {
+          "type": "string",
+          "x-go-name": "Introduction"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
+        },
+        "sId": {
+          "type": "string",
+          "x-go-name": "SId"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "mutipleChoice": {
+      "type": "object",
+      "properties": {
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Answers"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Choices"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "query": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    },
+    "singleChoice": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "x-go-name": "Answer"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Choices"
+        },
+        "question": {
+          "type": "string",
+          "x-go-name": "Question"
+        }
+      },
+      "x-go-package": "github.com/money-hub/MoneyDodo.service/model"
+    }
+  },
+  "responses": {
+    "swaggAuthOfAdminResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggAuthOfUserResp": {
+      "description": "HTTP status code 200 and token in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Token",
+            "type": "string",
+            "x-go-name": "Token"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggBadReq": {
+      "description": "Error Fail",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "HTTP Status Code 200",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggChargeResp": {
+      "description": "HTTP status code 200 and charge model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/Charge"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggChargesResp": {
+      "description": "HTTP status code 200 and charge models in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Charge models",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Charge"
+            },
+            "x-go-name": "Data"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggCommentResp": {
+      "description": "HTTP status code 200 and comment model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/Comment"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggCommentsResp": {
+      "description": "HTTP status code 200 and comment model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Comment model",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Comment"
+            },
+            "x-go-name": "Data"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggNoReturnValue": {
+      "description": "HTTP status code 200 and no return value",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "HTTP Status Code 200",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggTaskResp": {
+      "description": "HTTP status code 200 and task model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/Qtnr"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggTasksResp": {
+      "description": "HTTP status code 200 and an array of task models in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Tasks model",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Task"
+            },
+            "x-go-name": "Data"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggUserResp": {
+      "description": "HTTP status code 200 and user model in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/User"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    },
+    "swaggUsersResp": {
+      "description": "HTTP status code 200 and an array of user models in data",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "User model",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/User"
+            },
+            "x-go-name": "Data"
+          },
+          "errinfo": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Errinfo"
+          },
+          "status": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Status"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
