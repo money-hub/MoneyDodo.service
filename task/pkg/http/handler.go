@@ -27,11 +27,9 @@ func decodeGetTasksByIDRequest(_ context.Context, r *http1.Request) (interface{}
 	if !ok {
 		return nil, errors.New("not a valid userId")
 	}
-	states, ok := vals["state"]
-	if ok {
+	states, okk := vals["state"]
+	if okk {
 		state = states[0]
-	} else {
-		return nil, errors.New("not a valid state")
 	}
 	req := endpoint.GetTasksByIDRequest{
 		Id:    id,
