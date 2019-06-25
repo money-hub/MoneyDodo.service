@@ -32,7 +32,7 @@ func (l *LoggingMiddleware) GetAll(ctx context.Context, page, offset, limit int,
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetAll",
-			"input", fmt.Sprintf("%#v", Request{}),
+			"input", fmt.Sprintf("%#v", Request{Page: page, Offset: offset, Limit: limit, Orderby: orderby}),
 			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)
@@ -45,7 +45,7 @@ func (l *LoggingMiddleware) GetAllOfUser(ctx context.Context, userId string, pag
 	defer func(begin time.Time) {
 		l.Logger.Log(
 			"method", "GetAll",
-			"input", fmt.Sprintf("%#v", Request{}),
+			"input", fmt.Sprintf("%#v", Request{UserId: userId, Page: page, Offset: offset, Limit: limit, Orderby: orderby}),
 			"output", fmt.Sprintf("%#v", Response{status, errinfo, data}),
 			"took", time.Since(begin),
 		)

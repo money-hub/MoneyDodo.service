@@ -116,7 +116,7 @@ func (b *basicChargeService) GetSpec(ctx context.Context, chargeId string) (stat
 	if err != nil {
 		return false, err.Error(), nil
 	}
-	if charge.UserId != ctx.Value("id").(string) || ctx.Value("role") != 0 {
+	if charge.UserId != ctx.Value("id").(string) && ctx.Value("role") != 0 {
 		return false, "You can not query charges info of others.", nil
 	}
 	return true, "", charge
