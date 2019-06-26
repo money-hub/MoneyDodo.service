@@ -173,7 +173,9 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 0 {
 		return false, "Only the person making the comment, the task publisher, and the administrator can delete", ""
 	}
-	_, err = b.Engine().Where("id=?", item.Id).Delete(item)
+
+	comment := &model.Comment{}
+	_, err = b.Engine().Where("id=?", cid).Delete(comment)
 	if err != nil {
 		return false, err.Error(), ""
 	}
