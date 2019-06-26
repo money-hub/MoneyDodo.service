@@ -42,11 +42,11 @@ func (l loggingMiddleware) ChangeComment(ctx context.Context, taskId string, cId
 	}()
 	return l.next.ChangeComment(ctx, taskId, cId, comment)
 }
-func (l loggingMiddleware) DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string) {
+func (l loggingMiddleware) DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string) {
 	defer func() {
-		l.logger.Log("method", "DeleteComment", "taskId", taskId, "cId", cId, "comment", comment, "status", status, "errinfo", errinfo, "data", data)
+		l.logger.Log("method", "DeleteComment", "taskId", taskId, "cId", cId, "status", status, "errinfo", errinfo, "data", data)
 	}()
-	return l.next.DeleteComment(ctx, taskId, cId, comment)
+	return l.next.DeleteComment(ctx, taskId, cId)
 }
 func (l loggingMiddleware) LikeComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data *model.Comment) {
 	defer func() {

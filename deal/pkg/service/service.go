@@ -94,8 +94,14 @@ func (b *basicDealService) GetDealByState(ctx context.Context, state string) (st
 	// TODO implement the business logic of GetDealByState
 	deal := model.Deal{}
 	role := ctx.Value("role")
+	var rows *xorm.Rows
+	var err error
 	if role == 0 {
-		rows, err := b.Engine().Where("state = ?", state).Rows(deal)
+		if state != "" {
+			rows, err = b.Engine().Where("state = ?", state).Rows(deal)
+		} else {
+			rows, err = b.Engine().Rows(deal)
+		}
 		if err == nil {
 			for rows.Next() {
 				err1 := rows.Scan(&deal)

@@ -88,9 +88,8 @@ func MakeChangeCommentEndpoint(s service.CommentService) endpoint.Endpoint {
 
 // DeleteCommentRequest collects the request parameters for the DeleteComment method.
 type DeleteCommentRequest struct {
-	TaskId  string `json:"task_id"`
-	CId     string `json:"cid"`
-	Comment string `json:"comment"`
+	TaskId string `json:"task_id"`
+	CId    string `json:"cid"`
 }
 
 // DeleteCommentResponse collects the response parameters for the DeleteComment method.
@@ -104,7 +103,7 @@ type DeleteCommentResponse struct {
 func MakeDeleteCommentEndpoint(s service.CommentService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteCommentRequest)
-		status, errinfo, data := s.DeleteComment(ctx, req.TaskId, req.CId, req.Comment)
+		status, errinfo, data := s.DeleteComment(ctx, req.TaskId, req.CId)
 		return DeleteCommentResponse{
 			Data:    data,
 			Errinfo: errinfo,
@@ -203,11 +202,10 @@ func (e Endpoints) ChangeComment(ctx context.Context, taskId string, cId string,
 }
 
 // DeleteComment implements Service. Primarily useful in a client.
-func (e Endpoints) DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string) {
+func (e Endpoints) DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string) {
 	request := DeleteCommentRequest{
-		CId:     cId,
-		Comment: comment,
-		TaskId:  taskId,
+		CId:    cId,
+		TaskId: taskId,
 	}
 	response, err := e.DeleteCommentEndpoint(ctx, request)
 	if err != nil {
