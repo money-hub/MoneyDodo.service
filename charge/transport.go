@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/money-hub/MoneyDodo.service/model"
 )
 
 type Decodes struct {
@@ -100,17 +99,10 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	if r.Method == "POST" {
-		wrapper := model.Wrapper{}
-		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		err := json.NewDecoder(r.Body).Decode(&req.Charge)
 		if err != nil {
-			log.Println("The upload wrapper is not correct.")
+			log.Println(err)
 		}
-		c := model.Charge{}
-		err = json.Unmarshal(wrapper.Raw, &c)
-		if err != nil {
-			log.Println("task is not in the request Body.")
-		}
-		req.Charge = c
 	}
 	// fmt.Printf("%#v", req)
 	return req, nil
