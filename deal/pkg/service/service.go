@@ -26,7 +26,7 @@ type basicDealService struct {
 func (b *basicDealService) GetUserDealByState(ctx context.Context, id string, state string) (status bool, errinfo string, data []model.Deal) {
 	// TODO implement the business logic of GetUserDealByState
 	deal := model.Deal{}
-	role := ctx.Value("role").(int)
+	role := ctx.Value("role")
 	userID := ctx.Value("id").(string)
 	var rows *xorm.Rows
 	var err error
@@ -72,7 +72,7 @@ func (b *basicDealService) GetUserDealByState(ctx context.Context, id string, st
 func (b *basicDealService) GetDealByDID(ctx context.Context, id string) (status bool, errinfo string, data model.Deal) {
 	// TODO implement the business logic of GetDealByDID
 	deal := model.Deal{}
-	role := ctx.Value("role").(int)
+	role := ctx.Value("role")
 	userID := ctx.Value("id").(string)
 	if role == 0 {
 		status, err := b.Engine().Where("id = ?", id).Get(&deal)
@@ -93,9 +93,15 @@ func (b *basicDealService) GetDealByDID(ctx context.Context, id string) (status 
 func (b *basicDealService) GetDealByState(ctx context.Context, state string) (status bool, errinfo string, data []model.Deal) {
 	// TODO implement the business logic of GetDealByState
 	deal := model.Deal{}
-	role := ctx.Value("role").(int)
+	role := ctx.Value("role")
+	var rows *xorm.Rows
+	var err error
 	if role == 0 {
-		rows, err := b.Engine().Where("state = ?", state).Rows(deal)
+		if state != "" {
+			rows, err = b.Engine().Where("state = ?", state).Rows(deal)
+		} else {
+			rows, err = b.Engine().Rows(deal)
+		}
 		if err == nil {
 			for rows.Next() {
 				err1 := rows.Scan(&deal)
@@ -112,7 +118,7 @@ func (b *basicDealService) GetDealByState(ctx context.Context, state string) (st
 }
 func (b *basicDealService) PostAcceptDeal(ctx context.Context, deal model.Deal) (status bool, errinfo string, data model.Deal) {
 	// TODO implement the business logic of PostAcceptDeal
-	role := ctx.Value("role").(int)
+	role := ctx.Value("role")
 	if role == 1 {
 		_, err := b.Engine().Insert(deal)
 		if err == nil {
