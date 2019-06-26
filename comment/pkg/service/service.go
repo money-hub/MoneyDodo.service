@@ -151,10 +151,10 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	}
 	ok, err := b.Engine().Get(item)
 	if err != nil {
-		return false, err.Error(), "Delete comment failed"
+		return false, err.Error(), ""
 	}
 	if !ok {
-		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "No corresponding comment", ""
 	}
 
 	// 获取评论的发布者
@@ -163,22 +163,22 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	}
 	ok, err = b.Engine().Get(task)
 	if err != nil {
-		return false, err.Error(), "Delete comment failed"
+		return false, err.Error(), ""
 	}
 	if !ok {
-		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "No corresponding task publisher", ""
 	}
 
 	// 管理员和本人可以删除评论
-	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 2 {
-		return false, "Delete the comment failed, Deleting a comment failed, only the person making the comment, the task publisher, and the administrator can delete", "Delete the comment failed"
-	} else {
-		_, err := b.Engine().Delete(item)
-		if err != nil {
-			return false, err.Error(), "Delete the comment failed"
-		}
-		return true, "", ""
+	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 0 {
+		return false, "Only the person making the comment, the task publisher, and the administrator can delete", ""
 	}
+	_, err = b.Engine().Where("id=?", item.Id).Delete(item)
+	if err != nil {
+		return false, err.Error(), ""
+	}
+	return true, "", ""
+
 }
 
 // 点赞评论
