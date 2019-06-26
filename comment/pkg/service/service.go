@@ -25,7 +25,7 @@ type CommentService interface {
 	ChangeComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data *model.Comment)
 
 	// 删除某条评论
-	DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string)
+	DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string)
 
 	// 点赞某条评论
 	LikeComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data *model.Comment)
@@ -141,7 +141,7 @@ func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, 
 }
 
 // 删除评论
-func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string) {
+func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of DeleteComment
 
 	// 判断对应任务和评论是否存在

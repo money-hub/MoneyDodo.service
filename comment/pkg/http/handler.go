@@ -87,10 +87,11 @@ func decodePostCommentRequest(_ context.Context, r *http1.Request) (interface{},
 	if !ok {
 		return nil, errors.New("not a valid taskId")
 	}
-	req := endpoint.GetCommentRequest{
+	req := endpoint.PostCommentRequest{
 		TaskId: id,
 	}
-	return req, nil
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 // encodePostCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -135,14 +136,20 @@ func makeChangeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 // JSON-encoded request from the HTTP request body.
 func decodeChangeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["taskId"]
+	tid, ok := vars["taskId"]
 	if !ok {
 		return nil, errors.New("not a valid taskId")
 	}
-	req := endpoint.GetCommentRequest{
-		TaskId: id,
+	cid, ok := vars["cid"]
+	if !ok {
+		return nil, errors.New("not a valid cid")
 	}
-	return req, nil
+	req := endpoint.ChangeCommentRequest{
+		TaskId: tid,
+		CId:    cid,
+	}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 // encodeChangeCommentResponse is a transport/http.EncodeResponseFunc that encodes
@@ -182,12 +189,17 @@ func makeDeleteCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, optio
 // JSON-encoded request from the HTTP request body.
 func decodeDeleteCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["taskId"]
+	tid, ok := vars["taskId"]
 	if !ok {
 		return nil, errors.New("not a valid taskId")
 	}
-	req := endpoint.GetCommentRequest{
-		TaskId: id,
+	cid, ok := vars["cid"]
+	if !ok {
+		return nil, errors.New("not a valid cid")
+	}
+	req := endpoint.DeleteCommentRequest{
+		TaskId: tid,
+		CId:    cid,
 	}
 	return req, nil
 }
@@ -229,12 +241,17 @@ func makeLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, options
 // JSON-encoded request from the HTTP request body.
 func decodeLikeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["taskId"]
+	tid, ok := vars["taskId"]
 	if !ok {
 		return nil, errors.New("not a valid taskId")
 	}
-	req := endpoint.GetCommentRequest{
-		TaskId: id,
+	cid, ok := vars["cid"]
+	if !ok {
+		return nil, errors.New("not a valid cid")
+	}
+	req := endpoint.LikeCommentRequest{
+		TaskId: tid,
+		CId:    cid,
 	}
 	return req, nil
 }
@@ -276,12 +293,17 @@ func makeCancelLikeCommentHandler(m *mux.Router, endpoints endpoint.Endpoints, o
 // JSON-encoded request from the HTTP request body.
 func decodeCancelLikeCommentRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["taskId"]
+	tid, ok := vars["taskId"]
 	if !ok {
 		return nil, errors.New("not a valid taskId")
 	}
-	req := endpoint.GetCommentRequest{
-		TaskId: id,
+	cid, ok := vars["cid"]
+	if !ok {
+		return nil, errors.New("not a valid cid")
+	}
+	req := endpoint.CancelLikeCommentRequest{
+		TaskId: tid,
+		CId:    cid,
 	}
 	return req, nil
 }
