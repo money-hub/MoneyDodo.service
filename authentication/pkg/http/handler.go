@@ -130,8 +130,8 @@ func makeLogoutHandler(m *mux.Router, endpoints endpoint.Endpoints, options []ht
 // JSON-encoded request from the HTTP request body.
 func decodeLogoutRequest(ctx context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.LogoutRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	// err := json.NewDecoder(r.Body).Decode(&req)
+	return req, nil
 }
 
 // encodeLogoutResponse is a transport/http.EncodeResponseFunc that encodes
