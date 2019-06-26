@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/money-hub/MoneyDodo.service/model"
 )
 
 type Decodes struct {
@@ -99,7 +100,9 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	if r.Method == "POST" {
-		err := json.NewDecoder(r.Body).Decode(&req.Charge)
+		charge := model.Charge{}
+		err := json.NewDecoder(r.Body).Decode(&charge)
+		req.Charge = charge
 		if err != nil {
 			log.Println(err)
 		}
