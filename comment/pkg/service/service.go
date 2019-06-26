@@ -175,7 +175,7 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	}
 
 	comment := &model.Comment{}
-	_, err = b.Engine().Where("id=?", cid).Delete(comment)
+	_, err = b.Engine().Where("id=?", cId).Delete(comment)
 	if err != nil {
 		return false, err.Error(), ""
 	}
