@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/go-xorm/xorm"
 	"github.com/money-hub/MoneyDodo.service/db"
@@ -120,7 +121,31 @@ func (b *basicDealService) PostAcceptDeal(ctx context.Context, deal model.Deal) 
 	// TODO implement the business logic of PostAcceptDeal
 	role := ctx.Value("role")
 	if role == 1 {
-		_, err := b.Engine().Insert(deal)
+		task := model.Task{
+			Id: deal.TaskId,
+		}
+		dealTemp := model.Deal{}
+		//task info
+		//1. task's id is right
+		//2. task hasn't been accepted
+		//3. task's publisher is right
+		status, err := b.Engine().Where("taskId = ?", deal.TaskId).Get(&dealTemp)
+		if status != false {
+			return false, "Deal Error", data
+		}
+		status, err = b.Engine().Where("id = ?", deal.TaskId).Get(&task)
+		if status == false || err != nil {
+			return false, "Task Error", data
+		}
+		if task.Publisher != deal.Publisher {
+			return false, "Publisher Error", data
+		}
+		//deal info
+		//1. since time
+		//2. deal state
+		deal.Since = time.Now()
+		deal.State = "underway"
+		_, err = b.Engine().Insert(deal)
 		if err == nil {
 			return true, "", deal
 		}
