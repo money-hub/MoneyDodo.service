@@ -9,6 +9,6 @@ const (
 type Review struct {
 	Id     string `json:"id" xorm:"<-"`
 	TaskId string `json:"taskId" xorm:"taskId"`
-	UserId string `json:"userId" xorm:"userId"`
+	Name   string `json:"name" xorm:"name"`
 	State  string `json:"state" xorm:"state"`
 }
