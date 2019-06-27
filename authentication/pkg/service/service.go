@@ -159,7 +159,7 @@ func (b *basicAuthenticationService) EnterpriseLogin(ctx context.Context, name s
 
 	has, _ := b.Engine().Get(enterprise)
 	if has == true && enterprise.Password == password {
-		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 0)
+		token, _ := middleware.CreateToken([]byte(middleware.SecretKey), middleware.Issuer, name, 2)
 		// 将token保存或者更新进数据库中
 		err := saveToken(b, token, name)
 		checkErr(err)
@@ -176,7 +176,7 @@ func (b *basicAuthenticationService) Logout(ctx context.Context) (status bool, e
 	item := model.Token{
 		Id: ctx.Value("id").(string),
 	}
-	_, err := b.Engine().Delete(item)
+	_, err := b.Engine().Where("id=?", item.Id).Delete(item)
 	if err != nil {
 		checkErr(err)
 		return false, "Exit Unsuccessfully", ""

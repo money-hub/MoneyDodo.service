@@ -39,7 +39,7 @@ func (b *basicCertifyService) GetAuthInfo(ctx context.Context, id string) (statu
 			return true, "", user
 		}
 		return false, err.Error(), data
-	} else if role == 1 {
+	} else {
 		userID := ctx.Value("id").(string)
 		if userID == id {
 			user, err := getUserFromID(b, id)
@@ -55,7 +55,7 @@ func (b *basicCertifyService) GetAuthInfo(ctx context.Context, id string) (statu
 func (b *basicCertifyService) PostAuthInfo(ctx context.Context, id string, img string) (status bool, errinfo string, data model.User) {
 	// TODO implement the business logic of PostAuthInfo
 	role := ctx.Value("role").(int)
-	if role == 1 {
+	if role == 1 || role == 2 {
 		userID := ctx.Value("id").(string)
 		if userID == id {
 			user := model.User{

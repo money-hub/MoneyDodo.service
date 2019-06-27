@@ -70,8 +70,8 @@ func makeGetReviewsHandler(m *mux.Router, endpoints endpoint.Endpoints, options 
 // JSON-encoded request from the HTTP request body.
 func decodeGetReviewsRequest(_ context.Context, r *http1.Request) (interface{}, error) {
 	req := endpoint.GetReviewsRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	// err := json.NewDecoder(r.Body).Decode(&req)
+	return req, nil
 }
 
 // encodeGetReviewsResponse is a transport/http.EncodeResponseFunc that encodes
