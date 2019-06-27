@@ -25,7 +25,7 @@ type CommentService interface {
 	ChangeComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data *model.Comment)
 
 	// 删除某条评论
-	DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string)
+	DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string)
 
 	// 点赞某条评论
 	LikeComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data *model.Comment)
@@ -141,7 +141,7 @@ func (b *basicCommentService) ChangeComment(ctx context.Context, taskId string, 
 }
 
 // 删除评论
-func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, cId string, comment string) (status bool, errinfo string, data string) {
+func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, cId string) (status bool, errinfo string, data string) {
 	// TODO implement the business logic of DeleteComment
 
 	// 判断对应任务和评论是否存在
@@ -151,10 +151,10 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	}
 	ok, err := b.Engine().Get(item)
 	if err != nil {
-		return false, err.Error(), "Delete comment failed"
+		return false, err.Error(), ""
 	}
 	if !ok {
-		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "No corresponding comment", ""
 	}
 
 	// 获取评论的发布者
@@ -163,22 +163,24 @@ func (b *basicCommentService) DeleteComment(ctx context.Context, taskId string, 
 	}
 	ok, err = b.Engine().Get(task)
 	if err != nil {
-		return false, err.Error(), "Delete comment failed"
+		return false, err.Error(), ""
 	}
 	if !ok {
-		return false, "Delete the comment failed, no corresponding comment", "Delete comment failed"
+		return false, "No corresponding task publisher", ""
 	}
 
-	// 管理员和本人可以删除评论
-	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 2 {
-		return false, "Delete the comment failed, Deleting a comment failed, only the person making the comment, the task publisher, and the administrator can delete", "Delete the comment failed"
-	} else {
-		_, err := b.Engine().Delete(item)
-		if err != nil {
-			return false, err.Error(), "Delete the comment failed"
-		}
-		return true, "", ""
+	// 管理员、本人、任务发布者可以删除评论
+	if item.UserId != ctx.Value("id").(string) && task.Publisher != ctx.Value("id").(string) && ctx.Value("role").(int) != 0 {
+		return false, "Only the person making the comment, the task publisher, and the administrator can delete", ""
 	}
+
+	comment := &model.Comment{}
+	_, err = b.Engine().Where("id=?", cId).Delete(comment)
+	if err != nil {
+		return false, err.Error(), ""
+	}
+	return true, "", ""
+
 }
 
 // 点赞评论

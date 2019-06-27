@@ -100,17 +100,12 @@ func decodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	}
 
 	if r.Method == "POST" {
-		wrapper := model.Wrapper{}
-		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		charge := model.Charge{}
+		err := json.NewDecoder(r.Body).Decode(&charge)
+		req.Charge = charge
 		if err != nil {
-			log.Println("The upload wrapper is not correct.")
+			log.Println(err)
 		}
-		c := model.Charge{}
-		err = json.Unmarshal(wrapper.Raw, &c)
-		if err != nil {
-			log.Println("task is not in the request Body.")
-		}
-		req.Charge = c
 	}
 	// fmt.Printf("%#v", req)
 	return req, nil

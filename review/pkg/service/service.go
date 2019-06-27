@@ -41,6 +41,8 @@ func (b *basicReviewService) PostReview(ctx context.Context, review model.Review
 	}
 	return false, "This service only for enterprise", review
 }
+
+// 查看指定id审核结果
 func (b *basicReviewService) GetReview(ctx context.Context, rid string) (status bool, errinfo string, data model.Review) {
 	// TODO implement the business logic of GetReview
 	review := model.Review{Id: rid}
@@ -52,6 +54,8 @@ func (b *basicReviewService) GetReview(ctx context.Context, rid string) (status 
 	}
 	return false, "This service only for enterprise", review
 }
+
+// 查询所有审核结果
 func (b *basicReviewService) GetReviews(ctx context.Context) (status bool, errinfo string, data []model.Review) {
 	// TODO implement the business logic of GetReviews
 
@@ -76,6 +80,8 @@ func (b *basicReviewService) GetReviews(ctx context.Context) (status bool, errin
 	}
 	return false, "This service only for enterprise or admin", reviews
 }
+
+// 修改审核状态
 func (b *basicReviewService) PutReview(ctx context.Context, rid string, review model.Review) (status bool, errinfo string, data model.Review) {
 	// TODO implement the business logic of PutReview
 	if ctx.Value("role").(int) == 0 {
