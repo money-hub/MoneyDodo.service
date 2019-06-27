@@ -17,10 +17,76 @@ type DealService interface {
 	GetDealByDID(ctx context.Context, id string) (status bool, errinfo string, data model.Deal)
 	GetDealByState(ctx context.Context, state string) (status bool, errinfo string, data []model.Deal)
 	PostAcceptDeal(ctx context.Context, deal model.Deal) (status bool, errinfo string, data model.Deal)
+	PutDealState(ctx context.Context, deal model.Deal) (status bool, errinfo string, data *model.Deal)
 }
 
 type basicDealService struct {
 	*db.DBService
+}
+
+func (b *basicDealService) PutDealState(ctx context.Context, deal model.Deal) (status bool, errinfo string, data *model.Deal) {
+	var err error
+	d := &model.Deal{
+		Id: deal.Id,
+	}
+	sess := b.Engine().NewSession()
+	defer sess.Close()
+	if err = sess.Begin(); err != nil {
+		return false, err.Error(), nil
+	}
+	if _, err = sess.Get(d); err != nil {
+		sess.Rollback()
+		return false, err.Error(), nil
+	}
+	if ctx.Value("id").(string) == deal.Recipient {
+		if d.State == model.DealStateUnderway && deal.State == model.DealStateRecConfirm {
+			if _, err = sess.Where("id=?", deal.Id).Cols("state").Update(deal); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+		}
+	} else if ctx.Value("id").(string) == deal.Publisher {
+		if d.State == model.DealStateUnderway && deal.State == model.DealStateRecConfirm {
+			if _, err = sess.Where("id=?", deal.Id).Cols("state").Update(deal); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+			// 更新两个用户的余额
+			publisher := &model.User{
+				Id: d.Publisher,
+			}
+			if _, err = sess.Get(publisher); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+			recipient := &model.User{
+				Id: d.Recipient,
+			}
+			if _, err = sess.Get(recipient); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+			publisher.Balance = publisher.Balance + d.Reward
+			recipient.Balance = recipient.Balance + d.Reward
+			if _, err = sess.Where("id=?", publisher.Id).Cols("balance").Update(publisher); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+			if _, err = sess.Where("id=?", recipient.Id).Cols("balance").Update(recipient); err != nil {
+				sess.Rollback()
+				return false, err.Error(), nil
+			}
+		}
+	} else {
+		sess.Rollback()
+		return false, err.Error(), nil
+	}
+	err = sess.Commit()
+	if err != nil {
+		return false, err.Error(), nil
+	}
+	d.State = deal.State
+	return true, "", d
 }
 
 func (b *basicDealService) GetUserDealByState(ctx context.Context, id string, state string) (status bool, errinfo string, data []model.Deal) {

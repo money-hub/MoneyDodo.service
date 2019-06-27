@@ -14,6 +14,7 @@ type Endpoints struct {
 	GetDealByDIDEndpoint       endpoint.Endpoint
 	GetDealByStateEndpoint     endpoint.Endpoint
 	PostAcceptDealEndpoint     endpoint.Endpoint
+	PutDealStateEndpoint       endpoint.Endpoint
 }
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
@@ -24,6 +25,7 @@ func New(s service.DealService, mdw map[string][]endpoint.Middleware) Endpoints 
 		GetDealByStateEndpoint:     MakeGetDealByStateEndpoint(s),
 		GetUserDealByStateEndpoint: MakeGetUserDealByStateEndpoint(s),
 		PostAcceptDealEndpoint:     MakePostAcceptDealEndpoint(s),
+		PutDealStateEndpoint:       MakePutDealStateEndpoint(s),
 	}
 	for _, m := range mdw["GetUserDealByState"] {
 		eps.GetUserDealByStateEndpoint = m(eps.GetUserDealByStateEndpoint)
@@ -36,6 +38,9 @@ func New(s service.DealService, mdw map[string][]endpoint.Middleware) Endpoints 
 	}
 	for _, m := range mdw["PostAcceptDeal"] {
 		eps.PostAcceptDealEndpoint = m(eps.PostAcceptDealEndpoint)
+	}
+	for _, m := range mdw["PutDealState"] {
+		eps.PutDealStateEndpoint = m(eps.PutDealStateEndpoint)
 	}
 	return eps
 }

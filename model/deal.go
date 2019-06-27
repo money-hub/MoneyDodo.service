@@ -3,8 +3,9 @@ package model
 import "time"
 
 const (
-	DealStateUnderway = "underway"
-	DealStateClosure  = "closure"
+	DealStateUnderway   = "underway"
+	DealStateRecConfirm = "recConfirm"
+	DealStatePubConfirm = "pubConfirm"
 )
 
 type Deal struct {

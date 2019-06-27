@@ -24,6 +24,7 @@ func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[stri
 		"GetDealByState":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetDealByState", logger))},
 		"GetUserDealByState": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetUserDealByState", logger))},
 		"PostAcceptDeal":     {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PostAcceptDeal", logger))},
+		"PutDealState":       {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "PutDealState", logger))},
 	}
 	return options
 }
@@ -32,12 +33,13 @@ func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summar
 	mw["GetDealByDID"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetDealByDID")), endpoint.InstrumentingMiddleware(duration.With("method", "GetDealByDID"))}
 	mw["GetDealByState"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetDealByState")), endpoint.InstrumentingMiddleware(duration.With("method", "GetDealByState"))}
 	mw["PostAcceptDeal"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "PostAcceptDeal")), endpoint.InstrumentingMiddleware(duration.With("method", "PostAcceptDeal"))}
+	mw["PutDealState"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "PutDealState")), endpoint.InstrumentingMiddleware(duration.With("method", "PutDealState"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"GetUserDealByState", "GetDealByDID", "GetDealByState", "PostAcceptDeal"}
+	methods := []string{"GetUserDealByState", "GetDealByDID", "GetDealByState", "PostAcceptDeal", "PutDealState"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}

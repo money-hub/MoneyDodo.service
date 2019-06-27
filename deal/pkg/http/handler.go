@@ -121,3 +121,24 @@ func encodePostAcceptDealResponse(ctx context.Context, w http1.ResponseWriter, r
 	err = json.NewEncoder(w).Encode(response)
 	return
 }
+
+// makePutDealStateHandler creates the handler logic
+func makePutDealStateHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	m.Methods("Put").Path("/api/deals/{dId:[0-9]+}").Handler(handlers.CORS(handlers.AllowedMethods([]string{"Put"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.PutDealStateEndpoint, decodePutDealStateRequest, encodePutDealStateResponse, options...)))
+}
+
+// decodePutDealStateRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodePutDealStateRequest(_ context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.PutDealStateRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodePutDealStateResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodePutDealStateResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}

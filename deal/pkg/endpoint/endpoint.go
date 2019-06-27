@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	service "github.com/money-hub/MoneyDodo.service/deal/pkg/service"
 	model "github.com/money-hub/MoneyDodo.service/model"
@@ -108,6 +109,31 @@ func MakePostAcceptDealEndpoint(s service.DealService) endpoint.Endpoint {
 	}
 }
 
+// PutDealStateRequest collects the request parameters for the PutDealState method.
+type PutDealStateRequest struct {
+	Deal model.Deal `json:"deal"`
+}
+
+// PutDealStateResponse collects the response parameters for the PutDealState method.
+type PutDealStateResponse struct {
+	Status  bool        `json:"status"`
+	Errinfo string      `json:"errinfo"`
+	Data    *model.Deal `json:"data"`
+}
+
+// MakePutDealStateEndpoint returns an endpoint that invokes PutDealState on the service.
+func MakePutDealStateEndpoint(s service.DealService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(PutDealStateRequest)
+		status, errinfo, data := s.PutDealState(ctx, req.Deal)
+		return PutDealStateResponse{
+			Data:    data,
+			Errinfo: errinfo,
+			Status:  status,
+		}, nil
+	}
+}
+
 // GetUserDealByState implements Service. Primarily useful in a client.
 func (e Endpoints) GetUserDealByState(ctx context.Context, id string, state string) (status bool, errinfo string, data []model.Deal) {
 	request := GetUserDealByStateRequest{
@@ -149,4 +175,14 @@ func (e Endpoints) PostAcceptDeal(ctx context.Context, deal model.Deal) (status 
 		return
 	}
 	return response.(PostAcceptDealResponse).Status, response.(PostAcceptDealResponse).Errinfo, response.(PostAcceptDealResponse).Data
+}
+
+// PutDealState implements Service. Primarily useful in a client.
+func (e Endpoints) PutDealState(ctx context.Context, deal model.Deal) (status bool, errinfo string, data *model.Deal) {
+	request := PutDealStateRequest{Deal: deal}
+	response, err := e.PutDealStateEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(PutDealStateResponse).Status, response.(PutDealStateResponse).Errinfo, response.(PutDealStateResponse).Data
 }

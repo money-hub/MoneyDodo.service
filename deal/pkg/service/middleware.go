@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	log "github.com/go-kit/kit/log"
 	model "github.com/money-hub/MoneyDodo.service/model"
 )
@@ -22,7 +23,12 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 	}
 
 }
-
+func (l loggingMiddleware) PutDealState(ctx context.Context, deal model.Deal) (status bool, errinfo string, data *model.Deal) {
+	defer func() {
+		l.logger.Log("method", "PutDealState", "deal", deal, "status", status, "errinfo", errinfo, "data", data)
+	}()
+	return l.next.PutDealState(ctx, deal)
+}
 func (l loggingMiddleware) GetUserDealByState(ctx context.Context, id string, state string) (status bool, errinfo string, data []model.Deal) {
 	defer func() {
 		l.logger.Log("method", "GetUserDealByState", "id", id, "state", state, "status", status, "errinfo", errinfo, "data", data)

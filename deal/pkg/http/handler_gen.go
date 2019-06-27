@@ -19,5 +19,6 @@ func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.Serv
 	makeGetDealByDIDHandler(m, endpoints, options["GetDealByDID"])
 	makeGetDealByStateHandler(m, endpoints, options["GetDealByState"])
 	makePostAcceptDealHandler(m, endpoints, options["PostAcceptDeal"])
+	makePutDealStateHandler(m, endpoints, options["PutDealState"])
 	return m
 }
