@@ -48,7 +48,7 @@ func (b *basicDealService) GetUserDealByState(ctx context.Context, id string, st
 			return true, "", data
 		}
 		return false, err.Error(), data
-	} else if role == 1 {
+	} else {
 		if userID == id {
 			if state == "" {
 				rows, err = b.Engine().Where("publisher = ? or recipient = ?", id, id).Rows(deal)
@@ -81,7 +81,7 @@ func (b *basicDealService) GetDealByDID(ctx context.Context, id string) (status 
 			return false, "Get Failed", data
 		}
 		return true, "", deal
-	} else if role == 1 {
+	} else {
 		status, err := b.Engine().Where("(publisher = ? or recipient = ?) and id = ?", userID, userID, id).Get(&deal)
 		if status == false {
 			return false, "Get Failed", data
@@ -120,7 +120,7 @@ func (b *basicDealService) GetDealByState(ctx context.Context, state string) (st
 func (b *basicDealService) PostAcceptDeal(ctx context.Context, deal model.Deal) (status bool, errinfo string, data model.Deal) {
 	// TODO implement the business logic of PostAcceptDeal
 	role := ctx.Value("role")
-	if role == 1 {
+	if role == 1 || role == 2 {
 		task := model.Task{
 			Id: deal.TaskId,
 		}

@@ -38,7 +38,7 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 		}
 		return false, err.Error(), data
 	} else if state == "" {
-		if role == 1 {
+		if role == 1 || role == 2 {
 			if userID == id {
 				rows, err := b.Engine().Where("publisher = ?", id).Rows(task)
 				if err == nil {
@@ -53,7 +53,7 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 				}
 				return false, err.Error(), data
 			}
-		} else if role == 0 {
+		} else {
 			rows, err := b.Engine().Where("publisher = ?", id).Rows(task)
 			if err == nil {
 				for rows.Next() {
@@ -68,7 +68,7 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 			return false, err.Error(), data
 		}
 	} else {
-		if role == 1 {
+		if role == 1 || role == 2 {
 			if userID == id {
 				rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
 				if err == nil {
@@ -83,7 +83,7 @@ func (b *basicTaskService) GetTasksByID(ctx context.Context, id string, state st
 				}
 				return false, err.Error(), data
 			}
-		} else if role == 0 {
+		} else {
 			rows, err := b.Engine().Where("publisher = ? and state = ?", id, state).Rows(task)
 			if err == nil {
 				for rows.Next() {
